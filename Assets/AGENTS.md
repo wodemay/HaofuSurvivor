@@ -33,9 +33,10 @@ No commit history exists yet. Use imperative, scoped messages such as `feat(ui):
 - Project type: Unity 2D survivor game; current gameplay code is in `Scripts/Game/`, UI code in `Scripts/UI/`, and the primary scene is `Scenes/SampleScene.unity`.
 - Framework decision (2026-07-30): QFramework is the mandatory core architecture for all new and refactored business logic. Enforce Controller -> Command -> System -> Model/Utility dependencies; use Query for reads and typed Event for notifications.
 - Existing examples: `Player` controls movement and opens `UIGameOverPanel` when its hurt box is triggered. `*.Designer.cs` files contain generated UI bindings.
-- Validation baseline: no committed automated tests, build scripts, or Git commits exist.
+- Validation baseline: no committed automated tests or build scripts exist. The Git repository uses `main` and has an initial project commit.
 
 ### Change Log
 
 - 2026-07-30 | Added this contributor guide and durable project-context policy. Verified the Assets layout, QFramework installation, gameplay/UI scripts, scenes, and empty Git history.
 - 2026-07-30 | Added root `.gitignore` for Unity-generated files, IDE files, and the QFramework package cache. Git remote: `https://github.com/wodemay/HaofuSurvivor.git`; the initial project submission is on `main` and excludes local generated content.
+- 2026-07-30 | Created initial project commit `ba5dc5e` (2,392 files). Integrated the remote repository's initial `LICENSE` and `README.md` with merge commit `c813a91`; no conflicts occurred. A push to `origin/main` failed because this environment could not connect to `github.com:443`; retry `git push -u origin main` after network access is restored.
