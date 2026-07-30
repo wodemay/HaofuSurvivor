@@ -1,0 +1,19 @@
+# Unity generated files
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]serSettings/
+
+# IDE-generated files
+.vs/
+.vsconfig
+*.csproj
+*.sln
+*.user
+*.userprefs
+
+# QFramework local cache
+Assets/.qframework/PackageManager/PackageInfosRequestCache.json
