@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e8a7d1cf62548b28daa4123adf567f0, type: 3}
+  m_Name: Character_Vanguard
+  m_EditorClassIdentifier: 
+  Id: 2
+  DisplayName: "\u5148\u950B"
+  SkillDescription: "\u575A\u97E7\uFF1A\u66F4\u9AD8\u751F\u547D\u4E0E\u653B\u51FB\u529B\u3002"
+  SkillId: 0
+  Icon: {fileID: 10917, guid: 0000000000000000f000000000000000, type: 0}
+  PlayerPrefab: {fileID: 7151673315206538592, guid: 41b22cb75f68c984d886bbdbadbb758d, type: 3}
+  SortOrder: 1
+  MaxHealth: 140
+  MoveSpeed: 4.25
+  AttackPower: 12
