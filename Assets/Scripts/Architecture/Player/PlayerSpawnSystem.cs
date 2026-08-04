@@ -46,6 +46,10 @@ namespace HaoFuSurvivor
 
 		private static void EnsurePlayerComponents(GameObject playerObject)
 		{
+			var combatEntity = playerObject.GetComponent<CombatEntity>();
+			if (combatEntity == null) combatEntity = playerObject.AddComponent<CombatEntity>();
+			combatEntity.Initialize(CombatFaction.Player);
+
 			var rigidbody = playerObject.GetComponent<Rigidbody2D>();
 			if (rigidbody == null) rigidbody = playerObject.AddComponent<Rigidbody2D>();
 			rigidbody.bodyType = RigidbodyType2D.Kinematic;

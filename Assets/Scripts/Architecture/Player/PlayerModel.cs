@@ -8,6 +8,7 @@ namespace HaoFuSurvivor
 		public bool IsDead { get; internal set; }
 		public int CharacterId { get; internal set; }
 		public float CurrentHealth { get; internal set; }
+		public float DamageInvulnerabilityRemaining { get; internal set; }
 		public Vector2 Position { get; internal set; }
 
 		protected override void OnInit()
@@ -16,6 +17,7 @@ namespace HaoFuSurvivor
 			IsDead = false;
 			CharacterId = -1;
 			CurrentHealth = 0f;
+			DamageInvulnerabilityRemaining = 0f;
 			Position = Vector2.zero;
 		}
 	}

@@ -19,7 +19,8 @@ namespace HaoFuSurvivor
 		{
 			GameArchitecture.Interface.SendCommand(new TickRunTimerCommand(Time.deltaTime));
 			GameArchitecture.Interface.SendCommand(new TickEnemiesCommand(Time.deltaTime));
-			GameArchitecture.Interface.SendCommand(new TickEnemyAttacksCommand(Time.deltaTime));
+			GameArchitecture.Interface.SendCommand(new TickAttacksCommand(Time.deltaTime));
+			GameArchitecture.Interface.SendCommand(new TickPlayerDamageInvulnerabilityCommand(Time.deltaTime));
 		}
 
 		private void OpenGameHud()

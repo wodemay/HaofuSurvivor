@@ -9,10 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 30ad9a1b007d4525a59fe03ef9e22c45, type: 3}
-  m_Name: EnemyAttack_Contact
+  m_Script: {fileID: 11500000, guid: cf9105407af64c6b92ed47fd559fd786, type: 3}
+  m_Name: AttackCatalog
   m_EditorClassIdentifier: 
-  Id: 1001
-  AttackType: 0
-  Damage: 10
-  Cooldown: 1
+  Attacks:
+  - {fileID: 11400000, guid: 5f70154a4f0d4989b7afb3ae8d0a4088, type: 2}

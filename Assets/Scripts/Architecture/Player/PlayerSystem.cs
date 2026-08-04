@@ -16,7 +16,9 @@ namespace HaoFuSurvivor
 			playerModel.CharacterId = character.Id;
 			playerModel.Position = initialPosition;
 			playerModel.CurrentHealth = statModel.MaxHealth;
+			playerModel.DamageInvulnerabilityRemaining = 0f;
 			playerModel.IsDead = false;
+			playerModel.DamageInvulnerabilityRemaining = 0f;
 			playerModel.IsRegistered = true;
 		}
 
@@ -41,9 +43,10 @@ namespace HaoFuSurvivor
 		public void ApplyDamage(float damage)
 		{
 			var playerModel = this.GetModel<PlayerModel>();
-			if (!playerModel.IsRegistered || playerModel.IsDead || damage <= 0f) return;
+			if (!playerModel.IsRegistered || playerModel.IsDead || damage <= 0f || playerModel.DamageInvulnerabilityRemaining > 0f) return;
 
 			playerModel.CurrentHealth = Mathf.Max(0f, playerModel.CurrentHealth - damage);
+			playerModel.DamageInvulnerabilityRemaining = this.GetModel<PlayerStatModel>().DamageInvulnerabilityDuration;
 			this.SendEvent(new PlayerDamagedEvent(damage, playerModel.CurrentHealth));
 
 			if (playerModel.CurrentHealth > 0f) return;
@@ -51,6 +54,13 @@ namespace HaoFuSurvivor
 			playerModel.IsDead = true;
 			this.SendEvent(new PlayerDiedEvent());
 			this.GetSystem<RunSystem>().EndWithDefeat();
+		}
+
+		public void AdvanceDamageInvulnerability(float deltaTime)
+		{
+			if (deltaTime <= 0f) return;
+			var playerModel = this.GetModel<PlayerModel>();
+			playerModel.DamageInvulnerabilityRemaining = Mathf.Max(0f, playerModel.DamageInvulnerabilityRemaining - deltaTime);
 		}
 
 		protected override void OnInit()

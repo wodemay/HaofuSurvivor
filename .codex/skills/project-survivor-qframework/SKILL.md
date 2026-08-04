@@ -21,7 +21,7 @@ Implement this Unity project through QFramework. Read `Assets/AGENTS.md` before 
 - Treat `CharacterConfig.PlayerPrefab` and `EnemyConfig.Prefab` as visual/content prefabs, not runtime roots.
 - Spawn the player through `PlayerRootConfig`: root `PlayerRoot` owns movement/camera; selected content goes under `CharacterRoot`; health canvas goes under `HealthBarAnchor`.
 - Spawn enemies through `EnemyRootConfig`: root `EnemyRoot` owns runtime behavior; selected content goes under `CharacterRoot`; roots are parented under scene `EnemyContainer` and reused by `EnemyFactory` pools keyed by enemy ID.
-- Configure enemy attacks through `EnemyConfig.AttackIds` and `EnemyAttackCatalog`. The implemented contact attack uses ID 1001; its trigger bridge sends Commands, while EnemyAttackSystem owns cooldown and applies run-scaled damage through DamageSystem. Keep projectile and special attack work as new attack executors.
+- Configure all actor attacks through integer attack IDs and `AttackCatalog` in `Resources/Configs/Combat/`. `AttackConfig.ExecutorId` selects a registered executor; never add an attack-type enum or central type branch. The implemented contact attack uses ID 1001 and executor ID `contact`.
 
 ## Workflow
 
@@ -37,4 +37,5 @@ Implement this Unity project through QFramework. Read `Assets/AGENTS.md` before 
 - Run time is elapsed time. `RunTimelineConfig` emits typed stages and holds enemy/spawn multipliers plus stage enemy IDs.
 - Character selection persists the numeric selected ID before `StartSelectedCharacterRunCommand` spawns the player and starts the run.
 - `EnemySystem` ticks only while the run is active and player is registered; resetting the run releases active roots back to their per-ID pool.
-- `EnemyContactAttack` relies on PlayerRoot/HurtBox trigger overlap. EnemyRoot receives a runtime Kinematic Rigidbody2D from EnemyFactory so its pooled root can participate in this callback.
+- `ContactAttackTrigger` registers an AttackRuntime and uses generic CombatEntity faction overlap. EnemyRoot and PlayerRoot receive CombatEntity at runtime; EnemyRoot also receives a Kinematic Rigidbody2D for trigger callbacks. Player attack selection/input remains unimplemented, but it will use the same AttackSystem and executors.
+- Player damage invulnerability is modeled as `PlayerStatModel.DamageInvulnerabilityDuration` and `PlayerModel.DamageInvulnerabilityRemaining`. The default duration is `0`; future upgrades may raise it, but should keep it short.

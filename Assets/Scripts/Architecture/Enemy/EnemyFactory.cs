@@ -63,6 +63,10 @@ namespace HaoFuSurvivor
 
 		private static void ConfigureRoot(GameObject enemyRoot, EnemyConfig config)
 		{
+			var combatEntity = enemyRoot.GetComponent<CombatEntity>();
+			if (combatEntity == null) combatEntity = enemyRoot.AddComponent<CombatEntity>();
+			combatEntity.Initialize(CombatFaction.Enemy);
+
 			var rigidbody = enemyRoot.GetComponent<Rigidbody2D>();
 			if (rigidbody == null) rigidbody = enemyRoot.AddComponent<Rigidbody2D>();
 			rigidbody.bodyType = RigidbodyType2D.Kinematic;
@@ -70,12 +74,9 @@ namespace HaoFuSurvivor
 
 			foreach (var attackId in config.AttackIds)
 			{
-				var attack = GameArchitecture.Interface.GetUtility<EnemyAttackCatalog>().Get(attackId);
-				if (attack == null || attack.AttackType != EnemyAttackType.Contact) continue;
-				var contactAttack = enemyRoot.GetComponent<EnemyContactAttack>();
-				if (contactAttack == null) contactAttack = enemyRoot.AddComponent<EnemyContactAttack>();
-				contactAttack.Initialize(attackId);
-				break;
+				var attack = GameArchitecture.Interface.GetUtility<AttackCatalog>().Get(attackId);
+				var executor = attack == null ? null : GameArchitecture.Interface.GetUtility<AttackExecutorRegistry>().Get(attack.ExecutorId);
+				executor?.ConfigureOwner(enemyRoot, attack, CombatFaction.Enemy);
 			}
 		}
 
