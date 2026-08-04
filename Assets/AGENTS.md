@@ -99,3 +99,4 @@ No commit history exists yet. Use imperative, scoped messages such as `feat(ui):
 - 2026-08-04 | Added repository-local Codex skill `.codex/skills/project-survivor-qframework`. It captures the QFramework boundaries, user-owned UI workflow, root-prefab/configuration contracts, enemy pooling, validation, Git, and AGENTS handoff requirements for future sessions.
 - 2026-08-04 | Prepared the validated repository-local ProjectSurvivor Codex skill and its durable-context update for local Git commit.
 - 2026-08-04 | Local skill commit `3a70dd1` was not included in the preceding GitHub push; the branch is now being pushed so `.codex/skills/project-survivor-qframework` becomes available remotely.
+- 2026-08-04 | GitHub push succeeded through `e6d0251`; the repository now contains `.codex/skills/project-survivor-qframework`.
