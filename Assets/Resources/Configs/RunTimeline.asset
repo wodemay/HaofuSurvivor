@@ -13,32 +13,50 @@ MonoBehaviour:
   m_Name: RunTimeline
   m_EditorClassIdentifier: 
   Stages:
+  - TimeSeconds: 0
+    EventId: 1000
+    EnemyIds:
+    - 1
+    EnemyHealthMultiplier: 1
+    EnemyDamageMultiplier: 1
+    EnemyMoveSpeedMultiplier: 1
+    SpawnRateMultiplier: 1
   - TimeSeconds: 120
     EventId: 1001
+    EnemyIds:
+    - 1
     EnemyHealthMultiplier: 1.15
     EnemyDamageMultiplier: 1.1
     EnemyMoveSpeedMultiplier: 1.05
     SpawnRateMultiplier: 1.1
   - TimeSeconds: 300
     EventId: 1002
+    EnemyIds:
+    - 1
     EnemyHealthMultiplier: 1.4
     EnemyDamageMultiplier: 1.25
     EnemyMoveSpeedMultiplier: 1.1
     SpawnRateMultiplier: 1.3
   - TimeSeconds: 600
     EventId: 1003
+    EnemyIds:
+    - 1
     EnemyHealthMultiplier: 1.9
     EnemyDamageMultiplier: 1.5
     EnemyMoveSpeedMultiplier: 1.2
     SpawnRateMultiplier: 1.6
   - TimeSeconds: 900
     EventId: 1004
+    EnemyIds:
+    - 1
     EnemyHealthMultiplier: 2.5
     EnemyDamageMultiplier: 1.9
     EnemyMoveSpeedMultiplier: 1.3
     SpawnRateMultiplier: 2
   - TimeSeconds: 1100
     EventId: 1005
+    EnemyIds:
+    - 1
     EnemyHealthMultiplier: 3.2
     EnemyDamageMultiplier: 2.4
     EnemyMoveSpeedMultiplier: 1.4

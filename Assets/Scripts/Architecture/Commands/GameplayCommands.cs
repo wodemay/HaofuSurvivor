@@ -37,6 +37,21 @@ namespace HaoFuSurvivor
 		}
 	}
 
+	public class TickEnemiesCommand : AbstractCommand
+	{
+		private readonly float mDeltaTime;
+
+		public TickEnemiesCommand(float deltaTime)
+		{
+			mDeltaTime = deltaTime;
+		}
+
+		protected override void OnExecute()
+		{
+			this.GetSystem<EnemySystem>().Tick(mDeltaTime);
+		}
+	}
+
 	public class RegisterPlayerCommand : AbstractCommand
 	{
 		private readonly Vector2 mInitialPosition;

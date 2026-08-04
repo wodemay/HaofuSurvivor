@@ -11,6 +11,7 @@ namespace HaoFuSurvivor
 
 			runModel.Phase = RunPhase.Active;
 			this.GetSystem<RunTimerSystem>().StartTimer();
+			this.GetSystem<EnemySystem>().Reset();
 			this.SendEvent(new RunStartedEvent());
 		}
 

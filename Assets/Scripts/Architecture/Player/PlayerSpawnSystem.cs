@@ -5,28 +5,52 @@ namespace HaoFuSurvivor
 {
 	public class PlayerSpawnSystem : AbstractSystem
 	{
+		private const string PlayerRootConfigPath = "Configs/PlayerRoot";
+		private const string CharacterRootName = "CharacterRoot";
+		private const string HealthBarAnchorName = "HealthBarAnchor";
+
 		public bool SpawnSelectedCharacter()
 		{
 			if (this.GetModel<PlayerModel>().IsRegistered) return true;
 
 			var selectedCharacterId = this.GetModel<CharacterSelectionModel>().SelectedCharacterId;
 			var character = this.GetUtility<CharacterCatalog>().Get(selectedCharacterId);
-			if (character == null || character.PlayerPrefab == null)
+			var rootConfig = Resources.Load<PlayerRootConfig>(PlayerRootConfigPath);
+			if (character == null || character.PlayerPrefab == null || rootConfig == null || rootConfig.PlayerPrefab == null)
 			{
-				Debug.LogError($"Character '{selectedCharacterId}' has no PlayerPrefab assigned.");
+				Debug.LogError("Player spawn requires a selected character and Resources/Configs/PlayerRoot configuration.");
 				return false;
 			}
 
-			var playerObject = Object.Instantiate(character.PlayerPrefab, Vector3.zero, Quaternion.identity);
-			if (playerObject.GetComponent<PlayerController>() != null)
+			var playerObject = Object.Instantiate(rootConfig.PlayerPrefab, Vector3.zero, Quaternion.identity);
+			var characterRoot = playerObject.transform.Find(CharacterRootName);
+			var healthBarAnchor = playerObject.transform.Find(HealthBarAnchorName);
+			if (characterRoot == null || healthBarAnchor == null)
 			{
-				BindCamera(playerObject.transform);
-				return true;
+				Object.Destroy(playerObject);
+				Debug.LogError("Player root requires CharacterRoot and HealthBarAnchor children.");
+				return false;
 			}
 
-			Object.Destroy(playerObject);
-			Debug.LogError($"Character '{selectedCharacterId}' PlayerPrefab requires PlayerController.");
-			return false;
+			EnsurePlayerComponents(playerObject);
+			Object.Instantiate(character.PlayerPrefab, characterRoot);
+			if (rootConfig.HealthBarPrefab != null)
+			{
+				var healthBar = Object.Instantiate(rootConfig.HealthBarPrefab, healthBarAnchor);
+				if (healthBar.GetComponent<PlayerHealthBarView>() == null) healthBar.AddComponent<PlayerHealthBarView>();
+			}
+
+			BindCamera(playerObject.transform);
+			return true;
+		}
+
+		private static void EnsurePlayerComponents(GameObject playerObject)
+		{
+			var rigidbody = playerObject.GetComponent<Rigidbody2D>();
+			if (rigidbody == null) rigidbody = playerObject.AddComponent<Rigidbody2D>();
+			rigidbody.bodyType = RigidbodyType2D.Kinematic;
+			rigidbody.gravityScale = 0f;
+			if (playerObject.GetComponent<PlayerController>() == null) playerObject.AddComponent<PlayerController>();
 		}
 
 		private static void BindCamera(Transform playerTransform)
