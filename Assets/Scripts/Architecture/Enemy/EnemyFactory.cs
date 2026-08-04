@@ -33,6 +33,7 @@ namespace HaoFuSurvivor
 					pooledRoot.transform.SetParent(GetContainer(), false);
 					pooledRoot.transform.SetPositionAndRotation(position, Quaternion.identity);
 					pooledRoot.SetActive(true);
+					ConfigureRoot(pooledRoot, config);
 					return pooledRoot.transform;
 				}
 
@@ -46,6 +47,7 @@ namespace HaoFuSurvivor
 				}
 
 				if (config.Prefab != null) Instantiate(config.Prefab, characterRoot);
+				ConfigureRoot(enemyRoot, config);
 				mEnemyIds.Add(enemyRoot, config.Id);
 				return enemyRoot.transform;
 			}
@@ -57,6 +59,24 @@ namespace HaoFuSurvivor
 			renderer.color = new Color(0.8f, 0.12f, 0.16f);
 			enemy.transform.localScale = Vector3.one * 0.55f;
 			return enemy.transform;
+		}
+
+		private static void ConfigureRoot(GameObject enemyRoot, EnemyConfig config)
+		{
+			var rigidbody = enemyRoot.GetComponent<Rigidbody2D>();
+			if (rigidbody == null) rigidbody = enemyRoot.AddComponent<Rigidbody2D>();
+			rigidbody.bodyType = RigidbodyType2D.Kinematic;
+			rigidbody.gravityScale = 0f;
+
+			foreach (var attackId in config.AttackIds)
+			{
+				var attack = GameArchitecture.Interface.GetUtility<EnemyAttackCatalog>().Get(attackId);
+				if (attack == null || attack.AttackType != EnemyAttackType.Contact) continue;
+				var contactAttack = enemyRoot.GetComponent<EnemyContactAttack>();
+				if (contactAttack == null) contactAttack = enemyRoot.AddComponent<EnemyContactAttack>();
+				contactAttack.Initialize(attackId);
+				break;
+			}
 		}
 
 		public void Release(Transform enemyTransform)

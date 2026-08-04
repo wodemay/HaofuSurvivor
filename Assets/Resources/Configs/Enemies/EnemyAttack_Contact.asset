@@ -9,11 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6c4b898a7e0f48b0a987bd72cd0e9f88, type: 3}
-  m_Name: Enemy_Boss
+  m_Script: {fileID: 11500000, guid: 30ad9a1b007d4525a59fe03ef9e22c45, type: 3}
+  m_Name: EnemyAttack_Contact
   m_EditorClassIdentifier: 
-  Id: 4
-  Prefab: {fileID: 606102115199416587, guid: cd6a397ed86a2024da16102e44a625f1, type: 3}
-  MoveSpeed: 2
-  AttackIds:
-  - 1001
+  Id: 1001
+  AttackType: 0
+  Damage: 10
+  Cooldown: 1

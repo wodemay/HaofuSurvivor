@@ -52,6 +52,70 @@ namespace HaoFuSurvivor
 		}
 	}
 
+	public class TickEnemyAttacksCommand : AbstractCommand
+	{
+		private readonly float mDeltaTime;
+
+		public TickEnemyAttacksCommand(float deltaTime)
+		{
+			mDeltaTime = deltaTime;
+		}
+
+		protected override void OnExecute()
+		{
+			this.GetSystem<EnemyAttackSystem>().Tick(mDeltaTime);
+		}
+	}
+
+	public class RegisterEnemyContactAttackCommand : AbstractCommand
+	{
+		private readonly int mRuntimeId;
+		private readonly int mAttackId;
+
+		public RegisterEnemyContactAttackCommand(int runtimeId, int attackId)
+		{
+			mRuntimeId = runtimeId;
+			mAttackId = attackId;
+		}
+
+		protected override void OnExecute()
+		{
+			this.GetSystem<EnemyAttackSystem>().RegisterContactAttack(mRuntimeId, mAttackId);
+		}
+	}
+
+	public class UnregisterEnemyContactAttackCommand : AbstractCommand
+	{
+		private readonly int mRuntimeId;
+
+		public UnregisterEnemyContactAttackCommand(int runtimeId)
+		{
+			mRuntimeId = runtimeId;
+		}
+
+		protected override void OnExecute()
+		{
+			this.GetSystem<EnemyAttackSystem>().UnregisterContactAttack(mRuntimeId);
+		}
+	}
+
+	public class SetEnemyContactStateCommand : AbstractCommand
+	{
+		private readonly int mRuntimeId;
+		private readonly bool mIsContacting;
+
+		public SetEnemyContactStateCommand(int runtimeId, bool isContacting)
+		{
+			mRuntimeId = runtimeId;
+			mIsContacting = isContacting;
+		}
+
+		protected override void OnExecute()
+		{
+			this.GetSystem<EnemyAttackSystem>().SetContactState(mRuntimeId, mIsContacting);
+		}
+	}
+
 	public class RegisterPlayerCommand : AbstractCommand
 	{
 		private readonly Vector2 mInitialPosition;
