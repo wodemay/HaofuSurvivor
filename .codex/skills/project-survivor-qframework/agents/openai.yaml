@@ -1,0 +1,4 @@
+interface:
+  display_name: "Project Survivor QFramework"
+  short_description: "Implement Project Survivor within QFramework boundaries."
+  default_prompt: "Use $project-survivor-qframework to implement this Project Survivor task."

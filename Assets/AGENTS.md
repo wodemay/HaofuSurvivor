@@ -96,3 +96,5 @@ No commit history exists yet. Use imperative, scoped messages such as `feat(ui):
 - 2026-08-04 | Prepared the current gameplay, scene, prefab, configuration, architecture, and durable-context changes for the next GitHub submission on `main`.
 - 2026-08-04 | Created local commit `427bfc2` (`feat(gameplay): add rooted enemy pooling`) containing the current project state. Initial push through the configured proxy failed with a Git TLS unexpected-EOF connection error; remote submission is being retried.
 - 2026-08-04 | Retried the GitHub submission with HTTP/1.1 through the configured proxy. Push succeeded: `origin/main` now contains commits through `083eb63`.
+- 2026-08-04 | Added repository-local Codex skill `.codex/skills/project-survivor-qframework`. It captures the QFramework boundaries, user-owned UI workflow, root-prefab/configuration contracts, enemy pooling, validation, Git, and AGENTS handoff requirements for future sessions.
+- 2026-08-04 | Prepared the validated repository-local ProjectSurvivor Codex skill and its durable-context update for local Git commit.
