@@ -7,7 +7,7 @@ namespace HaoFuSurvivor
 	{
 		public int Id;
 		public string ExecutorId;
-		public CombatFaction TargetFaction;
+		public ScriptableObject ExecutorParameterConfig;
 		public float Damage = 10f;
 		public float Cooldown = 1f;
 	}

@@ -7,11 +7,11 @@
 | 文件或目录 | 用途 |
 | --- | --- |
 | `Assets/Resources/Configs/Combat/AttackCatalog.asset` | 全部攻击配置的总列表；新攻击必须加进这里。 |
-| `Assets/Resources/Configs/Combat/Attack_Contact.asset` | 当前碰撞攻击示例，ID 为 1001。 |
+| `Assets/Resources/Configs/Combat/Attack_Collision.asset` | 当前碰撞攻击示例，ID 为 1001。 |
 | `Assets/Scripts/Architecture/Combat/AttackConfig.cs` | 所有攻击共用的基础配置字段。 |
 | `Assets/Scripts/Architecture/Combat/AttackExecutorRegistry.cs` | 注册 `ExecutorId` 与执行器的唯一位置。 |
 | `Assets/Scripts/Architecture/Combat/AttackSystem.cs` | 统一处理攻击注册、冷却、目标阵营校验和执行。通常不需要修改。 |
-| `Assets/Scripts/Game/ContactAttackTrigger.cs` | 碰撞攻击的 Unity 触发桥接示例。 |
+| `Assets/Scripts/Game/CollisionAttackTrigger.cs` | 碰撞攻击的 Unity 触发桥接示例。 |
 | `Assets/Scripts/Architecture/Enemy/EnemyConfig.cs` | Enemy 的 `AttackIds` 列表。 |
 
 当前 `ProjectSurvivor/Configuration Creator` 只创建 Character 和 Enemy，不创建 AttackConfig；攻击资产需要按以下步骤在 Unity Editor 中创建。
@@ -24,14 +24,13 @@
 
 1. 在 Project 窗口进入 `Assets/Resources/Configs/Combat/`。
 2. 右键空白处，选择 `Create → ProjectSurvivor → Combat → Attack Config`。
-3. 命名为 `Attack_<技能名称>`，例如 `Attack_Slash`、`Attack_Fireball`、`Attack_Contact`。攻击配置不绑定角色或 Enemy，名称只表达技能本身。
+3. 命名为 `Attack_<技能名称>`，例如 `Attack_Slash`、`Attack_Fireball`、`Attack_Collision`。攻击配置不绑定角色或 Enemy，名称只表达技能本身。
 4. 选中新资产，在 Inspector 填写：
 
 | 字段 | 填写规则 |
 | --- | --- |
 | `Id` | 全局唯一正整数。当前 1001 已被普通碰撞攻击使用。 |
-| `Executor Id` | 已注册执行器的名称。当前只有 `contact`。 |
-| `Target Faction` | 攻击可命中的阵营；Enemy 攻击玩家填 `Player`。 |
+| `Executor Id` | 已注册执行器的名称。当前只有 `collision`。 |
 | `Damage` | 单次基础伤害。Enemy 会自动乘时间轴敌人伤害倍率。 |
 | `Cooldown` | 同一个攻击运行时两次成功释放的最短间隔，建议大于 0。 |
 
@@ -51,7 +50,7 @@ EnemyFactory 会读取这个 ID，找到 AttackConfig 的 ExecutorId，并让该
 
 ## 创建全新行为攻击
 
-适用于子弹、冲撞、范围爆炸、激光、召唤等尚无执行器的攻击。以下以 `projectile` 为示例。
+适用于冲撞、范围爆炸、激光、召唤等尚无执行器的攻击。`projectile` 已实现；其完整配置与运行时流程见 `Docs/Guides/ProjectileAttack.zh-CN.md`。
 
 ### 1. 新建执行器代码
 
@@ -117,7 +116,7 @@ this.SendCommand(new RegisterAttackCommand(runtimeId, attackId, ownerFaction));
 
 ### 4. 处理专属参数
 
-当前 `AttackConfig` 只有通用字段：ID、ExecutorId、目标阵营、伤害和冷却。子弹速度、预制体、生命周期、范围、数量等不能硬塞进它。
+当前 `AttackConfig` 只有通用字段：ID、ExecutorId、伤害和冷却。目标阵营由攻击拥有者的 `CombatEntity.Faction` 在运行时决定：Player 自动攻击 Enemy，Enemy 自动攻击 Player。子弹速度、预制体、生命周期、范围、数量等不能硬塞进它。
 
 首次新增有专属参数的执行器时：
 
@@ -131,17 +130,16 @@ this.SendCommand(new RegisterAttackCommand(runtimeId, attackId, ownerFaction));
 
 ## 当前碰撞攻击作为参考
 
-`Attack_Contact.asset`：
+`Attack_Collision.asset`：
 
 ```text
 Id: 1001
-Executor Id: contact
-Target Faction: Player
+Executor Id: collision
 Damage: 10
 Cooldown: 1
 ```
 
-`contact` 执行器会给 EnemyRoot 配置 `ContactAttackTrigger`。该组件检测不同 `CombatEntity` 阵营的碰撞体，发送通用攻击命令；AttackSystem 校验冷却后调用执行器，再由 DamageSystem 结算伤害。
+`collision` 执行器会给 EnemyRoot 配置 `CollisionAttackTrigger`。该组件检测不同 `CombatEntity` 阵营的碰撞体，发送通用攻击命令；AttackSystem 校验冷却后调用执行器，再由 DamageSystem 结算伤害。
 
 ## 完整验证清单
 

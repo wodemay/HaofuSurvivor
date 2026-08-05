@@ -28,6 +28,7 @@ namespace HaoFuSurvivor
 			playerModel.IsRegistered = false;
 			playerModel.IsDead = false;
 			this.GetModel<InputModel>().Movement = Vector2.zero;
+			this.GetSystem<PlayerLoadoutSystem>().Reset();
 		}
 
 		public void Move(float deltaTime)

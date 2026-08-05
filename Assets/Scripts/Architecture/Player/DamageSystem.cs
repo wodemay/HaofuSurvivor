@@ -4,11 +4,15 @@ namespace HaoFuSurvivor
 {
 	public class DamageSystem : AbstractSystem
 	{
-		public void ApplyDamage(CombatFaction targetFaction, float damage)
+		public void ApplyDamage(CombatEntity target, float damage)
 		{
-			if (targetFaction == CombatFaction.Player)
+			if (target != null && target.Faction == CombatFaction.Player)
 			{
 				this.GetSystem<PlayerSystem>().ApplyDamage(damage);
+			}
+			else if (target != null && target.Faction == CombatFaction.Enemy)
+			{
+				this.GetSystem<EnemyHealthSystem>().ApplyDamage(target, damage);
 			}
 		}
 

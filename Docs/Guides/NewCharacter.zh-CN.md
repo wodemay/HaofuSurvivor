@@ -27,7 +27,7 @@ PlayerRoot
 
 - `Id`：唯一整数角色 ID。
 - `DisplayName`、`SkillDescription`、`Icon`：选择界面显示数据。
-- `SkillId`：未来技能组 ID；当前可填 `0`。
+- `SkillGroupId`：未来技能组 ID；当前可填 `0`。
 - `PlayerPrefab`：角色内容预制体。
 - `SortOrder`：选择界面排序。
 - `MaxHealth`、`MoveSpeed`、`AttackPower`：初始属性。
@@ -36,7 +36,7 @@ CharacterCatalog 会加载该目录下的配置并按 `SortOrder` 排序，无�
 
 ## 3. 角色攻击扩展
 
-未来角色技能组应使用 `SkillId → AttackIds` 映射，将攻击注册到通用 `AttackSystem`。不要重新创建玩家专属攻击系统；参考 [NewAttack.zh-CN.md](NewAttack.zh-CN.md)。
+角色技能组使用 `SkillGroupId → WeaponIds → AttackIds` 映射，将攻击注册到通用 `AttackSystem`。不要重新创建玩家专属攻击系统；参考 [SkillGroup.zh-CN.md](SkillGroup.zh-CN.md)。
 
 ## 验证
 

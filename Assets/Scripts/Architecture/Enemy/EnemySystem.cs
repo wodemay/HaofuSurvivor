@@ -10,8 +10,21 @@ namespace HaoFuSurvivor
 		private float mSpawnElapsed;
 		public void Reset()
 		{
-			foreach (var enemy in mEnemies) EnemyFactory.Instance.Release(enemy);
+			foreach (var enemy in mEnemies)
+			{
+				this.GetSystem<EnemyHealthSystem>().Unregister(enemy.GetComponent<CombatEntity>());
+				EnemyFactory.Instance.Release(enemy);
+			}
 			mEnemies.Clear(); mMoveSpeeds.Clear(); mSpawnElapsed = 0f; this.GetModel<EnemyModel>().AliveCount = 0;
+		}
+
+		public void Release(Transform enemy)
+		{
+			if (enemy == null || !mEnemies.Remove(enemy)) return;
+			mMoveSpeeds.Remove(enemy);
+			this.GetSystem<EnemyHealthSystem>().Unregister(enemy.GetComponent<CombatEntity>());
+			EnemyFactory.Instance.Release(enemy);
+			this.GetModel<EnemyModel>().AliveCount = mEnemies.Count;
 		}
 		public void Tick(float deltaTime)
 		{
