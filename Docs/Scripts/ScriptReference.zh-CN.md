@@ -5,7 +5,11 @@
 ## Architecture/Character
 
 - `CharacterCatalog.cs`：加载并按排序提供角色配置。
-- `CharacterConfig.cs`：角色静态数据，包含 ID、属性、技能 ID、图标与角色内容预制体。
+- `CharacterConfig.cs`：角色静态数据，包含 ID、属性、技能组 ID、图标与角色内容预制体。
+- `SkillGroupConfig.cs` / `SkillGroupCatalogConfig.cs` / `SkillGroupCatalog.cs`：技能组静态定义、目录与按 ID 查询。
+- `WeaponConfig.cs` / `WeaponCatalogConfig.cs` / `WeaponCatalog.cs`：武器到 AttackIds 的静态映射、目录与按 ID 查询。
+- `PlayerLoadoutModel.cs`：保存本局已拥有的武器、技能与闪避 ID。
+- `PlayerLoadoutSystem.cs`：加载初始技能组；当前只装备武器攻击，预留技能与闪避入口。
 - `CharacterSelectionModel.cs`：保存当前选中的角色 ID。
 - `CharacterSelectionStorage.cs`：通过 PlayerPrefs 持久化角色选择。
 - `CharacterSelectionSystem.cs`：校验、切换并确认角色选择，发布选择事件。
@@ -16,7 +20,9 @@
 - `AttackConfig.cs`：通用攻击配置；`ExecutorId` 决定行为，不使用攻击类型枚举分支。
 - `AttackCatalogConfig.cs`：攻击配置列表的 ScriptableObject 容器。
 - `AttackCatalog.cs`：加载 `Resources/Configs/Combat/AttackCatalog` 并按 ID 查询攻击。
-- `AttackExecutorRegistry.cs`：注册并查找攻击执行器；当前注册 `contact` 执行器。该执行器配置触碰触发器，并通过通用伤害入口结算。
+- `AttackExecutorRegistry.cs`：注册并查找攻击执行器；当前注册 `collision` 执行器。该执行器配置碰撞触发器，并通过通用伤害入口结算。
+- `CombatTargetSystem.cs`：维护启用中的战斗实体，并通过 Query 提供最近敌对目标。
+- `ProjectileAttackParameterConfig.cs`：子弹预制体、速度、生命周期、射程和对象池基础参数。
 - `AttackSystem.cs`：维护攻击运行时、冷却、目标阵营验证与执行器调用。
 
 ## Architecture/Commands 与 Events
@@ -26,7 +32,8 @@
 
 ## Architecture/Enemy
 
-- `EnemyConfig.cs`：单个怪物静态数据，包含 ID、内容预制体、移速和攻击 ID 列表。
+- `EnemyConfig.cs`：单个怪物静态数据，包含 ID、内容预制体、基础生命、移速和攻击 ID 列表。
+- `EnemyHealthSystem.cs`：维护活动 EnemyRoot 的运行时生命值；按时间轴生命倍率初始化，处理通用伤害、发布受伤/死亡事件并回收死亡对象。
 - `EnemyCatalogConfig.cs`：怪物列表与全局刷怪参数。
 - `EnemyConfigCatalog.cs`：加载怪物目录并按 ID 查询怪物配置。
 - `EnemyRootConfig.cs`：绑定通用 `EnemyRoot` 预制体。
@@ -69,7 +76,10 @@
 - `PlayerController.cs`：Unity 输入与 Rigidbody2D 桥接；读取桌面移动轴并发送玩家移动命令。
 - `PlayerHealthBarView.cs`：监听玩家受伤事件，按当前血量刷新世界空间 Slider。
 - `CombatEntity.cs`：为运行时对象标识阵营，使玩家与敌人可走同一套攻击目标判定。
-- `ContactAttackTrigger.cs`：Unity 触碰桥接；检测不同阵营碰撞体并向 AttackSystem 请求释放攻击。
+- `CollisionAttackTrigger.cs`：Unity 碰撞桥接；检测不同阵营碰撞体并向 AttackSystem 请求释放攻击。
+- `ProjectileAttackTrigger.cs`：远程攻击桥接；查询最近敌对目标并请求发射。
+- `ProjectileController.cs`：子弹飞行、命中和超时回收。
+- `ProjectileFactory.cs`：子弹对象池创建、获取与回收。
 
 ## Editor
 

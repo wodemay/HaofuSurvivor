@@ -60,6 +60,30 @@ namespace HaoFuSurvivor
 	{
 	}
 
+	public struct EnemyDamagedEvent
+	{
+		public readonly CombatEntity Enemy;
+		public readonly float Damage;
+		public readonly float RemainingHealth;
+
+		public EnemyDamagedEvent(CombatEntity enemy, float damage, float remainingHealth)
+		{
+			Enemy = enemy;
+			Damage = damage;
+			RemainingHealth = remainingHealth;
+		}
+	}
+
+	public struct EnemyDiedEvent
+	{
+		public readonly CombatEntity Enemy;
+
+		public EnemyDiedEvent(CombatEntity enemy)
+		{
+			Enemy = enemy;
+		}
+	}
+
 	public struct CharacterSelectionChangedEvent
 	{
 		public readonly int CharacterId;

@@ -8,7 +8,7 @@ namespace HaoFuSurvivor
 		public int Id;
 		public string DisplayName;
 		[TextArea] public string SkillDescription;
-		public int SkillId;
+		public int SkillGroupId;
 		public Sprite Icon;
 		public GameObject PlayerPrefab;
 		public int SortOrder;

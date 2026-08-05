@@ -66,6 +66,7 @@ namespace HaoFuSurvivor
 			var combatEntity = enemyRoot.GetComponent<CombatEntity>();
 			if (combatEntity == null) combatEntity = enemyRoot.AddComponent<CombatEntity>();
 			combatEntity.Initialize(CombatFaction.Enemy);
+			GameArchitecture.Interface.SendCommand(new RegisterEnemyHealthCommand(combatEntity, config.BaseHealth));
 
 			var rigidbody = enemyRoot.GetComponent<Rigidbody2D>();
 			if (rigidbody == null) rigidbody = enemyRoot.AddComponent<Rigidbody2D>();

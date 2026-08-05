@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Attacks:
   - {fileID: 11400000, guid: 5f70154a4f0d4989b7afb3ae8d0a4088, type: 2}
+  - {fileID: 11400000, guid: cc2ec306624b46b43840e4cf264189c3, type: 2}

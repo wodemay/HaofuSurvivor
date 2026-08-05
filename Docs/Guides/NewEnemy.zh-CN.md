@@ -38,7 +38,7 @@ EnemyRoot
 
 ## 4. 攻击与碰撞
 
-攻击 ID 必须已在 `Resources/Configs/Combat/AttackCatalog.asset` 中定义。EnemyFactory 根据攻击对应的 Executor 配置触发器；例如 `contact` 会使用 EnemyRoot 的 HurtBox 参与碰撞攻击。
+攻击 ID 必须已在 `Resources/Configs/Combat/AttackCatalog.asset` 中定义。EnemyFactory 根据攻击对应的 Executor 配置触发器；例如 `collision` 会使用 EnemyRoot 的 HurtBox 参与碰撞攻击。
 
 ## 验证
 
@@ -46,3 +46,9 @@ EnemyRoot
 - 内容预制体引用有效。
 - EnemyRoot 仍有 `CharacterRoot`。
 - 运行后 EnemyContainer 下出现 EnemyRoot，重开一局后根节点被停用并进入对应 ID 的对象池。
+
+## 生命值
+
+- `BaseHealth` 是怪物基础生命值，生成时会乘以当前 `RunTimeline` 的 `EnemyHealthMultiplier`。
+- 当前开局基准：现有 Enemy 的 `BaseHealth` 为 `20`，初始投射物攻击每发造成 `10` 点伤害，因此开局两发击杀。
+- 运行时伤害与死亡由 `EnemyHealthSystem` 处理；死亡的 `EnemyRoot` 会回收到对应 ID 的对象池。不要修改运行中的 ScriptableObject 资产。

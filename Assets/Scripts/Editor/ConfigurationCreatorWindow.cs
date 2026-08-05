@@ -17,7 +17,7 @@ namespace HaoFuSurvivor.Editor
 		private int mCharacterId;
 		private string mCharacterName = "New Character";
 		private string mSkillDescription;
-		private int mSkillId;
+		private int mSkillGroupId;
 		private int mCharacterSortOrder;
 		private float mCharacterMaxHealth = 100f;
 		private float mCharacterMoveSpeed = 5f;
@@ -58,7 +58,7 @@ namespace HaoFuSurvivor.Editor
 			mCharacterId = EditorGUILayout.IntField("Id", mCharacterId);
 			mCharacterName = EditorGUILayout.TextField("Display Name", mCharacterName);
 			mSkillDescription = EditorGUILayout.TextArea(mSkillDescription, GUILayout.MinHeight(48f));
-			mSkillId = EditorGUILayout.IntField("Skill Id", mSkillId);
+			mSkillGroupId = EditorGUILayout.IntField("Skill Group Id", mSkillGroupId);
 			mCharacterSortOrder = EditorGUILayout.IntField("Sort Order", mCharacterSortOrder);
 			mCharacterMaxHealth = EditorGUILayout.FloatField("Max Health", mCharacterMaxHealth);
 			mCharacterMoveSpeed = EditorGUILayout.FloatField("Move Speed", mCharacterMoveSpeed);
@@ -104,7 +104,7 @@ namespace HaoFuSurvivor.Editor
 			config.Id = mCharacterId;
 			config.DisplayName = mCharacterName;
 			config.SkillDescription = mSkillDescription;
-			config.SkillId = mSkillId;
+			config.SkillGroupId = mSkillGroupId;
 			config.SortOrder = mCharacterSortOrder;
 			config.MaxHealth = mCharacterMaxHealth;
 			config.MoveSpeed = mCharacterMoveSpeed;

@@ -86,18 +86,20 @@ namespace HaoFuSurvivor
 	{
 		private readonly int mRuntimeId;
 		private readonly int mAttackId;
+		private readonly GameObject mOwner;
 		private readonly CombatFaction mOwnerFaction;
 
-		public RegisterAttackCommand(int runtimeId, int attackId, CombatFaction ownerFaction)
+		public RegisterAttackCommand(int runtimeId, int attackId, GameObject owner, CombatFaction ownerFaction)
 		{
 			mRuntimeId = runtimeId;
 			mAttackId = attackId;
+			mOwner = owner;
 			mOwnerFaction = ownerFaction;
 		}
 
 		protected override void OnExecute()
 		{
-			this.GetSystem<AttackSystem>().Register(mRuntimeId, mAttackId, mOwnerFaction);
+			this.GetSystem<AttackSystem>().Register(mRuntimeId, mAttackId, mOwner, mOwnerFaction);
 		}
 	}
 
@@ -119,17 +121,81 @@ namespace HaoFuSurvivor
 	public class TryExecuteAttackCommand : AbstractCommand
 	{
 		private readonly int mRuntimeId;
-		private readonly CombatFaction mTargetFaction;
+		private readonly CombatEntity mTarget;
 
-		public TryExecuteAttackCommand(int runtimeId, CombatFaction targetFaction)
+		public TryExecuteAttackCommand(int runtimeId, CombatEntity target)
 		{
 			mRuntimeId = runtimeId;
-			mTargetFaction = targetFaction;
+			mTarget = target;
 		}
 
 		protected override void OnExecute()
 		{
-			this.GetSystem<AttackSystem>().TryExecute(mRuntimeId, mTargetFaction);
+			this.GetSystem<AttackSystem>().TryExecute(mRuntimeId, mTarget);
+		}
+	}
+
+	public class ApplyCombatDamageCommand : AbstractCommand
+	{
+		private readonly CombatEntity mTarget;
+		private readonly float mDamage;
+
+		public ApplyCombatDamageCommand(CombatEntity target, float damage)
+		{
+			mTarget = target;
+			mDamage = damage;
+		}
+
+		protected override void OnExecute()
+		{
+			this.GetSystem<DamageSystem>().ApplyDamage(mTarget, mDamage);
+		}
+	}
+
+	public class RegisterCombatTargetCommand : AbstractCommand
+	{
+		private readonly CombatEntity mEntity;
+
+		public RegisterCombatTargetCommand(CombatEntity entity)
+		{
+			mEntity = entity;
+		}
+
+		protected override void OnExecute()
+		{
+			this.GetSystem<CombatTargetSystem>().Register(mEntity);
+		}
+	}
+
+	public class UnregisterCombatTargetCommand : AbstractCommand
+	{
+		private readonly CombatEntity mEntity;
+
+		public UnregisterCombatTargetCommand(CombatEntity entity)
+		{
+			mEntity = entity;
+		}
+
+		protected override void OnExecute()
+		{
+			this.GetSystem<CombatTargetSystem>().Unregister(mEntity);
+		}
+	}
+
+	public class RegisterEnemyHealthCommand : AbstractCommand
+	{
+		private readonly CombatEntity mEnemy;
+		private readonly float mBaseHealth;
+
+		public RegisterEnemyHealthCommand(CombatEntity enemy, float baseHealth)
+		{
+			mEnemy = enemy;
+			mBaseHealth = baseHealth;
+		}
+
+		protected override void OnExecute()
+		{
+			this.GetSystem<EnemyHealthSystem>().Register(mEnemy, mBaseHealth);
 		}
 	}
 

@@ -34,6 +34,7 @@ namespace HaoFuSurvivor
 
 			EnsurePlayerComponents(playerObject);
 			Object.Instantiate(character.PlayerPrefab, characterRoot);
+			this.GetSystem<PlayerLoadoutSystem>().EquipInitialSkillGroup(playerObject, character.SkillGroupId);
 			if (rootConfig.HealthBarPrefab != null)
 			{
 				var healthBar = Object.Instantiate(rootConfig.HealthBarPrefab, healthBarAnchor);

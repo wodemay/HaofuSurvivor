@@ -15,7 +15,7 @@ MonoBehaviour:
   Id: 3
   DisplayName: "\u65A5\u5019"
   SkillDescription: "\u8FC5\u6377\uFF1A\u66F4\u9AD8\u79FB\u52A8\u901F\u5EA6\u3002"
-  SkillId: 0
+  SkillGroupId: 0
   Icon: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
   PlayerPrefab: {fileID: 6247748158833517194, guid: 22d26f2c37a2718478232424f21f300f, type: 3}
   SortOrder: 2
