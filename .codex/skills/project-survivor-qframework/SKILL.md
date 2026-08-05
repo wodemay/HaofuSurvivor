@@ -18,6 +18,7 @@ Implement this Unity project through QFramework. Read `Assets/AGENTS.md` before 
 
 - The user owns UI panels, prefabs, hierarchy changes, controls, and QFramework Bind generation. If a task needs a new or structurally changed UI object, stop and request that the user creates it first. Then implement only non-UI integration.
 - Use ScriptableObject assets in `Resources/Configs/` for static game data. IDs are integers.
+- Use Unity menu `ProjectSurvivor/Configuration Creator` to create CharacterConfig or EnemyConfig and optional empty content-prefab templates. The tool assigns the next numeric ID and adds EnemyConfig to EnemyCatalog; never use it to create PlayerRoot, EnemyRoot, UI, or final art.
 - Treat `CharacterConfig.PlayerPrefab` and `EnemyConfig.Prefab` as visual/content prefabs, not runtime roots.
 - Spawn the player through `PlayerRootConfig`: root `PlayerRoot` owns movement/camera; selected content goes under `CharacterRoot`; health canvas goes under `HealthBarAnchor`.
 - Spawn enemies through `EnemyRootConfig`: root `EnemyRoot` owns runtime behavior; selected content goes under `CharacterRoot`; roots are parented under scene `EnemyContainer` and reused by `EnemyFactory` pools keyed by enemy ID.
