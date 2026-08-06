@@ -1,100 +1,103 @@
 # 项目脚本说明
 
-本文说明 `Assets/Scripts/` 中当前所有 C# 脚本的职责。业务代码遵循 QFramework：Controller/View → Command → System → Model/Utility，读取通过 Query，跨模块通知通过 Event。
+本文以当前 `Assets/Scripts/` 为准，说明每个脚本的职责与边界。业务链路必须遵循 QFramework：Controller/View → Command → System → Model/Utility；读取使用 Query，跨模块通知使用 Event。
 
 ## Architecture/Character
 
-- `CharacterCatalog.cs`：加载并按排序提供角色配置。
-- `CharacterConfig.cs`：角色静态数据，包含 ID、属性、技能组 ID、图标与角色内容预制体。
-- `SkillGroupConfig.cs` / `SkillGroupCatalogConfig.cs` / `SkillGroupCatalog.cs`：技能组静态定义、目录与按 ID 查询。
-- `WeaponConfig.cs` / `WeaponCatalogConfig.cs` / `WeaponCatalog.cs`：武器到 AttackIds 的静态映射、目录与按 ID 查询。
-- `PlayerLoadoutModel.cs`：保存本局已拥有的武器、技能与闪避 ID。
-- `PlayerLoadoutSystem.cs`：加载初始技能组；当前只装备武器攻击，预留技能与闪避入口。
+- `CharacterConfig.cs`：角色静态数据，含数值、内容预制体与 `SkillGroupId`。
+- `CharacterCatalog.cs`：加载角色配置，按排序和 ID 查询。
 - `CharacterSelectionModel.cs`：保存当前选中的角色 ID。
-- `CharacterSelectionStorage.cs`：通过 PlayerPrefs 持久化角色选择。
-- `CharacterSelectionSystem.cs`：校验、切换并确认角色选择，发布选择事件。
+- `CharacterSelectionStorage.cs`：用 PlayerPrefs 持久化角色选择。
+- `CharacterSelectionSystem.cs`：校验、切换和确认选择，并发布选择事件。
+
+## Architecture/Skill
+
+- `SkillGroupConfig.cs`：定义初始武器、技能和闪避 ID。
+- `SkillGroupCatalogConfig.cs` / `SkillGroupCatalog.cs`：技能组目录与按 ID 查询。
+- `WeaponConfig.cs`：武器静态容器模板，定义初始 Attack、等级上限、可升级状态和每级 Attack 增删项。
+- `WeaponCatalogConfig.cs` / `WeaponCatalog.cs`：武器目录与按 ID 查询。
+- `WeaponEvolutionConfig.cs`：定义来源武器、进化所需等级和目标武器。
+- `WeaponEvolutionCatalogConfig.cs` / `WeaponEvolutionCatalog.cs`：进化目录与运行时查询。
+- `WeaponRuntimeData.cs`：单把角色武器的运行时容器，保存稳定槽位 ID、等级、可升级状态和当前 Attack 内容。
+- `GetPlayerWeaponsQuery.cs`：只读返回当前 WeaponRuntime 快照。
+- `PlayerLoadoutModel.cs`：保存本局 WeaponRuntime、技能、闪避和当前拥有者。
+- `PlayerLoadoutSystem.cs`：装备、升级、替换、进化和重置角色武器容器，并管理对应 Attack Trigger。
 
 ## Architecture/Combat
 
-- `CombatFaction.cs`：定义玩家与敌人的阵营标识，用于攻击目标校验。
-- `AttackConfig.cs`：通用攻击配置；`ExecutorId` 决定行为，不使用攻击类型枚举分支。
-- `AttackCatalogConfig.cs`：攻击配置列表的 ScriptableObject 容器。
-- `AttackCatalog.cs`：加载 `Resources/Configs/Combat/AttackCatalog` 并按 ID 查询攻击。
-- `AttackExecutorRegistry.cs`：注册并查找攻击执行器；当前注册 `collision` 执行器。该执行器配置碰撞触发器，并通过通用伤害入口结算。
-- `CombatTargetSystem.cs`：维护启用中的战斗实体，并通过 Query 提供最近敌对目标。
-- `ProjectileAttackParameterConfig.cs`：子弹预制体、速度、生命周期、射程和对象池基础参数。
-- `AttackSystem.cs`：维护攻击运行时、冷却、目标阵营验证与执行器调用。
-
-## Architecture/Commands 与 Events
-
-- `GameplayCommands.cs`：集中声明开局、计时、敌人、攻击注册/释放、攻击尝试、玩家移动、受伤无敌帧与角色选择命令。
-- `GameplayEvents.cs`：声明局开始/结束、计时更新、时间轴阶段、玩家受伤/死亡及角色选择事件。
+- `CombatFaction.cs`：玩家与敌人的阵营标识。
+- `AttackConfig.cs`：通用攻击静态数据；`ExecutorId` 决定行为，含伤害、冷却和可选参数资产。
+- `AttackCatalogConfig.cs` / `AttackCatalog.cs`：攻击目录与按 ID 查询。
+- `ProjectileAttackParameterConfig.cs`：子弹预制体、速度、射程、寿命和对象池容量。
+- `AttackExecutorRegistry.cs`：执行器注册表；含 `IAttackExecutor`、`CollisionAttackExecutor` 与 `ProjectileAttackExecutor`。
+- `AttackSystem.cs`：保存攻击运行时、冷却和同阵营拦截，调用对应执行器。
+- `CombatTargetSystem.cs`：维护可攻击实体；`FindClosestCombatTargetQuery` 查询最近敌对目标。
 
 ## Architecture/Enemy
 
-- `EnemyConfig.cs`：单个怪物静态数据，包含 ID、内容预制体、基础生命、移速和攻击 ID 列表。
-- `EnemyHealthSystem.cs`：维护活动 EnemyRoot 的运行时生命值；按时间轴生命倍率初始化，处理通用伤害、发布受伤/死亡事件并回收死亡对象。
-- `EnemyCatalogConfig.cs`：怪物列表与全局刷怪参数。
-- `EnemyConfigCatalog.cs`：加载怪物目录并按 ID 查询怪物配置。
+- `EnemyConfig.cs`：敌人静态数据，包含内容预制体、基础生命、移速和攻击 ID。
+- `EnemyCatalogConfig.cs`：敌人列表及生成间隔、波次、上限等全局参数。
+- `EnemyConfigCatalog.cs`：声明 `EnemyCatalog`，加载目录并按 ID 查询敌人。
 - `EnemyRootConfig.cs`：绑定通用 `EnemyRoot` 预制体。
-- `EnemyFactory.cs`：按怪物 ID 管理 EnemyRoot 对象池，挂载角色内容、CombatEntity、刚体和攻击执行器。
-- `EnemyModel.cs`：保存当前存活怪物数量。
-- `EnemySystem.cs`：根据时间轴阶段刷怪、追踪玩家、维护存活列表和对象池回收。
+- `EnemyModel.cs`：保存当前存活敌人数。
+- `EnemyFactory.cs`：创建、配置及按敌人 ID 池化 `EnemyRoot`；挂载内容、战斗实体、生命和攻击桥接。
+- `EnemySystem.cs`：按时间轴阶段生成敌人、追踪玩家、维护活动列表并回收死亡敌人。
+- `EnemyHealthSystem.cs`：保存活动敌人的运行时生命；初始化时应用时间轴生命倍率，处理受伤、死亡与回收。
 
-## Architecture/Input
+## Architecture/Player 与 Input
 
-- `InputModel.cs`：保存归一化后的玩家移动输入。
-- `InputSystem.cs`：写入移动输入状态。
-
-## Architecture/Player
-
-- `PlayerModel.cs`：保存玩家注册状态、位置、血量、死亡状态和受伤无敌帧剩余时间。
-- `PlayerStatModel.cs`：保存生命、移速、攻击和无敌帧时长等运行时属性；无敌帧默认值为 0。
-- `PlayerRootConfig.cs`：绑定 PlayerRoot 与血条画布预制体。
-- `PlayerSpawnSystem.cs`：创建 PlayerRoot，注入 CombatEntity、Rigidbody2D、PlayerController，挂载角色内容和血条并绑定摄像机。
-- `PlayerSystem.cs`：注册玩家、移动、受伤、死亡和无敌帧计时。
+- `InputModel.cs` / `InputSystem.cs`：保存并写入归一化移动输入。
+- `PlayerModel.cs`：保存玩家注册、位置、角色 ID、生命、死亡和无敌帧状态。
+- `PlayerStatModel.cs`：保存本局最大生命、移速、攻击力和无敌帧时长。
+- `PlayerRootConfig.cs`：绑定 `PlayerRoot` 与血条画布预制体。
+- `PlayerSpawnSystem.cs`：创建 PlayerRoot，挂载选中角色、血条、CombatEntity，并绑定摄像机和初始技能组。
+- `PlayerSystem.cs`：处理注册、移动、受伤、死亡及无敌帧推进。
 - `StatSystem.cs`：提供玩家最终属性读取接口。
-- `DamageSystem.cs`：按目标阵营分发通用伤害；当前已实现对玩家的伤害结算。
+- `DamageSystem.cs`：根据 CombatEntity 阵营，将通用伤害路由给玩家或敌人生命系统。
 
 ## Architecture/Run
 
-- `RunModel.cs`：保存局内阶段（未开始、进行、胜利、失败）。
-- `RunSystem.cs`：开始或结束一局游戏，并重置计时和敌人。
-- `RunTimelineConfig.cs`：定义时间点事件、怪物 ID 列表和敌人/刷怪倍率。
+- `RunModel.cs`：保存局内阶段 `RunPhase`。
+- `RunSystem.cs`：开始、胜利结束或失败结束一局，并重置计时和敌人。
+- `RunTimelineConfig.cs`：定义时间点事件、阶段敌人 ID 与敌人/生成倍率。
 - `RunTimerModel.cs`：保存累计时间、当前阶段和当前倍率。
-- `RunTimerSystem.cs`：推进正向计时，应用已到达时间轴阶段并发布事件。
-- `GetRunTimerStateQuery.cs`：只读返回当前计时和倍率状态。
+- `RunTimerSystem.cs`：推进正计时、应用已到达阶段并发布事件。
+- `GetRunTimerStateQuery.cs`：只读返回当前计时与倍率快照。
 
-## Architecture 根节点
+## Architecture/Commands、Events 与根架构
 
-- `GameArchitecture.cs`：QFramework 架构注册点，注册所有 Model、System 和 Utility。
+- `GameplayCommands.cs`：集中声明开局、计时、刷怪、攻击、伤害、目标注册、敌人生命、玩家移动和角色选择命令。
+- `GameplayEvents.cs`：声明局内、时间轴、角色选择、玩家受伤/死亡、敌人受伤/死亡事件。
+- `GameArchitecture.cs`：唯一的 QFramework 注册点，注册所有 Model、System 和 Utility。
 
 ## Game
 
-- `GameStart.cs`：启动 ResKit 与 GameArchitecture，打开角色选择/HUD，并逐帧驱动计时、敌人、攻击和玩家无敌帧命令。文件内的 `CameraFollow` 在 LateUpdate 跟随已生成玩家。
-- `GameStart.Designer.cs`：QFramework 为 GameStart 生成的绑定代码，不手动修改。
-- `PlayerController.cs`：Unity 输入与 Rigidbody2D 桥接；读取桌面移动轴并发送玩家移动命令。
-- `PlayerHealthBarView.cs`：监听玩家受伤事件，按当前血量刷新世界空间 Slider。
-- `CombatEntity.cs`：为运行时对象标识阵营，使玩家与敌人可走同一套攻击目标判定。
-- `CollisionAttackTrigger.cs`：Unity 碰撞桥接；检测不同阵营碰撞体并向 AttackSystem 请求释放攻击。
-- `ProjectileAttackTrigger.cs`：远程攻击桥接；查询最近敌对目标并请求发射。
-- `ProjectileController.cs`：子弹飞行、命中和超时回收。
-- `ProjectileFactory.cs`：子弹对象池创建、获取与回收。
-
-## Editor
-
-- `ConfigurationCreatorWindow.cs`：Unity 编辑器窗口。可创建角色或怪物内容预制体模板和对应配置，自动分配数字 ID；Enemy 创建时自动加入 EnemyCatalog。
+- `GameStart.cs`：初始化 ResKit 与 GameArchitecture，打开角色选择/HUD，并逐帧驱动计时、敌人、攻击和无敌帧命令。
+- `GameStart.Designer.cs`：QFramework 自动生成的 Bind 文件，禁止手改。
+- `CameraFollow`：定义在 `GameStart.cs`，于 LateUpdate 跟随已生成玩家。
+- `CombatEntity.cs`：Unity 侧战斗身份桥接，注册/注销可被攻击目标并保存阵营。
+- `CollisionAttackTrigger.cs`：碰撞攻击桥接，检测敌对实体并请求执行攻击。
+- `ProjectileAttackTrigger.cs`：远程攻击桥接，查询最近敌对实体并请求执行攻击。
+- `ProjectileController.cs`：子弹飞行、碰撞命中、超时和状态重置。
+- `ProjectileFactory.cs`：在运行时 `ProjectileContainer` 下创建、获取和回收子弹对象池。
+- `PlayerController.cs`：桌面移动输入与 Rigidbody2D 桥接，发送移动命令。
+- `PlayerHealthBarView.cs`：监听玩家受伤事件并刷新血条 Slider。
 
 ## UI
 
-- `UICharacterSelectPanel.cs`：角色选择面板逻辑，构建角色条目、记录选中项并确认开局。
-- `UICharacterSelectPanel.Designer.cs`：角色选择面板的自动生成 Bind 字段，不手动修改。
-- `UICharacterSelectItem.cs`：单个角色条目控制器，通过既定子节点路径填充配置并处理点击。
-- `UIGameHUDPanel.cs`：局内 HUD，显示累计计时并处理返回按钮。
-- `UIGameHUDPanel.Designer.cs`：局内 HUD 的自动生成 Bind 字段，不手动修改。
+- `UICharacterSelectPanel.cs`：角色选择面板逻辑，创建条目、记录选择并确认开局。
+- `UICharacterSelectPanel.Designer.cs`：自动生成 Bind 文件，禁止手改。
+- `UICharacterSelectItem.cs`：单个角色条目，通过既定子节点路径显示配置与处理点击。
+- `UIGameHUDPanel.cs`：局内 HUD，显示正计时并处理返回操作。
+- `UIGameHUDPanel.Designer.cs`：自动生成 Bind 文件，禁止手改。
+
+## Editor
+
+- `ConfigurationCreatorWindow.cs`：菜单 `ProjectSurvivor/Configuration Creator` 对应的编辑器窗口；创建角色或敌人的配置和内容预制体模板，分配下一个数字 ID，并自动把敌人加入 EnemyCatalog。
 
 ## 维护规则
 
-- 新增攻击时创建新的 `IAttackExecutor` 并注册 `ExecutorId`；不要恢复 `AttackType` 枚举或集中分支。
-- 新增脚本后同步更新本文和 `Assets/AGENTS.md`。
-- UI 层级、Prefab 与 Bind 仅由用户创建或调整；脚本只做后续接入。
+- 新攻击添加新的 `IAttackExecutor` 与 `ExecutorId`，禁止恢复 AttackType 枚举或集中分支。
+- 静态数值只放 ScriptableObject；局内升级和生命等可变状态只放 Model/System。
+- UI 层级、Prefab 结构和 Bind 由用户维护；脚本只能接入既有对象。
+- 新增或删除脚本后，同时更新本文和 `Assets/AGENTS.md`。

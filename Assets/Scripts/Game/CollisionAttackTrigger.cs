@@ -6,15 +6,19 @@ namespace HaoFuSurvivor
 	public class CollisionAttackTrigger : MonoBehaviour, IController, IAttackTrigger
 	{
 		private int mAttackId;
+		private int mWeaponRuntimeId;
 		private CombatFaction mOwnerFaction;
 		private bool mIsRegistered;
 		public int AttackId => mAttackId;
+		public int WeaponRuntimeId => mWeaponRuntimeId;
+		public bool IsRegistered => mIsRegistered;
 
 		public IArchitecture GetArchitecture() => GameArchitecture.Interface;
 
-		public void Initialize(int attackId, CombatFaction ownerFaction)
+		public void Initialize(int attackId, CombatFaction ownerFaction, int weaponRuntimeId = 0)
 		{
 			mAttackId = attackId;
+			mWeaponRuntimeId = weaponRuntimeId;
 			mOwnerFaction = ownerFaction;
 			mIsRegistered = true;
 			this.SendCommand(new RegisterAttackCommand(GetInstanceID(), attackId, gameObject, ownerFaction));
@@ -27,11 +31,16 @@ namespace HaoFuSurvivor
 			this.SendCommand(new TryExecuteAttackCommand(GetInstanceID(), target));
 		}
 
-		private void OnDisable()
+		public void Unregister()
 		{
 			if (!mIsRegistered) return;
 			this.SendCommand(new UnregisterAttackCommand(GetInstanceID()));
 			mIsRegistered = false;
+		}
+
+		private void OnDisable()
+		{
+			Unregister();
 		}
 	}
 }

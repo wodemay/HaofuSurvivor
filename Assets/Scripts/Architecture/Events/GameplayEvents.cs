@@ -84,6 +84,58 @@ namespace HaoFuSurvivor
 		}
 	}
 
+	public struct WeaponEquippedEvent
+	{
+		public readonly int WeaponRuntimeId;
+		public readonly int WeaponId;
+
+		public WeaponEquippedEvent(int weaponRuntimeId, int weaponId)
+		{
+			WeaponRuntimeId = weaponRuntimeId;
+			WeaponId = weaponId;
+		}
+	}
+
+	public struct WeaponUpgradedEvent
+	{
+		public readonly int WeaponRuntimeId;
+		public readonly int WeaponId;
+		public readonly int Level;
+
+		public WeaponUpgradedEvent(int weaponRuntimeId, int weaponId, int level)
+		{
+			WeaponRuntimeId = weaponRuntimeId;
+			WeaponId = weaponId;
+			Level = level;
+		}
+	}
+
+	public struct WeaponReplacedEvent
+	{
+		public readonly int WeaponRuntimeId;
+		public readonly int WeaponId;
+
+		public WeaponReplacedEvent(int weaponRuntimeId, int weaponId)
+		{
+			WeaponRuntimeId = weaponRuntimeId;
+			WeaponId = weaponId;
+		}
+	}
+
+	public struct WeaponEvolvedEvent
+	{
+		public readonly int WeaponRuntimeId;
+		public readonly int SourceWeaponId;
+		public readonly int TargetWeaponId;
+
+		public WeaponEvolvedEvent(int weaponRuntimeId, int sourceWeaponId, int targetWeaponId)
+		{
+			WeaponRuntimeId = weaponRuntimeId;
+			SourceWeaponId = sourceWeaponId;
+			TargetWeaponId = targetWeaponId;
+		}
+	}
+
 	public struct CharacterSelectionChangedEvent
 	{
 		public readonly int CharacterId;
