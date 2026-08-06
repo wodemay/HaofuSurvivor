@@ -23,6 +23,7 @@ namespace HaoFuSurvivor
 			RegisterUtility(new AttackExecutorRegistry());
 			RegisterUtility(new SkillGroupCatalog());
 			RegisterUtility(new WeaponCatalog());
+			RegisterUtility(new WeaponEvolutionCatalog());
 
 			RegisterSystem(new RunSystem());
 			RegisterSystem(new RunTimerSystem());

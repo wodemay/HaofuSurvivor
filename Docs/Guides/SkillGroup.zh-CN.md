@@ -7,7 +7,7 @@
 ```text
 CharacterConfig.SkillGroupId
 → SkillGroupConfig
-→ WeaponConfig.AttackIds
+→ WeaponConfig.InitialAttackIds
 → AttackConfig
 ```
 
@@ -17,10 +17,10 @@ CharacterConfig.SkillGroupId
 - `StartingSkillIds`：预留主动/被动技能 ID；当前只记录，不执行。
 - `StartingDodgeId`：预留闪避 ID；当前只记录，不执行。
 
-当前示例：幸存者的 `SkillGroupId = 1`，`SkillGroup_ProjectileStarter` 给予武器 ID `1`，`Weapon_Projectile` 给予攻击 ID `1002`（子弹）。
+当前示例：幸存者的 `SkillGroupId = 1`，`SkillGroup_ProjectileStarter` 给予武器 ID `1`，`Weapon_Projectile` 的初始 Attack 为 `1002`（子弹）。
 
 ## 运行时职责
 
-`PlayerLoadoutModel` 保存本局持有的武器、技能和闪避 ID。`PlayerLoadoutSystem` 在玩家生成时加载技能组，并为每个武器的 AttackId 调用既有攻击执行器。玩家销毁时模型重置。
+`PlayerLoadoutModel` 保存本局 WeaponRuntime、技能和闪避 ID。每个 WeaponRuntime 独立保存等级、可升级状态和当前 Attack 容器内容；`PlayerLoadoutSystem` 在玩家生成时加载技能组并注册攻击。玩家销毁时会注销对应 Trigger 后重置模型。
 
-未来升级系统调用 `PlayerLoadoutSystem.EquipWeapon`、`AddSkill`、`SetDodge`；升级逻辑不得直接修改 ScriptableObject。
+升级系统通过 `UpgradeWeaponCommand`、`ReplaceWeaponCommand`、`EvolveWeaponCommand` 或 `ReplaceWeaponAttacksCommand` 修改运行时武器；详情见 [WeaponSystem.zh-CN.md](WeaponSystem.zh-CN.md)。

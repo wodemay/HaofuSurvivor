@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using QFramework;
 using UnityEngine;
 
@@ -196,6 +197,70 @@ namespace HaoFuSurvivor
 		protected override void OnExecute()
 		{
 			this.GetSystem<EnemyHealthSystem>().Register(mEnemy, mBaseHealth);
+		}
+	}
+
+	public class UpgradeWeaponCommand : AbstractCommand
+	{
+		private readonly int mWeaponRuntimeId;
+
+		public UpgradeWeaponCommand(int weaponRuntimeId)
+		{
+			mWeaponRuntimeId = weaponRuntimeId;
+		}
+
+		protected override void OnExecute()
+		{
+			this.GetSystem<PlayerLoadoutSystem>().UpgradeWeapon(mWeaponRuntimeId);
+		}
+	}
+
+	public class EvolveWeaponCommand : AbstractCommand
+	{
+		private readonly int mWeaponRuntimeId;
+
+		public EvolveWeaponCommand(int weaponRuntimeId)
+		{
+			mWeaponRuntimeId = weaponRuntimeId;
+		}
+
+		protected override void OnExecute()
+		{
+			this.GetSystem<PlayerLoadoutSystem>().TryEvolveWeapon(mWeaponRuntimeId);
+		}
+	}
+
+	public class ReplaceWeaponCommand : AbstractCommand
+	{
+		private readonly int mWeaponRuntimeId;
+		private readonly int mTargetWeaponId;
+
+		public ReplaceWeaponCommand(int weaponRuntimeId, int targetWeaponId)
+		{
+			mWeaponRuntimeId = weaponRuntimeId;
+			mTargetWeaponId = targetWeaponId;
+		}
+
+		protected override void OnExecute()
+		{
+			this.GetSystem<PlayerLoadoutSystem>().ReplaceWeapon(mWeaponRuntimeId, mTargetWeaponId);
+		}
+	}
+
+	public class ReplaceWeaponAttacksCommand : AbstractCommand
+	{
+		private readonly int mWeaponRuntimeId;
+		private readonly IReadOnlyList<int> mAttackIds;
+
+		public ReplaceWeaponAttacksCommand(int weaponRuntimeId, IReadOnlyList<int> attackIds)
+		{
+			mWeaponRuntimeId = weaponRuntimeId;
+			mAttackIds = attackIds;
+		}
+
+		protected override void OnExecute()
+		{
+			this.GetSystem<PlayerLoadoutSystem>().ReplaceWeaponAttacks(mWeaponRuntimeId, mAttackIds);
 		}
 	}
 

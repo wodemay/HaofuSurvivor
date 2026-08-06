@@ -23,7 +23,7 @@ namespace HaoFuSurvivor
 	public interface IAttackExecutor
 	{
 		string Id { get; }
-		void ConfigureOwner(GameObject owner, AttackConfig config, CombatFaction ownerFaction);
+		void ConfigureOwner(GameObject owner, AttackConfig config, CombatFaction ownerFaction, int weaponRuntimeId = 0);
 		void Execute(AttackExecutionContext context);
 	}
 
@@ -52,11 +52,11 @@ namespace HaoFuSurvivor
 	{
 		public string Id => "collision";
 
-		public void ConfigureOwner(GameObject owner, AttackConfig config, CombatFaction ownerFaction)
+		public void ConfigureOwner(GameObject owner, AttackConfig config, CombatFaction ownerFaction, int weaponRuntimeId = 0)
 		{
-			var trigger = AttackTriggerUtility.Find<CollisionAttackTrigger>(owner, config.Id);
+			var trigger = AttackTriggerUtility.Find<CollisionAttackTrigger>(owner, config.Id, weaponRuntimeId);
 			if (trigger == null) trigger = owner.AddComponent<CollisionAttackTrigger>();
-			trigger.Initialize(config.Id, ownerFaction);
+			trigger.Initialize(config.Id, ownerFaction, weaponRuntimeId);
 		}
 
 		public void Execute(AttackExecutionContext context)
@@ -72,12 +72,12 @@ namespace HaoFuSurvivor
 	{
 		public string Id => "projectile";
 
-		public void ConfigureOwner(GameObject owner, AttackConfig config, CombatFaction ownerFaction)
+		public void ConfigureOwner(GameObject owner, AttackConfig config, CombatFaction ownerFaction, int weaponRuntimeId = 0)
 		{
 			if (config.ExecutorParameterConfig is not ProjectileAttackParameterConfig parameters) return;
-			var trigger = AttackTriggerUtility.Find<ProjectileAttackTrigger>(owner, config.Id);
+			var trigger = AttackTriggerUtility.Find<ProjectileAttackTrigger>(owner, config.Id, weaponRuntimeId);
 			if (trigger == null) trigger = owner.AddComponent<ProjectileAttackTrigger>();
-			trigger.Initialize(config.Id, ownerFaction, parameters.AttackRange);
+			trigger.Initialize(config.Id, ownerFaction, parameters.AttackRange, weaponRuntimeId);
 		}
 
 		public void Execute(AttackExecutionContext context)
@@ -99,17 +99,33 @@ namespace HaoFuSurvivor
 	public interface IAttackTrigger
 	{
 		int AttackId { get; }
+		int WeaponRuntimeId { get; }
+		bool IsRegistered { get; }
+		void Unregister();
 	}
 
 	public static class AttackTriggerUtility
 	{
-		public static T Find<T>(GameObject owner, int attackId) where T : MonoBehaviour, IAttackTrigger
+		public static T Find<T>(GameObject owner, int attackId, int weaponRuntimeId) where T : MonoBehaviour, IAttackTrigger
 		{
+			if (owner == null) return null;
 			foreach (var trigger in owner.GetComponents<T>())
 			{
-				if (trigger.AttackId == attackId) return trigger;
+				if (trigger.IsRegistered && trigger.AttackId == attackId && trigger.WeaponRuntimeId == weaponRuntimeId) return trigger;
 			}
 			return null;
+		}
+
+		public static void Remove(GameObject owner, int weaponRuntimeId)
+		{
+			if (owner == null) return;
+			foreach (var component in owner.GetComponents<MonoBehaviour>())
+			{
+				if (component is not IAttackTrigger trigger || trigger.WeaponRuntimeId != weaponRuntimeId) continue;
+				trigger.Unregister();
+				if (Application.isPlaying) Object.Destroy(component);
+				else Object.DestroyImmediate(component);
+			}
 		}
 	}
 }
