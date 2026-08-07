@@ -22,7 +22,7 @@ namespace HaoFuSurvivor
 
 		public void TryExecute(int runtimeId, CombatEntity target)
 		{
-			if (this.GetModel<RunModel>().Phase != RunPhase.Active) return;
+			if (!this.GetSystem<RunTimerSystem>().IsRunning()) return;
 			if (!mRuntimes.TryGetValue(runtimeId, out var runtime)) return;
 			if (target == null || runtime.OwnerFaction == target.Faction || runtime.CooldownRemaining > 0f) return;
 
@@ -33,8 +33,10 @@ namespace HaoFuSurvivor
 			executor.Execute(new AttackExecutionContext(runtime.Owner, runtime.OwnerFaction, target, runtime.Config));
 		}
 
-		public void Advance(float deltaTime)
+		public void Advance()
 		{
+			var deltaTime = this.GetModel<RunTimerModel>().DeltaTime;
+			if (deltaTime <= 0f) return;
 			foreach (var runtime in mRuntimes.Values)
 			{
 				runtime.CooldownRemaining = Mathf.Max(0f, runtime.CooldownRemaining - deltaTime);

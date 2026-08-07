@@ -40,46 +40,56 @@ namespace HaoFuSurvivor
 
 	public class TickEnemiesCommand : AbstractCommand
 	{
-		private readonly float mDeltaTime;
-
-		public TickEnemiesCommand(float deltaTime)
+		protected override void OnExecute()
 		{
-			mDeltaTime = deltaTime;
+			this.GetSystem<EnemySystem>().Tick();
+		}
+	}
+
+	public class TickRunPhysicsCommand : AbstractCommand
+	{
+		private readonly float mUnscaledFixedDeltaTime;
+
+		public TickRunPhysicsCommand(float unscaledFixedDeltaTime)
+		{
+			mUnscaledFixedDeltaTime = unscaledFixedDeltaTime;
 		}
 
 		protected override void OnExecute()
 		{
-			this.GetSystem<EnemySystem>().Tick(mDeltaTime);
+			this.GetSystem<RunTimerSystem>().AdvanceFixed(mUnscaledFixedDeltaTime);
+		}
+	}
+
+	public class PauseRunCommand : AbstractCommand
+	{
+		protected override void OnExecute()
+		{
+			this.GetSystem<RunSystem>().Pause();
+		}
+	}
+
+	public class ResumeRunCommand : AbstractCommand
+	{
+		protected override void OnExecute()
+		{
+			this.GetSystem<RunSystem>().Resume();
 		}
 	}
 
 	public class TickAttacksCommand : AbstractCommand
 	{
-		private readonly float mDeltaTime;
-
-		public TickAttacksCommand(float deltaTime)
-		{
-			mDeltaTime = deltaTime;
-		}
-
 		protected override void OnExecute()
 		{
-			this.GetSystem<AttackSystem>().Advance(mDeltaTime);
+			this.GetSystem<AttackSystem>().Advance();
 		}
 	}
 
 	public class TickPlayerDamageInvulnerabilityCommand : AbstractCommand
 	{
-		private readonly float mDeltaTime;
-
-		public TickPlayerDamageInvulnerabilityCommand(float deltaTime)
-		{
-			mDeltaTime = deltaTime;
-		}
-
 		protected override void OnExecute()
 		{
-			this.GetSystem<PlayerSystem>().AdvanceDamageInvulnerability(mDeltaTime);
+			this.GetSystem<PlayerSystem>().AdvanceDamageInvulnerability();
 		}
 	}
 
@@ -306,16 +316,9 @@ namespace HaoFuSurvivor
 
 	public class MovePlayerCommand : AbstractCommand
 	{
-		private readonly float mDeltaTime;
-
-		public MovePlayerCommand(float deltaTime)
-		{
-			mDeltaTime = deltaTime;
-		}
-
 		protected override void OnExecute()
 		{
-			this.GetSystem<PlayerSystem>().Move(mDeltaTime);
+			this.GetSystem<PlayerSystem>().Move();
 		}
 	}
 

@@ -26,9 +26,10 @@ namespace HaoFuSurvivor
 			EnemyFactory.Instance.Release(enemy);
 			this.GetModel<EnemyModel>().AliveCount = mEnemies.Count;
 		}
-		public void Tick(float deltaTime)
+		public void Tick()
 		{
-			if (deltaTime <= 0f || this.GetModel<RunModel>().Phase != RunPhase.Active) return;
+			var deltaTime = this.GetModel<RunTimerModel>().FixedDeltaTime;
+			if (deltaTime <= 0f || !this.GetSystem<RunTimerSystem>().IsRunning()) return;
 			var player = this.GetModel<PlayerModel>();
 			var catalog = this.GetUtility<EnemyCatalog>();
 			var stageIndex = this.GetModel<RunTimerModel>().CurrentStageIndex;
@@ -65,7 +66,10 @@ namespace HaoFuSurvivor
 			for (var i = mEnemies.Count - 1; i >= 0; i--)
 			{
 				var enemy = mEnemies[i]; if (enemy == null) { mEnemies.RemoveAt(i); mMoveSpeeds.Remove(enemy); continue; }
-				enemy.position = Vector2.MoveTowards(enemy.position, playerPosition, mMoveSpeeds[enemy] * multiplier * deltaTime);
+				var nextPosition = Vector2.MoveTowards(enemy.position, playerPosition, mMoveSpeeds[enemy] * multiplier * deltaTime);
+				var rigidbody = enemy.GetComponent<Rigidbody2D>();
+				if (rigidbody != null) rigidbody.MovePosition(nextPosition);
+				else enemy.position = nextPosition;
 			}
 			this.GetModel<EnemyModel>().AliveCount = mEnemies.Count;
 		}

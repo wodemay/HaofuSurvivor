@@ -38,13 +38,17 @@ namespace HaoFuSurvivor
 		private void FixedUpdate()
 		{
 			if (!mIsActive) return;
-			mRigidbody.MovePosition(mRigidbody.position + mDirection * mMoveSpeed * Time.fixedDeltaTime);
+			var deltaTime = this.SendQuery(new GetRunTimeStateQuery()).FixedDeltaTime;
+			if (deltaTime <= 0f) return;
+			mRigidbody.MovePosition(mRigidbody.position + mDirection * mMoveSpeed * deltaTime);
 		}
 
 		private void Update()
 		{
 			if (!mIsActive) return;
-			mRemainingLifetime -= Time.deltaTime;
+			var deltaTime = this.SendQuery(new GetRunTimeStateQuery()).DeltaTime;
+			if (deltaTime <= 0f) return;
+			mRemainingLifetime -= deltaTime;
 			if (mRemainingLifetime <= 0f) ProjectileFactory.Instance.Release(this);
 		}
 

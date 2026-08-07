@@ -57,8 +57,8 @@
 
 - Trigger 初始化时通过 `RegisterAttackCommand` 注册运行时 ID；禁用时通过 `UnregisterAttackCommand` 注销。
 - `GameStart` 每帧发送 `TickAttacksCommand`，由 `AttackSystem.Advance` 递减冷却。
-- EnemyRoot 死亡或局内重置时，`EnemySystem` 先注销敌人生命，再由 `EnemyFactory` 按敌人 ID 回收根节点。
-- 子弹命中或生命周期结束时，由 `ProjectileFactory` 回收到运行时 `ProjectileContainer`。
+- EnemyRoot 死亡或局内重置时，`EnemySystem` 先注销敌人生命，再由 `EnemyFactory` 按敌人 ID 回收根节点；复用时重新注册既有 Trigger，不重复挂载攻击组件。
+- 子弹命中或生命周期结束时，由 `ProjectileFactory` 回收到运行时 `ProjectileContainer`；两类对象池都会跳过跨场景后已销毁的池引用。
 
 ## 新攻击的接入位置
 

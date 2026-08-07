@@ -34,7 +34,13 @@ namespace HaoFuSurvivor
 
 			EnsurePlayerComponents(playerObject);
 			Object.Instantiate(character.PlayerPrefab, characterRoot);
-			this.GetSystem<PlayerLoadoutSystem>().EquipInitialSkillGroup(playerObject, character.SkillGroupId);
+			if (!this.GetSystem<PlayerLoadoutSystem>().EquipInitialSkillGroup(playerObject, character.SkillGroupId))
+			{
+				this.GetSystem<PlayerSystem>().Unregister();
+				Object.Destroy(playerObject);
+				Debug.LogError($"Player spawn failed because skill group {character.SkillGroupId} could not be equipped.");
+				return false;
+			}
 			if (rootConfig.HealthBarPrefab != null)
 			{
 				var healthBar = Object.Instantiate(rootConfig.HealthBarPrefab, healthBarAnchor);

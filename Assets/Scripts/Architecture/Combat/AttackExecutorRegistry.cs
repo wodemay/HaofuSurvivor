@@ -111,7 +111,8 @@ namespace HaoFuSurvivor
 			if (owner == null) return null;
 			foreach (var trigger in owner.GetComponents<T>())
 			{
-				if (trigger.IsRegistered && trigger.AttackId == attackId && trigger.WeaponRuntimeId == weaponRuntimeId) return trigger;
+				if (trigger.AttackId != attackId || trigger.WeaponRuntimeId != weaponRuntimeId) continue;
+				if (weaponRuntimeId == 0 || trigger.IsRegistered) return trigger;
 			}
 			return null;
 		}

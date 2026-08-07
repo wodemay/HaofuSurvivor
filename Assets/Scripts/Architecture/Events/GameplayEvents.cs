@@ -4,6 +4,14 @@ namespace HaoFuSurvivor
 	{
 	}
 
+	public struct RunPausedEvent
+	{
+	}
+
+	public struct RunResumedEvent
+	{
+	}
+
 	public struct RunEndedEvent
 	{
 		public readonly RunPhase Phase;
