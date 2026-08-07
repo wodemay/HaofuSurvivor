@@ -15,3 +15,5 @@
 暂停入口是 `PauseRunCommand`，恢复入口是 `ResumeRunCommand`。它们通过 `RunSystem` 改变 `RunPhase`，再由 `RunTimerSystem` 将逻辑增量清零并同步 Unity 的 `Time.timeScale`。
 
 暂停期间 `RunTimerSystem.IsRunning()` 为 `false`。攻击执行、冷却、伤害无敌帧、敌人刷新/移动、玩家移动和投射物移动/寿命均不得推进。未来暂停 UI 只负责发送这两个 Command，不能自行冻结业务模块。
+
+维护暂停功能时，不应新增绕过 `RunTimerSystem` 的局部计时器。
