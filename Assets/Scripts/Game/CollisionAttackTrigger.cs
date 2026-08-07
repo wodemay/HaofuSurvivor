@@ -26,6 +26,8 @@ namespace HaoFuSurvivor
 
 		private void OnTriggerStay2D(Collider2D other)
 		{
+			if (!this.SendQuery(new GetRunTimeStateQuery()).IsRunning) return;
+
 			var target = other.GetComponentInParent<CombatEntity>();
 			if (target == null || target.Faction == mOwnerFaction) return;
 			this.SendCommand(new TryExecuteAttackCommand(GetInstanceID(), target));

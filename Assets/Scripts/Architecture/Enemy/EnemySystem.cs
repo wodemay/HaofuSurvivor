@@ -12,9 +12,11 @@ namespace HaoFuSurvivor
 		{
 			foreach (var enemy in mEnemies)
 			{
+				if (enemy == null) continue;
 				this.GetSystem<EnemyHealthSystem>().Unregister(enemy.GetComponent<CombatEntity>());
 				EnemyFactory.Instance.Release(enemy);
 			}
+			EnemyFactory.Instance.ReleaseAllActive();
 			mEnemies.Clear(); mMoveSpeeds.Clear(); mSpawnElapsed = 0f; this.GetModel<EnemyModel>().AliveCount = 0;
 		}
 

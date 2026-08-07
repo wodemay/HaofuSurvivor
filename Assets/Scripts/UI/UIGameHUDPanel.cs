@@ -14,7 +14,8 @@ namespace HaoFuSurvivor
 		protected override void OnInit(IUIData uiData = null)
 		{
 			mData = uiData as UIGameHUDPanelData ?? new UIGameHUDPanelData();
-			Button_Back.onClick.AddListener(Back);
+			Button_Back.onClick.AddListener(ReturnToCharacterSelection);
+			Button_Pause.onClick.AddListener(TogglePause);
 			this.RegisterEvent<RunTimerUpdatedEvent>(OnRunTimerUpdated)
 				.UnRegisterWhenGameObjectDestroyed(gameObject);
 			RefreshTime();
@@ -34,7 +35,29 @@ namespace HaoFuSurvivor
 		
 		protected override void OnClose()
 		{
-			Button_Back.onClick.RemoveListener(Back);
+			Button_Back.onClick.RemoveListener(ReturnToCharacterSelection);
+			Button_Pause.onClick.RemoveListener(TogglePause);
+		}
+
+		private void TogglePause()
+		{
+			if (this.SendQuery(new GetRunTimeStateQuery()).IsRunning)
+			{
+				this.SendCommand(new PauseRunCommand());
+			}
+			else
+			{
+				this.SendCommand(new ResumeRunCommand());
+			}
+		}
+
+		private void ReturnToCharacterSelection()
+		{
+			this.SendCommand(new ExitRunToCharacterSelectionCommand());
+			CloseSelf();
+			UIKit.OpenPanel<UICharacterSelectPanel>(
+				assetBundleName: "uicharacterselectpanel_prefab",
+				prefabName: UICharacterSelectPanel.Name);
 		}
 
 		private void OnRunTimerUpdated(RunTimerUpdatedEvent timerEvent)

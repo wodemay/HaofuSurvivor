@@ -93,6 +93,14 @@ namespace HaoFuSurvivor
 		}
 	}
 
+	public class ExitRunToCharacterSelectionCommand : AbstractCommand
+	{
+		protected override void OnExecute()
+		{
+			this.GetSystem<RunSystem>().ExitToCharacterSelection();
+		}
+	}
+
 	public class RegisterAttackCommand : AbstractCommand
 	{
 		private readonly int mRuntimeId;

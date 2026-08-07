@@ -55,6 +55,17 @@ namespace HaoFuSurvivor
 			this.SendEvent(new RunResumedEvent());
 		}
 
+		public void ExitToCharacterSelection()
+		{
+			var runModel = this.GetModel<RunModel>();
+			if (runModel.Phase == RunPhase.None) return;
+
+			runModel.Phase = RunPhase.None;
+			this.GetSystem<RunTimerSystem>().Stop();
+			this.GetSystem<EnemySystem>().Reset();
+			this.GetSystem<PlayerSpawnSystem>().DespawnCurrentCharacter();
+		}
+
 		protected override void OnInit()
 		{
 		}
