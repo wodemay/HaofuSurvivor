@@ -4,6 +4,7 @@ namespace HaoFuSurvivor
 	{
 		None,
 		Active,
+		Paused,
 		Defeat,
 		Victory
 	}

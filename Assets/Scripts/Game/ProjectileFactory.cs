@@ -43,12 +43,17 @@ namespace HaoFuSurvivor
 		private ProjectileController Get(ProjectileAttackParameterConfig parameters)
 		{
 			if (parameters.ProjectilePrefab == null) return null;
+			PruneDestroyedProjectiles();
 			if (!mPools.TryGetValue(parameters.ProjectilePrefab, out var pool))
 			{
 				pool = new Queue<ProjectileController>(Mathf.Max(0, parameters.PoolCapacity));
 				mPools.Add(parameters.ProjectilePrefab, pool);
 			}
-			if (pool.Count > 0) return pool.Dequeue();
+			while (pool.Count > 0)
+			{
+				var pooledProjectile = pool.Dequeue();
+				if (pooledProjectile != null) return pooledProjectile;
+			}
 
 			var projectileObject = Instantiate(parameters.ProjectilePrefab, GetContainer());
 			var projectile = projectileObject.GetComponent<ProjectileController>();
@@ -61,6 +66,16 @@ namespace HaoFuSurvivor
 		{
 			var container = GameObject.Find(ContainerName);
 			return container != null ? container.transform : new GameObject(ContainerName).transform;
+		}
+
+		private void PruneDestroyedProjectiles()
+		{
+			var destroyedProjectiles = new List<ProjectileController>();
+			foreach (var projectile in mPrefabs.Keys)
+			{
+				if (projectile == null) destroyedProjectiles.Add(projectile);
+			}
+			foreach (var projectile in destroyedProjectiles) mPrefabs.Remove(projectile);
 		}
 
 		private void Awake()

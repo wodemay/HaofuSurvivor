@@ -24,17 +24,22 @@ namespace HaoFuSurvivor
 		}
 		public Transform Create(EnemyConfig config, Vector3 position)
 		{
+			PruneDestroyedRoots();
 			var rootConfig = Resources.Load<EnemyRootConfig>(EnemyRootConfigPath);
 			if (rootConfig != null && rootConfig.EnemyPrefab != null)
 			{
-				if (mPools.TryGetValue(config.Id, out var pool) && pool.Count > 0)
+				if (mPools.TryGetValue(config.Id, out var pool))
 				{
-					var pooledRoot = pool.Dequeue();
-					pooledRoot.transform.SetParent(GetContainer(), false);
-					pooledRoot.transform.SetPositionAndRotation(position, Quaternion.identity);
-					pooledRoot.SetActive(true);
-					ConfigureRoot(pooledRoot, config);
-					return pooledRoot.transform;
+					while (pool.Count > 0)
+					{
+						var pooledRoot = pool.Dequeue();
+						if (pooledRoot == null) continue;
+						pooledRoot.transform.SetParent(GetContainer(), false);
+						pooledRoot.transform.SetPositionAndRotation(position, Quaternion.identity);
+						pooledRoot.SetActive(true);
+						ConfigureRoot(pooledRoot, config);
+						return pooledRoot.transform;
+					}
 				}
 
 				var enemyRoot = Instantiate(rootConfig.EnemyPrefab, position, Quaternion.identity, GetContainer());
@@ -107,6 +112,16 @@ namespace HaoFuSurvivor
 			var container = GameObject.Find(EnemyContainerName);
 			if (container != null) return container.transform;
 			return new GameObject(EnemyContainerName).transform;
+		}
+
+		private void PruneDestroyedRoots()
+		{
+			var destroyedRoots = new List<GameObject>();
+			foreach (var root in mEnemyIds.Keys)
+			{
+				if (root == null) destroyedRoots.Add(root);
+			}
+			foreach (var root in destroyedRoots) mEnemyIds.Remove(root);
 		}
 		private void Awake()
 		{

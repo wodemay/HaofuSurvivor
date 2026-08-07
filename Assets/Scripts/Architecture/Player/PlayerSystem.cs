@@ -31,11 +31,12 @@ namespace HaoFuSurvivor
 			this.GetSystem<PlayerLoadoutSystem>().Reset();
 		}
 
-		public void Move(float deltaTime)
+		public void Move()
 		{
+			var deltaTime = this.GetModel<RunTimerModel>().FixedDeltaTime;
 			var playerModel = this.GetModel<PlayerModel>();
 			if (!playerModel.IsRegistered || playerModel.IsDead) return;
-			if (this.GetModel<RunModel>().Phase != RunPhase.Active) return;
+			if (deltaTime <= 0f || !this.GetSystem<RunTimerSystem>().IsRunning()) return;
 
 			var direction = this.GetModel<InputModel>().Movement;
 			playerModel.Position += direction * this.GetSystem<StatSystem>().GetMoveSpeed() * deltaTime;
@@ -57,8 +58,9 @@ namespace HaoFuSurvivor
 			this.GetSystem<RunSystem>().EndWithDefeat();
 		}
 
-		public void AdvanceDamageInvulnerability(float deltaTime)
+		public void AdvanceDamageInvulnerability()
 		{
+			var deltaTime = this.GetModel<RunTimerModel>().DeltaTime;
 			if (deltaTime <= 0f) return;
 			var playerModel = this.GetModel<PlayerModel>();
 			playerModel.DamageInvulnerabilityRemaining = Mathf.Max(0f, playerModel.DamageInvulnerabilityRemaining - deltaTime);

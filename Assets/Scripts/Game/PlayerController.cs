@@ -26,7 +26,7 @@ namespace HaoFuSurvivor
 
 		private void FixedUpdate()
 		{
-			this.SendCommand(new MovePlayerCommand(Time.fixedDeltaTime));
+			this.SendCommand<MovePlayerCommand>();
 			mRigidbody.MovePosition(this.GetModel<PlayerModel>().Position);
 		}
 

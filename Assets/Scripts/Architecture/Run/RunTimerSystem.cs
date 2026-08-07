@@ -9,6 +9,10 @@ namespace HaoFuSurvivor
 		{
 			var timer = this.GetModel<RunTimerModel>();
 			timer.ElapsedSeconds = 0f;
+			timer.DeltaTime = 0f;
+			timer.FixedDeltaTime = 0f;
+			timer.IsPaused = false;
+			Time.timeScale = 1f;
 			timer.CurrentStageIndex = -1;
 			timer.EnemyHealthMultiplier = 1f;
 			timer.EnemyDamageMultiplier = 1f;
@@ -17,14 +21,53 @@ namespace HaoFuSurvivor
 			this.SendEvent(new RunTimerUpdatedEvent(0));
 		}
 
-		public void Advance(float deltaTime)
+		public void Pause()
 		{
-			if (deltaTime <= 0f || this.GetModel<RunModel>().Phase != RunPhase.Active) return;
-
 			var timer = this.GetModel<RunTimerModel>();
-			timer.ElapsedSeconds += deltaTime;
+			timer.IsPaused = true;
+			timer.DeltaTime = 0f;
+			timer.FixedDeltaTime = 0f;
+			Time.timeScale = 0f;
+		}
+
+		public void Resume()
+		{
+			this.GetModel<RunTimerModel>().IsPaused = false;
+			Time.timeScale = 1f;
+		}
+
+		public void Stop()
+		{
+			var timer = this.GetModel<RunTimerModel>();
+			timer.DeltaTime = 0f;
+			timer.FixedDeltaTime = 0f;
+			Time.timeScale = 0f;
+		}
+
+		public void Advance(float unscaledDeltaTime)
+		{
+			var timer = this.GetModel<RunTimerModel>();
+			timer.DeltaTime = GetGameDeltaTime(unscaledDeltaTime);
+			if (timer.DeltaTime <= 0f) return;
+
+			timer.ElapsedSeconds += timer.DeltaTime;
 			ApplyReachedStages(timer);
 			this.SendEvent(new RunTimerUpdatedEvent((int)timer.ElapsedSeconds));
+		}
+
+		public void AdvanceFixed(float unscaledFixedDeltaTime)
+		{
+			this.GetModel<RunTimerModel>().FixedDeltaTime = GetGameDeltaTime(unscaledFixedDeltaTime);
+		}
+
+		public bool IsRunning()
+		{
+			return this.GetModel<RunModel>().Phase == RunPhase.Active && !this.GetModel<RunTimerModel>().IsPaused;
+		}
+
+		private float GetGameDeltaTime(float unscaledDeltaTime)
+		{
+			return IsRunning() ? Mathf.Max(0f, unscaledDeltaTime) : 0f;
 		}
 
 		private void ApplyReachedStages(RunTimerModel timer)
