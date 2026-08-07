@@ -54,7 +54,7 @@ namespace HaoFuSurvivor
 
 		private void OnTriggerEnter2D(Collider2D other)
 		{
-			if (!mIsActive) return;
+			if (!mIsActive || !this.SendQuery(new GetRunTimeStateQuery()).IsRunning) return;
 			var target = other.GetComponentInParent<CombatEntity>();
 			if (target == null || target.Faction == mOwnerFaction) return;
 			this.SendCommand(new ApplyCombatDamageCommand(target, mDamage));

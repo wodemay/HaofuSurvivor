@@ -6,6 +6,8 @@ namespace HaoFuSurvivor
 	{
 		public void ApplyDamage(CombatEntity target, float damage)
 		{
+			if (!this.GetSystem<RunTimerSystem>().IsRunning()) return;
+
 			if (target != null && target.Faction == CombatFaction.Player)
 			{
 				this.GetSystem<PlayerSystem>().ApplyDamage(damage);

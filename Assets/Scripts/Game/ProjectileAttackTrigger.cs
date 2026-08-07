@@ -28,6 +28,8 @@ namespace HaoFuSurvivor
 
 		private void Update()
 		{
+			if (!this.SendQuery(new GetRunTimeStateQuery()).IsRunning) return;
+
 			var target = this.SendQuery(new FindClosestCombatTargetQuery(transform.position, mOwnerFaction, mAttackRange));
 			if (target != null) this.SendCommand(new TryExecuteAttackCommand(GetInstanceID(), target));
 		}

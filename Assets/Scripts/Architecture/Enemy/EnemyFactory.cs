@@ -86,6 +86,15 @@ namespace HaoFuSurvivor
 			}
 		}
 
+		public void ReleaseAllActive()
+		{
+			PruneDestroyedRoots();
+			foreach (var enemyRoot in new List<GameObject>(mEnemyIds.Keys))
+			{
+				if (enemyRoot != null && enemyRoot.activeInHierarchy) Release(enemyRoot.transform);
+			}
+		}
+
 		public void Release(Transform enemyTransform)
 		{
 			if (enemyTransform == null) return;

@@ -8,6 +8,7 @@ namespace HaoFuSurvivor
 		private const string PlayerRootConfigPath = "Configs/PlayerRoot";
 		private const string CharacterRootName = "CharacterRoot";
 		private const string HealthBarAnchorName = "HealthBarAnchor";
+		private GameObject mCurrentPlayer;
 
 		public bool SpawnSelectedCharacter()
 		{
@@ -48,7 +49,15 @@ namespace HaoFuSurvivor
 			}
 
 			BindCamera(playerObject.transform);
+			mCurrentPlayer = playerObject;
 			return true;
+		}
+
+		public void DespawnCurrentCharacter()
+		{
+			this.GetSystem<PlayerSystem>().Unregister();
+			if (mCurrentPlayer != null) Object.Destroy(mCurrentPlayer);
+			mCurrentPlayer = null;
 		}
 
 		private static void EnsurePlayerComponents(GameObject playerObject)

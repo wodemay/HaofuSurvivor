@@ -20,12 +20,20 @@ namespace HaoFuSurvivor
 
 		private void Update()
 		{
+			if (!this.SendQuery(new GetRunTimeStateQuery()).IsRunning)
+			{
+				this.SendCommand(new SetMovementInputCommand(Vector2.zero));
+				return;
+			}
+
 			var movement = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
 			this.SendCommand(new SetMovementInputCommand(movement));
 		}
 
 		private void FixedUpdate()
 		{
+			if (!this.SendQuery(new GetRunTimeStateQuery()).IsRunning) return;
+
 			this.SendCommand<MovePlayerCommand>();
 			mRigidbody.MovePosition(this.GetModel<PlayerModel>().Position);
 		}

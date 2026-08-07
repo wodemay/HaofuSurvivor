@@ -18,14 +18,20 @@ namespace HaoFuSurvivor
 		private void Update()
 		{
 			GameArchitecture.Interface.SendCommand(new TickRunTimerCommand(Time.unscaledDeltaTime));
+			if (!GameArchitecture.Interface.SendQuery(new GetRunTimeStateQuery()).IsRunning) return;
+
 			GameArchitecture.Interface.SendCommand(new TickAttacksCommand());
 			GameArchitecture.Interface.SendCommand(new TickPlayerDamageInvulnerabilityCommand());
+			LogKit.E("unscaledDeltaTime: " + Time.unscaledDeltaTime);
 		}
 
 		private void FixedUpdate()
 		{
-			GameArchitecture.Interface.SendCommand(new TickRunPhysicsCommand(Time.fixedUnscaledDeltaTime));
+			GameArchitecture.Interface.SendCommand(new TickRunPhysicsCommand(Time.fixedDeltaTime));
+			if (!GameArchitecture.Interface.SendQuery(new GetRunTimeStateQuery()).IsRunning) return;
+
 			GameArchitecture.Interface.SendCommand(new TickEnemiesCommand());
+			LogKit.E("Fixed: " + Time.fixedDeltaTime);
 		}
 
 		private void OpenGameHud()

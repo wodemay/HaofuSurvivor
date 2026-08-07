@@ -5,7 +5,7 @@ using QFramework;
 
 namespace HaoFuSurvivor
 {
-	// Generate Id:45a21b55-09e0-4cee-8f13-ac01976461f1
+	// Generate Id:0325b9d9-61fc-4866-9dc0-905f0a7697a8
 	public partial class UIGameHUDPanel
 	{
 		public const string Name = "UIGameHUDPanel";
@@ -14,6 +14,8 @@ namespace HaoFuSurvivor
 		public UnityEngine.UI.Text Text_RemainingTime;
 		[SerializeField]
 		public UnityEngine.UI.Button Button_Back;
+		[SerializeField]
+		public UnityEngine.UI.Button Button_Pause;
 		
 		private UIGameHUDPanelData mPrivateData = null;
 		
@@ -21,6 +23,7 @@ namespace HaoFuSurvivor
 		{
 			Text_RemainingTime = null;
 			Button_Back = null;
+			Button_Pause = null;
 			
 			mData = null;
 		}
