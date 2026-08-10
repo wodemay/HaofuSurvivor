@@ -48,7 +48,7 @@
 
 - `InputModel.cs` / `InputSystem.cs`：保存并写入归一化移动输入。
 - `PlayerModel.cs`：保存玩家注册、位置、角色 ID、生命、死亡和无敌帧状态。
-- `PlayerStatModel.cs`：保存本局最大生命、移速、攻击力和无敌帧时长。
+- `PlayerStatModel.cs`：保存本局最大生命、移速、攻击力、无敌帧和经验吸取属性（范围、加速度、最高速度）。
 - `PlayerRootConfig.cs`：绑定 `PlayerRoot` 与血条画布预制体。
 - `PlayerSpawnSystem.cs`：创建 PlayerRoot，挂载选中角色、血条、CombatEntity，并绑定摄像机和初始技能组；技能组装配失败时注销玩家状态并销毁半初始化根节点。
 - `PlayerSystem.cs`：处理注册、移动、受伤、死亡及无敌帧推进。
@@ -64,6 +64,15 @@
 - `RunTimerModel.cs`：保存累计时间、当前阶段/倍率，以及统一逻辑帧和物理帧增量。
 - `RunTimerSystem.cs`：唯一的局内时间源，推进正计时、应用阶段、发布事件，并在暂停/结束时停止游戏时间。
 - `GetRunTimerStateQuery.cs`：只读返回当前计时与倍率快照。
+
+## Architecture/Experience 与 LevelUp
+
+- `ExperienceModel.cs`：保存角色等级、当前经验和下一等级所需经验。
+- `ExperienceSystem.cs`：处理经验掉落、捕获、吸取、经验结算并发布等级提升事件。
+- `ExperienceDropConfig.cs` / `ExperienceProgressionConfig.cs`：定义经验球和等级经验表的静态数据。
+- `ExperienceDropController.cs` / `ExperienceFactory.cs`：提供经验球 Unity 移动桥接和按配置 ID 的对象池复用。
+- `LevelUpModel.cs`：保存待处理的升级等级队列。
+- `LevelUpSystem.cs`：接收等级事件，管理升级候选、确认、队列和 `LevelUpSelection` 对局冻结。
 
 ## Architecture/Commands、Events 与根架构
 

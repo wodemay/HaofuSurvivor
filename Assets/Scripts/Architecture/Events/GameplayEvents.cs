@@ -84,12 +84,42 @@ namespace HaoFuSurvivor
 
 	public struct EnemyDiedEvent
 	{
-		public readonly CombatEntity Enemy;
+		public readonly ExperienceDropConfig ExperienceDrop;
+		public readonly UnityEngine.Vector2 DeathPosition;
 
-		public EnemyDiedEvent(CombatEntity enemy)
+		public EnemyDiedEvent(ExperienceDropConfig experienceDrop, UnityEngine.Vector2 deathPosition)
 		{
-			Enemy = enemy;
+			ExperienceDrop = experienceDrop;
+			DeathPosition = deathPosition;
 		}
+	}
+
+	public struct ExperienceCollectedEvent
+	{
+		public readonly int Amount;
+		public readonly int CurrentExperience;
+		public readonly int RequiredExperience;
+
+		public ExperienceCollectedEvent(int amount, int currentExperience, int requiredExperience)
+		{
+			Amount = amount;
+			CurrentExperience = currentExperience;
+			RequiredExperience = requiredExperience;
+		}
+	}
+
+	public struct PlayerLevelUpEvent
+	{
+		public readonly int Level;
+
+		public PlayerLevelUpEvent(int level)
+		{
+			Level = level;
+		}
+	}
+
+	public struct LevelUpSelectionRequestedEvent
+	{
 	}
 
 	public struct WeaponEquippedEvent

@@ -15,5 +15,8 @@ namespace HaoFuSurvivor
 		public float MaxHealth;
 		public float MoveSpeed;
 		public float AttackPower;
+		public float BaseExperienceAbsorbRadius = 2.5f;
+		public float BaseExperienceAbsorbAcceleration = 50f;
+		public float BaseExperienceAbsorbMaxSpeed = 30f;
 	}
 }

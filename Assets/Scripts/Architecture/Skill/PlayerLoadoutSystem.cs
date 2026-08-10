@@ -124,6 +124,16 @@ namespace HaoFuSurvivor
 			this.GetModel<PlayerLoadoutModel>().DodgeId = dodgeId;
 		}
 
+		public bool HasUpgradeableWeapon()
+		{
+			foreach (var runtime in this.GetModel<PlayerLoadoutModel>().Weapons)
+			{
+				var config = this.GetUtility<WeaponCatalog>().Get(runtime.WeaponId);
+				if (config != null && runtime.CanUpgrade && runtime.Level < config.MaxLevel) return true;
+			}
+			return false;
+		}
+
 		public void Reset()
 		{
 			var model = this.GetModel<PlayerLoadoutModel>();

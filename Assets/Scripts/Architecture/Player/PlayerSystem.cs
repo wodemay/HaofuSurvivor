@@ -13,6 +13,9 @@ namespace HaoFuSurvivor
 			statModel.MaxHealth = Mathf.Max(1f, character.MaxHealth);
 			statModel.MoveSpeed = Mathf.Max(0f, character.MoveSpeed);
 			statModel.AttackPower = Mathf.Max(0f, character.AttackPower);
+			statModel.ExperienceAbsorbRadius = Mathf.Max(0f, character.BaseExperienceAbsorbRadius);
+			statModel.ExperienceAbsorbAcceleration = Mathf.Max(0.01f, character.BaseExperienceAbsorbAcceleration);
+			statModel.ExperienceAbsorbMaxSpeed = Mathf.Max(0.01f, character.BaseExperienceAbsorbMaxSpeed);
 			playerModel.CharacterId = character.Id;
 			playerModel.Position = initialPosition;
 			playerModel.CurrentHealth = statModel.MaxHealth;

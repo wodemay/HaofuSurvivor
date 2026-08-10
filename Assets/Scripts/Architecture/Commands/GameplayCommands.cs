@@ -93,6 +93,29 @@ namespace HaoFuSurvivor
 		}
 	}
 
+	public class TickExperienceCommand : AbstractCommand
+	{
+		protected override void OnExecute()
+		{
+			this.GetSystem<ExperienceSystem>().Tick();
+		}
+	}
+
+	public class CompleteLevelUpWeaponCommand : AbstractCommand
+	{
+		private readonly int mWeaponRuntimeId;
+
+		public CompleteLevelUpWeaponCommand(int weaponRuntimeId)
+		{
+			mWeaponRuntimeId = weaponRuntimeId;
+		}
+
+		protected override void OnExecute()
+		{
+			this.GetSystem<LevelUpSystem>().CompleteWeaponUpgrade(mWeaponRuntimeId);
+		}
+	}
+
 	public class ExitRunToCharacterSelectionCommand : AbstractCommand
 	{
 		protected override void OnExecute()

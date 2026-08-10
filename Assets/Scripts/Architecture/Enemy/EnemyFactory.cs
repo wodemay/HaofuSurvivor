@@ -11,6 +11,7 @@ namespace HaoFuSurvivor
 		private static Sprite sPlaceholderSprite;
 		private readonly Dictionary<int, Queue<GameObject>> mPools = new();
 		private readonly Dictionary<GameObject, int> mEnemyIds = new();
+		private readonly Dictionary<GameObject, EnemyConfig> mConfigs = new();
 		public static EnemyFactory Instance
 		{
 			get
@@ -38,6 +39,7 @@ namespace HaoFuSurvivor
 						pooledRoot.transform.SetPositionAndRotation(position, Quaternion.identity);
 						pooledRoot.SetActive(true);
 						ConfigureRoot(pooledRoot, config);
+						mConfigs[pooledRoot] = config;
 						return pooledRoot.transform;
 					}
 				}
@@ -54,6 +56,7 @@ namespace HaoFuSurvivor
 				if (config.Prefab != null) Instantiate(config.Prefab, characterRoot);
 				ConfigureRoot(enemyRoot, config);
 				mEnemyIds.Add(enemyRoot, config.Id);
+				mConfigs.Add(enemyRoot, config);
 				return enemyRoot.transform;
 			}
 
@@ -64,6 +67,12 @@ namespace HaoFuSurvivor
 			renderer.color = new Color(0.8f, 0.12f, 0.16f);
 			enemy.transform.localScale = Vector3.one * 0.55f;
 			return enemy.transform;
+		}
+
+		public EnemyConfig GetConfig(Transform enemyTransform)
+		{
+			if (enemyTransform == null) return null;
+			return mConfigs.TryGetValue(enemyTransform.gameObject, out var config) ? config : null;
 		}
 
 		private static void ConfigureRoot(GameObject enemyRoot, EnemyConfig config)
@@ -130,7 +139,11 @@ namespace HaoFuSurvivor
 			{
 				if (root == null) destroyedRoots.Add(root);
 			}
-			foreach (var root in destroyedRoots) mEnemyIds.Remove(root);
+			foreach (var root in destroyedRoots)
+			{
+				mEnemyIds.Remove(root);
+				mConfigs.Remove(root);
+			}
 		}
 		private void Awake()
 		{

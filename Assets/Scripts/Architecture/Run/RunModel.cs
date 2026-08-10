@@ -5,6 +5,7 @@ namespace HaoFuSurvivor
 		None,
 		Active,
 		Paused,
+		LevelUpSelection,
 		Defeat,
 		Victory
 	}
