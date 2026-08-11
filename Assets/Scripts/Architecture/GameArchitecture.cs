@@ -14,6 +14,8 @@ namespace HaoFuSurvivor
 			RegisterModel(new InputModel());
 			RegisterModel(new CharacterSelectionModel());
 			RegisterModel(new PlayerLoadoutModel());
+			RegisterModel(new ExperienceModel());
+			RegisterModel(new LevelUpModel());
 
 			RegisterUtility(new CharacterCatalog());
 			RegisterUtility(new CharacterSelectionStorage());
@@ -24,6 +26,7 @@ namespace HaoFuSurvivor
 			RegisterUtility(new SkillGroupCatalog());
 			RegisterUtility(new WeaponCatalog());
 			RegisterUtility(new WeaponEvolutionCatalog());
+			RegisterUtility(new ExperienceProgressionCatalog());
 
 			RegisterSystem(new RunSystem());
 			RegisterSystem(new RunTimerSystem());
@@ -38,6 +41,8 @@ namespace HaoFuSurvivor
 			RegisterSystem(new StatSystem());
 			RegisterSystem(new DamageSystem());
 			RegisterSystem(new CharacterSelectionSystem());
+			RegisterSystem(new ExperienceSystem());
+			RegisterSystem(new LevelUpSystem());
 		}
 	}
 }

@@ -12,6 +12,8 @@ namespace HaoFuSurvivor
 			runModel.Phase = RunPhase.Active;
 			this.GetSystem<RunTimerSystem>().StartTimer();
 			this.GetSystem<EnemySystem>().Reset();
+			this.GetSystem<ExperienceSystem>().Reset();
+			this.GetSystem<LevelUpSystem>().Reset();
 			this.SendEvent(new RunStartedEvent());
 		}
 
@@ -55,6 +57,24 @@ namespace HaoFuSurvivor
 			this.SendEvent(new RunResumedEvent());
 		}
 
+		public void BeginLevelUpSelection()
+		{
+			var runModel = this.GetModel<RunModel>();
+			if (runModel.Phase != RunPhase.Active) return;
+
+			runModel.Phase = RunPhase.LevelUpSelection;
+			this.GetSystem<RunTimerSystem>().Pause();
+		}
+
+		public void EndLevelUpSelection()
+		{
+			var runModel = this.GetModel<RunModel>();
+			if (runModel.Phase != RunPhase.LevelUpSelection) return;
+
+			runModel.Phase = RunPhase.Active;
+			this.GetSystem<RunTimerSystem>().Resume();
+		}
+
 		public void ExitToCharacterSelection()
 		{
 			var runModel = this.GetModel<RunModel>();
@@ -63,6 +83,8 @@ namespace HaoFuSurvivor
 			runModel.Phase = RunPhase.None;
 			this.GetSystem<RunTimerSystem>().Stop();
 			this.GetSystem<EnemySystem>().Reset();
+			this.GetSystem<ExperienceSystem>().Reset();
+			this.GetSystem<LevelUpSystem>().Reset();
 			this.GetSystem<PlayerSpawnSystem>().DespawnCurrentCharacter();
 		}
 

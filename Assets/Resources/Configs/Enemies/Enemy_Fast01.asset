@@ -17,3 +17,5 @@ MonoBehaviour:
   BaseHealth: 20
   MoveSpeed: 2
   AttackIds: e9030000
+  ExperienceDrop: {fileID: 11400000, guid: 9f69ff63e06f4ea7ab610567952d1470, type: 2}
+  DropTableId: 0

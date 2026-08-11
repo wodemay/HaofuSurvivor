@@ -13,16 +13,19 @@ namespace HaoFuSurvivor
 			GameArchitecture.InitArchitecture();
 			this.RegisterEvent<RunStartedEvent>(_ => OpenGameHud())
 				.UnRegisterWhenGameObjectDestroyed(gameObject);
+			this.RegisterEvent<LevelUpSelectionRequestedEvent>(_ => OpenLevelUpPanel())
+				.UnRegisterWhenGameObjectDestroyed(gameObject);
 		}
 
 		private void Update()
 		{
 			GameArchitecture.Interface.SendCommand(new TickRunTimerCommand(Time.unscaledDeltaTime));
 			if (!GameArchitecture.Interface.SendQuery(new GetRunTimeStateQuery()).IsRunning) return;
+			GameArchitecture.Interface.SendCommand(new TickExperienceCommand());
+			if (!GameArchitecture.Interface.SendQuery(new GetRunTimeStateQuery()).IsRunning) return;
 
 			GameArchitecture.Interface.SendCommand(new TickAttacksCommand());
 			GameArchitecture.Interface.SendCommand(new TickPlayerDamageInvulnerabilityCommand());
-			LogKit.E("unscaledDeltaTime: " + Time.unscaledDeltaTime);
 		}
 
 		private void FixedUpdate()
@@ -31,7 +34,6 @@ namespace HaoFuSurvivor
 			if (!GameArchitecture.Interface.SendQuery(new GetRunTimeStateQuery()).IsRunning) return;
 
 			GameArchitecture.Interface.SendCommand(new TickEnemiesCommand());
-			LogKit.E("Fixed: " + Time.fixedDeltaTime);
 		}
 
 		private void OpenGameHud()
@@ -39,6 +41,13 @@ namespace HaoFuSurvivor
 			UIKit.OpenPanel<UIGameHUDPanel>(
 				assetBundleName: "uigamehudpanel_prefab",
 				prefabName: UIGameHUDPanel.Name);
+		}
+
+		private void OpenLevelUpPanel()
+		{
+			UIKit.OpenPanel<UILevelUpPanel>(
+				assetBundleName: "uileveluppanel_prefab",
+				prefabName: UILevelUpPanel.Name);
 		}
 
 		private void Start()

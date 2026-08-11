@@ -7,6 +7,9 @@ namespace HaoFuSurvivor
 	public class WeaponConfig : ScriptableObject
 	{
 		public int Id;
+		public string DisplayName;
+		[TextArea] public string Description;
+		public Sprite Icon;
 		public List<int> InitialAttackIds = new();
 		public int MaxLevel = 5;
 		public bool CanUpgrade = true;

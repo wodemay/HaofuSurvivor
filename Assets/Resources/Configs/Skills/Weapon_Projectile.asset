@@ -13,6 +13,9 @@ MonoBehaviour:
   m_Name: Weapon_Projectile
   m_EditorClassIdentifier: 
   Id: 1
+  DisplayName: Projectile Weapon
+  Description: Upgrade projectile weapon power.
+  Icon: {fileID: 0}
   InitialAttackIds:
   - 1002
   MaxLevel: 5

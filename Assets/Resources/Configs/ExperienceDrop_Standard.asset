@@ -1,0 +1,11 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8641c3768167c84a8e34a307f72a3c4, type: 3}
+  m_Name: ExperienceDrop_Standard
+  Id: 1
+  DisplayName: Standard Experience
+  BaseExperience: 1
+  Prefab: {fileID: 6396020795192296653, guid: f4780f7f53010454e8efb19157ebd0b1, type: 3}

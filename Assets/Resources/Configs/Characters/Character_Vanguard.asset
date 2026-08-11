@@ -22,3 +22,6 @@ MonoBehaviour:
   MaxHealth: 140
   MoveSpeed: 4.25
   AttackPower: 12
+  BaseExperienceAbsorbRadius: 2.5
+  BaseExperienceAbsorbAcceleration: 50
+  BaseExperienceAbsorbMaxSpeed: 30

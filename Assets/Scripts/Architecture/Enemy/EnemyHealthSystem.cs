@@ -28,8 +28,10 @@ namespace HaoFuSurvivor
 			this.SendEvent(new EnemyDamagedEvent(enemy, damage, currentHealth));
 			if (currentHealth > 0f) return;
 
+			var config = EnemyFactory.Instance.GetConfig(enemy.transform);
+			var deathPosition = enemy.transform.position;
 			mCurrentHealth.Remove(enemy);
-			this.SendEvent(new EnemyDiedEvent(enemy));
+			this.SendEvent(new EnemyDiedEvent(config == null ? null : config.ExperienceDrop, deathPosition));
 			this.GetSystem<EnemySystem>().Release(enemy.transform);
 		}
 

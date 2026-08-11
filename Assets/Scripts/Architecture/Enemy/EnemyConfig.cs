@@ -10,5 +10,7 @@ namespace HaoFuSurvivor
 		public float BaseHealth = 20f;
 		public float MoveSpeed = 2f;
 		public List<int> AttackIds = new();
+		public ExperienceDropConfig ExperienceDrop;
+		public int DropTableId;
 	}
 }
