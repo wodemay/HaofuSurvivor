@@ -6,6 +6,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a8641c3768167c84a8e34a307f72a3c4, type: 3}
   m_Name: ExperienceDrop_Standard
   Id: 1
-  DisplayName: Standard Experience
+  DisplayName: 普通经验
   BaseExperience: 1
   Prefab: {fileID: 6396020795192296653, guid: f4780f7f53010454e8efb19157ebd0b1, type: 3}

@@ -43,6 +43,7 @@ namespace HaoFuSurvivor
 			weapon.Level = 1;
 			weapon.CanUpgrade = canUpgrade;
 			weapon.SetAttackIds(attackIds);
+			weapon.ResetModifiers();
 		}
 
 		public void SetWeaponAttackIds(WeaponRuntimeData weapon, IEnumerable<int> attackIds)

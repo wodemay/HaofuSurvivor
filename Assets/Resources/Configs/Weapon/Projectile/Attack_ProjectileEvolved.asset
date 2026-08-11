@@ -9,8 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 29c0417882fffa348bae7650b80027b8, type: 3}
-  m_Name: WeaponCatalog
+  m_Script: {fileID: 11500000, guid: 31f998e1d2c44d59b08db2e3eeebcaef, type: 3}
+  m_Name: Attack_ProjectileEvolved
   m_EditorClassIdentifier: 
-  Weapons:
-  - {fileID: 11400000, guid: e2bd2f05e98bbcd4ebf652696439937f, type: 2}
+  Id: 1003
+  ExecutorId: projectile
+  ExecutorParameterConfig: {fileID: 11400000, guid: d290374440ee9434da44ad517d24c7f8, type: 2}
+  Damage: 25
+  Cooldown: 0.35

@@ -21,7 +21,7 @@ namespace HaoFuSurvivor
 			mWeaponRuntimeId = weaponRuntimeId;
 			mOwnerFaction = ownerFaction;
 			mIsRegistered = true;
-			this.SendCommand(new RegisterAttackCommand(GetInstanceID(), attackId, gameObject, ownerFaction));
+			this.SendCommand(new RegisterAttackCommand(GetInstanceID(), attackId, gameObject, ownerFaction, weaponRuntimeId));
 		}
 
 		private void OnTriggerStay2D(Collider2D other)

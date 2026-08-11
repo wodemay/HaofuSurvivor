@@ -104,15 +104,17 @@ namespace HaoFuSurvivor
 	public class CompleteLevelUpWeaponCommand : AbstractCommand
 	{
 		private readonly int mWeaponRuntimeId;
+		private readonly bool mIsEvolution;
 
-		public CompleteLevelUpWeaponCommand(int weaponRuntimeId)
+		public CompleteLevelUpWeaponCommand(int weaponRuntimeId, bool isEvolution)
 		{
 			mWeaponRuntimeId = weaponRuntimeId;
+			mIsEvolution = isEvolution;
 		}
 
 		protected override void OnExecute()
 		{
-			this.GetSystem<LevelUpSystem>().CompleteWeaponUpgrade(mWeaponRuntimeId);
+			this.GetSystem<LevelUpSystem>().CompleteWeaponUpgrade(mWeaponRuntimeId, mIsEvolution);
 		}
 	}
 
@@ -130,18 +132,20 @@ namespace HaoFuSurvivor
 		private readonly int mAttackId;
 		private readonly GameObject mOwner;
 		private readonly CombatFaction mOwnerFaction;
+		private readonly int mWeaponRuntimeId;
 
-		public RegisterAttackCommand(int runtimeId, int attackId, GameObject owner, CombatFaction ownerFaction)
+		public RegisterAttackCommand(int runtimeId, int attackId, GameObject owner, CombatFaction ownerFaction, int weaponRuntimeId = 0)
 		{
 			mRuntimeId = runtimeId;
 			mAttackId = attackId;
 			mOwner = owner;
 			mOwnerFaction = ownerFaction;
+			mWeaponRuntimeId = weaponRuntimeId;
 		}
 
 		protected override void OnExecute()
 		{
-			this.GetSystem<AttackSystem>().Register(mRuntimeId, mAttackId, mOwner, mOwnerFaction);
+			this.GetSystem<AttackSystem>().Register(mRuntimeId, mAttackId, mOwner, mOwnerFaction, mWeaponRuntimeId);
 		}
 	}
 

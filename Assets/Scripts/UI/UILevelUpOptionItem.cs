@@ -8,17 +8,17 @@ namespace HaoFuSurvivor
 	{
 		private Button mSelectButton;
 
-		public void Initialize(LevelUpWeaponOption option, Action<int> onSelected)
+		public void Initialize(LevelUpWeaponOption option, Action<LevelUpWeaponOption> onSelected)
 		{
 			var icon = transform.Find("Image_Icon")?.GetComponent<Image>();
 			if (icon != null) icon.sprite = option.Icon;
 			SetText("TextGroup/Text_Name", option.DisplayName);
-			SetText("TextGroup/Text_Level", $"Level{option.CurrentLevel}->Level{option.CurrentLevel + 1}");
+			SetText("TextGroup/Text_Level", option.LevelText);
 			SetText("TextGroup/Text_Description", option.Description);
 			mSelectButton = transform.Find("Button_Select")?.GetComponent<Button>();
 			if (mSelectButton == null) return;
 			mSelectButton.onClick.RemoveAllListeners();
-			mSelectButton.onClick.AddListener(() => onSelected?.Invoke(option.RuntimeId));
+			mSelectButton.onClick.AddListener(() => onSelected?.Invoke(option));
 		}
 
 		private void SetText(string path, string content)

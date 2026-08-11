@@ -64,6 +64,7 @@ namespace HaoFuSurvivor
 			}
 
 			if (!ReplaceWeaponAttacks(runtimeId, attackIds)) return false;
+			runtime.ApplyModifiers(upgrade?.AttackModifiers);
 			model.SetWeaponLevel(runtime, nextLevel);
 			this.SendEvent(new WeaponUpgradedEvent(runtimeId, runtime.WeaponId, nextLevel));
 			return true;
@@ -132,6 +133,14 @@ namespace HaoFuSurvivor
 				if (config != null && runtime.CanUpgrade && runtime.Level < config.MaxLevel) return true;
 			}
 			return false;
+		}
+
+		public bool HasEvolution(int runtimeId)
+		{
+			var runtime = this.GetModel<PlayerLoadoutModel>().GetWeapon(runtimeId);
+			var evolution = runtime == null ? null : this.GetUtility<WeaponEvolutionCatalog>().Get(runtime.WeaponId, runtime.Level);
+			var target = evolution == null ? null : this.GetUtility<WeaponCatalog>().Get(evolution.TargetWeaponId);
+			return runtime != null && target != null && !target.CanUpgrade && target.MaxLevel == 1;
 		}
 
 		public void Reset()

@@ -58,9 +58,9 @@ namespace HaoFuSurvivor
 			}
 		}
 
-		private void SelectWeapon(int weaponRuntimeId)
+		private void SelectWeapon(LevelUpWeaponOption option)
 		{
-			this.SendCommand(new CompleteLevelUpWeaponCommand(weaponRuntimeId));
+			this.SendCommand(new CompleteLevelUpWeaponCommand(option.RuntimeId, option.IsEvolution));
 			if (this.SendQuery(new GetLevelUpStateQuery()).PendingSelectionCount > 0)
 			{
 				RefreshOptions();

@@ -14,11 +14,11 @@
 
 - `SkillGroupConfig.cs`：定义初始武器、技能和闪避 ID。
 - `SkillGroupCatalogConfig.cs` / `SkillGroupCatalog.cs`：技能组目录与按 ID 查询。
-- `WeaponConfig.cs`：武器静态容器模板；`InitialAttackIds` 定义初始填充物，`MaxLevel`、`CanUpgrade` 和 `WeaponLevelUpgrade` 定义升级边界及每级 Attack 增删。
+- `WeaponConfig.cs`：武器静态容器模板；`InitialAttackIds` 定义初始填充物，`MaxLevel`、`CanUpgrade` 和 `WeaponLevelUpgrade` 定义升级边界、每级 Attack 增删、显示文本与按 Attack ID 生效的运行时修正。
 - `WeaponCatalogConfig.cs` / `WeaponCatalog.cs`：武器目录与按 ID 查询。
 - `WeaponEvolutionConfig.cs`：定义来源武器、进化所需等级和目标武器；目标武器必须固定为 1 级且不可升级。
 - `WeaponEvolutionCatalogConfig.cs` / `WeaponEvolutionCatalog.cs`：进化目录与运行时查询。
-- `WeaponRuntimeData.cs`：单把角色武器的运行时容器，保存稳定槽位 ID、当前 WeaponId、等级、可升级状态和当前 Attack 填充物；替换或进化时保留槽位 ID。
+- `WeaponRuntimeData.cs`：单把角色武器的运行时容器，保存稳定槽位 ID、当前 WeaponId、等级、可升级状态、Attack 填充物与按 Attack ID 累加的升级修正；替换或进化时保留槽位 ID 并清空旧修正。
 - `GetPlayerWeaponsQuery.cs`：只读返回当前 WeaponRuntime 快照。
 - `PlayerLoadoutModel.cs`：保存本局 WeaponRuntime、技能、闪避和当前拥有者。
 - `PlayerLoadoutSystem.cs`：装备、升级、替换 Attack、直接替换 Weapon、按目录进化和重置角色武器容器；校验 Attack 配置，并管理每个容器独立的 Attack Trigger 生命周期。
@@ -29,7 +29,7 @@
 - `AttackConfig.cs`：通用攻击静态数据；`ExecutorId` 决定行为，含伤害、冷却和可选参数资产。
 - `AttackCatalogConfig.cs` / `AttackCatalog.cs`：攻击目录与按 ID 查询。
 - `ProjectileAttackParameterConfig.cs`：子弹预制体、速度、射程、寿命和对象池容量。
-- `AttackExecutorRegistry.cs`：执行器注册表；含 `IAttackExecutor`、`CollisionAttackExecutor` 与 `ProjectileAttackExecutor`。`IAttackTrigger` 以 WeaponRuntimeId 区分角色武器；Enemy 的运行时 ID 为 0，复用 EnemyRoot 时重新注册既有 Trigger，不新增组件。
+- `AttackExecutorRegistry.cs`：执行器注册表；含 `IAttackExecutor`、`CollisionAttackExecutor` 与 `ProjectileAttackExecutor`。投射物执行器读取 WeaponRuntime 修正以生成多发、伤害、速度与穿透不同的子弹。`IAttackTrigger` 以 WeaponRuntimeId 区分角色武器；Enemy 的运行时 ID 为 0，复用 EnemyRoot 时重新注册既有 Trigger，不新增组件。
 - `AttackSystem.cs`：保存攻击运行时、冷却和同阵营拦截，调用对应执行器。
 - `CombatTargetSystem.cs`：维护可攻击实体；`FindClosestCombatTargetQuery` 查询最近敌对目标。
 
@@ -72,7 +72,7 @@
 - `ExperienceDropConfig.cs` / `ExperienceProgressionConfig.cs`：定义经验球和等级经验表的静态数据。
 - `ExperienceDropController.cs` / `ExperienceFactory.cs`：提供经验球 Unity 移动桥接和按配置 ID 的对象池复用。
 - `LevelUpModel.cs`：保存待处理的升级等级队列。
-- `LevelUpSystem.cs`：接收等级事件，管理升级候选、确认、队列和 `LevelUpSelection` 对局冻结。
+- `LevelUpSystem.cs`：接收等级事件，管理普通升级与满级进化候选、确认、队列和 `LevelUpSelection` 对局冻结。
 
 ## Architecture/Commands、Events 与根架构
 
@@ -88,7 +88,7 @@
 - `CombatEntity.cs`：Unity 侧战斗身份桥接，注册/注销可被攻击目标并保存阵营。
 - `CollisionAttackTrigger.cs`：碰撞攻击桥接，检测敌对实体并请求执行攻击；角色武器容器替换时按 WeaponRuntimeId 注销。
 - `ProjectileAttackTrigger.cs`：远程攻击桥接，查询最近敌对实体并请求执行攻击；角色武器容器替换时按 WeaponRuntimeId 注销。
-- `ProjectileController.cs`：子弹飞行、碰撞命中、超时和状态重置。
+- `ProjectileController.cs`：子弹飞行、碰撞命中、超时、穿透目标计数与状态重置。
 - `ProjectileFactory.cs`：在运行时 `ProjectileContainer` 下创建、获取和回收子弹对象池；获取时跳过跨场景后已销毁的池引用。
 - `PlayerController.cs`：桌面移动输入与 Rigidbody2D 桥接，发送移动命令。
 - `PlayerHealthBarView.cs`：监听玩家受伤事件并刷新血条 Slider。
