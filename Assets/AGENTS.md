@@ -75,6 +75,8 @@ Write all project documentation in the project-root `Docs/` directory, never und
 
 ### Change Log
 
+- 2026-08-11 | Pushed merge commit `442fe9f` to `feat/unified-game-clock`; PR #8 remains open against `main` and now points to this commit: https://github.com/wodemay/HaofuSurvivor/pull/8. The merge conflict shown by GitHub has been resolved. MCP package files under `Packages/` remain local and uncommitted.
+
 - 2026-08-11 | Pushed `9ce1136` (`feat(weapon): add projectile upgrade path`) to `feat/unified-game-clock`, excluding user-local MCP package changes under `Packages/`. The previous PR #7 was no longer open, so created PR #8 into `main`: https://github.com/wodemay/HaofuSurvivor/pull/8. It contains the projectile weapon upgrade/evolution loop, reorganized Weapon configuration assets, Chinese display texts, and synchronized guides; it has not been merged.
 
 - 2026-08-11 | Updated `Docs/Guides/WeaponUpgrade.zh-CN.md` and `Docs/Scripts/ScriptReference.zh-CN.md` for the relocated Weapon configuration paths, runtime modifier flow, projectile multi-shot/pierce behavior, evolution candidates, and the distinction between Chinese display text and non-localized internal identifiers. Documentation-only change; `git diff --check` passed and no obsolete English display text or old projectile-Weapon path remains in current Docs/configuration assets.
