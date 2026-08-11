@@ -1,5 +1,6 @@
 using QFramework;
 using UnityEngine;
+using System.Collections.Generic;
 
 namespace HaoFuSurvivor
 {
@@ -12,6 +13,8 @@ namespace HaoFuSurvivor
 		private float mDamage;
 		private float mMoveSpeed;
 		private float mRemainingLifetime;
+		private int mRemainingPierce;
+		private readonly HashSet<int> mHitTargetIds = new();
 		private bool mIsActive;
 
 		public IArchitecture GetArchitecture() => GameArchitecture.Interface;
@@ -24,7 +27,7 @@ namespace HaoFuSurvivor
 		}
 
 		public void Launch(Vector2 position, Vector2 direction, CombatFaction ownerFaction, float damage,
-			float moveSpeed, float lifetime)
+			float moveSpeed, float lifetime, int pierce)
 		{
 			transform.position = position;
 			mDirection = direction.normalized;
@@ -32,6 +35,8 @@ namespace HaoFuSurvivor
 			mDamage = damage;
 			mMoveSpeed = Mathf.Max(0f, moveSpeed);
 			mRemainingLifetime = Mathf.Max(0.01f, lifetime);
+			mRemainingPierce = Mathf.Max(0, pierce);
+			mHitTargetIds.Clear();
 			mIsActive = true;
 		}
 
@@ -56,15 +61,17 @@ namespace HaoFuSurvivor
 		{
 			if (!mIsActive || !this.SendQuery(new GetRunTimeStateQuery()).IsRunning) return;
 			var target = other.GetComponentInParent<CombatEntity>();
-			if (target == null || target.Faction == mOwnerFaction) return;
+			if (target == null || target.Faction == mOwnerFaction || !mHitTargetIds.Add(target.GetInstanceID())) return;
 			this.SendCommand(new ApplyCombatDamageCommand(target, mDamage));
-			ProjectileFactory.Instance.Release(this);
+			if (mRemainingPierce-- <= 0) ProjectileFactory.Instance.Release(this);
 		}
 
 		public void ResetState()
 		{
 			mIsActive = false;
 			mRigidbody.velocity = Vector2.zero;
+			mRemainingPierce = 0;
+			mHitTargetIds.Clear();
 		}
 	}
 }

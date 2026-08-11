@@ -10,13 +10,21 @@ namespace HaoFuSurvivor
 		public readonly CombatFaction OwnerFaction;
 		public readonly CombatEntity Target;
 		public readonly AttackConfig Config;
+		public readonly WeaponRuntimeData WeaponRuntime;
 
-		public AttackExecutionContext(GameObject owner, CombatFaction ownerFaction, CombatEntity target, AttackConfig config)
+		public AttackExecutionContext(GameObject owner, CombatFaction ownerFaction, CombatEntity target, AttackConfig config,
+			WeaponRuntimeData weaponRuntime)
 		{
 			Owner = owner;
 			OwnerFaction = ownerFaction;
 			Target = target;
 			Config = config;
+			WeaponRuntime = weaponRuntime;
+		}
+
+		public float GetModifierValue(string key, float defaultValue)
+		{
+			return WeaponRuntime == null ? defaultValue : WeaponRuntime.GetModifierValue(Config.Id, key, defaultValue);
 		}
 	}
 
@@ -91,8 +99,17 @@ namespace HaoFuSurvivor
 			var multiplier = context.OwnerFaction == CombatFaction.Enemy
 				? GameArchitecture.Interface.GetModel<RunTimerModel>().EnemyDamageMultiplier
 				: 1f;
-			ProjectileFactory.Instance.Spawn(parameters, context.Owner.transform.position, direction.normalized,
-				context.OwnerFaction, context.Config.Damage * multiplier);
+			var projectileCount = Mathf.Max(1, Mathf.RoundToInt(context.GetModifierValue(WeaponUpgradeModifierKeys.ProjectileCountAdd, 0f) + 1f));
+			var damage = Mathf.Max(0f, context.Config.Damage + context.GetModifierValue(WeaponUpgradeModifierKeys.ProjectileDamageAdd, 0f));
+			var speed = Mathf.Max(0f, parameters.MoveSpeed * context.GetModifierValue(WeaponUpgradeModifierKeys.ProjectileSpeedMultiplier, 1f));
+			var pierce = Mathf.Max(0, Mathf.FloorToInt(context.GetModifierValue(WeaponUpgradeModifierKeys.ProjectilePierceAdd, 0f)));
+			for (var index = 0; index < projectileCount; index++)
+			{
+				var angle = (index - (projectileCount - 1) * 0.5f) * 10f;
+				var projectileDirection = Quaternion.Euler(0f, 0f, angle) * direction.normalized;
+				ProjectileFactory.Instance.Spawn(parameters, context.Owner.transform.position, projectileDirection,
+					context.OwnerFaction, damage * multiplier, speed, pierce);
+			}
 		}
 	}
 

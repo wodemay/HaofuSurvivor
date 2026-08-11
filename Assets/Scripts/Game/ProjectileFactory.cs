@@ -23,12 +23,12 @@ namespace HaoFuSurvivor
 		}
 
 		public void Spawn(ProjectileAttackParameterConfig parameters, Vector2 position, Vector2 direction,
-			CombatFaction ownerFaction, float damage)
+			CombatFaction ownerFaction, float damage, float moveSpeed, int pierce)
 		{
 			var projectile = Get(parameters);
 			if (projectile == null) return;
 			projectile.gameObject.SetActive(true);
-			projectile.Launch(position, direction, ownerFaction, damage, parameters.MoveSpeed, parameters.Lifetime);
+			projectile.Launch(position, direction, ownerFaction, damage, moveSpeed, parameters.Lifetime, pierce);
 		}
 
 		public void Release(ProjectileController projectile)

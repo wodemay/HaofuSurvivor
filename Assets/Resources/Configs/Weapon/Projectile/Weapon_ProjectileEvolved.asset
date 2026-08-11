@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d8f4f1ef12c28b64eb58148529e525a2, type: 3}
-  m_Name: Weapon_Projectile
+  m_Name: Weapon_ProjectileEvolved
   m_EditorClassIdentifier: 
-  Id: 1
-  DisplayName: Projectile Weapon
-  Description: Upgrade projectile weapon power.
+  Id: 2
+  DisplayName: 投射物武器·进化
+  Description: 进化后的投射物武器。
   Icon: {fileID: 0}
   InitialAttackIds:
-  - 1002
-  MaxLevel: 5
-  CanUpgrade: 1
+  - 1003
+  MaxLevel: 1
+  CanUpgrade: 0
   LevelUpgrades: []

@@ -20,7 +20,26 @@ namespace HaoFuSurvivor
 	public class WeaponLevelUpgrade
 	{
 		public int Level;
+		[TextArea] public string Description;
 		public List<int> AddAttackIds = new();
 		public List<int> RemoveAttackIds = new();
+		public List<WeaponAttackModifier> AttackModifiers = new();
+	}
+
+	[System.Serializable]
+	public class WeaponAttackModifier
+	{
+		public int AttackId;
+		public string Key;
+		public float Value;
+	}
+
+	public static class WeaponUpgradeModifierKeys
+	{
+		public const string AttackCooldownMultiplier = "Attack.CooldownMultiplier";
+		public const string ProjectileDamageAdd = "Projectile.DamageAdd";
+		public const string ProjectileCountAdd = "Projectile.CountAdd";
+		public const string ProjectileSpeedMultiplier = "Projectile.SpeedMultiplier";
+		public const string ProjectilePierceAdd = "Projectile.PierceAdd";
 	}
 }

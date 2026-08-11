@@ -23,7 +23,7 @@ namespace HaoFuSurvivor
 			mOwnerFaction = ownerFaction;
 			mAttackRange = Mathf.Max(0f, attackRange);
 			mIsRegistered = true;
-			this.SendCommand(new RegisterAttackCommand(GetInstanceID(), attackId, gameObject, ownerFaction));
+			this.SendCommand(new RegisterAttackCommand(GetInstanceID(), attackId, gameObject, ownerFaction, weaponRuntimeId));
 		}
 
 		private void Update()

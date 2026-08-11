@@ -12,15 +12,19 @@ namespace HaoFuSurvivor
 		public readonly string DisplayName;
 		public readonly string Description;
 		public readonly Sprite Icon;
+		public readonly bool IsEvolution;
+		public readonly string LevelText;
 
-		public LevelUpWeaponOption(WeaponRuntimeData runtime, WeaponConfig config)
+		public LevelUpWeaponOption(WeaponRuntimeData runtime, WeaponConfig config, string description, bool isEvolution = false)
 		{
 			RuntimeId = runtime.RuntimeId;
 			WeaponId = runtime.WeaponId;
 			CurrentLevel = runtime.Level;
 			DisplayName = string.IsNullOrWhiteSpace(config.DisplayName) ? $"Weapon {runtime.WeaponId}" : config.DisplayName;
-			Description = config.Description;
+			Description = string.IsNullOrWhiteSpace(description) ? config.Description : description;
 			Icon = config.Icon;
+			IsEvolution = isEvolution;
+			LevelText = isEvolution ? $"Level{runtime.Level}->Evolve" : $"Level{runtime.Level}->Level{runtime.Level + 1}";
 		}
 	}
 
@@ -53,8 +57,19 @@ namespace HaoFuSurvivor
 			foreach (var runtime in this.GetModel<PlayerLoadoutModel>().Weapons)
 			{
 				var config = catalog.Get(runtime.WeaponId);
-				if (config == null || !runtime.CanUpgrade || runtime.Level >= config.MaxLevel) continue;
-				options.Add(new LevelUpWeaponOption(runtime, config));
+				if (config == null) continue;
+				if (runtime.CanUpgrade && runtime.Level < config.MaxLevel)
+				{
+					var upgrade = config.LevelUpgrades.Find(item => item != null && item.Level == runtime.Level + 1);
+					options.Add(new LevelUpWeaponOption(runtime, config, upgrade?.Description));
+					continue;
+				}
+				var evolution = GameArchitecture.Interface.GetUtility<WeaponEvolutionCatalog>().Get(runtime.WeaponId, runtime.Level);
+				var target = evolution == null ? null : catalog.Get(evolution.TargetWeaponId);
+				if (target != null && !target.CanUpgrade && target.MaxLevel == 1)
+				{
+					options.Add(new LevelUpWeaponOption(runtime, target, target.Description, true));
+				}
 			}
 			return options;
 		}
@@ -67,11 +82,12 @@ namespace HaoFuSurvivor
 			this.GetModel<LevelUpModel>().Reset();
 		}
 
-		public bool CompleteWeaponUpgrade(int weaponRuntimeId)
+		public bool CompleteWeaponUpgrade(int weaponRuntimeId, bool isEvolution)
 		{
 			var model = this.GetModel<LevelUpModel>();
 			if (model.PendingSelectionCount <= 0) return false;
-			if (!this.GetSystem<PlayerLoadoutSystem>().UpgradeWeapon(weaponRuntimeId)) return false;
+			var loadout = this.GetSystem<PlayerLoadoutSystem>();
+			if (isEvolution ? !loadout.TryEvolveWeapon(weaponRuntimeId) : !loadout.UpgradeWeapon(weaponRuntimeId)) return false;
 
 			model.CompleteCurrent();
 			PresentNextSelection();
@@ -107,7 +123,12 @@ namespace HaoFuSurvivor
 
 		private bool HasSelectionOptions()
 		{
-			return this.GetSystem<PlayerLoadoutSystem>().HasUpgradeableWeapon();
+			var loadout = this.GetSystem<PlayerLoadoutSystem>();
+			foreach (var runtime in this.GetModel<PlayerLoadoutModel>().Weapons)
+			{
+				if (loadout.HasEvolution(runtime.RuntimeId)) return true;
+			}
+			return loadout.HasUpgradeableWeapon();
 		}
 
 		protected override void OnInit()

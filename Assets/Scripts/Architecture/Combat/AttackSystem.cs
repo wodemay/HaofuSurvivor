@@ -8,11 +8,11 @@ namespace HaoFuSurvivor
 	{
 		private readonly Dictionary<int, AttackRuntime> mRuntimes = new();
 
-		public void Register(int runtimeId, int attackId, GameObject owner, CombatFaction ownerFaction)
+		public void Register(int runtimeId, int attackId, GameObject owner, CombatFaction ownerFaction, int weaponRuntimeId)
 		{
 			var config = this.GetUtility<AttackCatalog>().Get(attackId);
 			if (config == null) return;
-			mRuntimes[runtimeId] = new AttackRuntime(config, owner, ownerFaction);
+			mRuntimes[runtimeId] = new AttackRuntime(config, owner, ownerFaction, weaponRuntimeId);
 		}
 
 		public void Unregister(int runtimeId)
@@ -29,8 +29,12 @@ namespace HaoFuSurvivor
 			var executor = this.GetUtility<AttackExecutorRegistry>().Get(runtime.Config.ExecutorId);
 			if (executor == null) return;
 
-			runtime.CooldownRemaining = Mathf.Max(0.01f, runtime.Config.Cooldown);
-			executor.Execute(new AttackExecutionContext(runtime.Owner, runtime.OwnerFaction, target, runtime.Config));
+			var weaponRuntime = runtime.WeaponRuntimeId == 0 ? null : this.GetModel<PlayerLoadoutModel>().GetWeapon(runtime.WeaponRuntimeId);
+			var cooldownMultiplier = weaponRuntime == null
+				? 1f
+				: weaponRuntime.GetModifierValue(runtime.Config.Id, WeaponUpgradeModifierKeys.AttackCooldownMultiplier, 1f);
+			runtime.CooldownRemaining = Mathf.Max(0.01f, runtime.Config.Cooldown * Mathf.Max(0.01f, cooldownMultiplier));
+			executor.Execute(new AttackExecutionContext(runtime.Owner, runtime.OwnerFaction, target, runtime.Config, weaponRuntime));
 		}
 
 		public void Advance()
@@ -52,13 +56,15 @@ namespace HaoFuSurvivor
 			public readonly AttackConfig Config;
 			public readonly GameObject Owner;
 			public readonly CombatFaction OwnerFaction;
+			public readonly int WeaponRuntimeId;
 			public float CooldownRemaining;
 
-			public AttackRuntime(AttackConfig config, GameObject owner, CombatFaction ownerFaction)
+			public AttackRuntime(AttackConfig config, GameObject owner, CombatFaction ownerFaction, int weaponRuntimeId)
 			{
 				Config = config;
 				Owner = owner;
 				OwnerFaction = ownerFaction;
+				WeaponRuntimeId = weaponRuntimeId;
 			}
 		}
 	}
