@@ -15,6 +15,8 @@ namespace HaoFuSurvivor
 				.UnRegisterWhenGameObjectDestroyed(gameObject);
 			this.RegisterEvent<LevelUpSelectionRequestedEvent>(_ => OpenLevelUpPanel())
 				.UnRegisterWhenGameObjectDestroyed(gameObject);
+			this.RegisterEvent<RunEndedEvent>(OnRunEnded)
+				.UnRegisterWhenGameObjectDestroyed(gameObject);
 		}
 
 		private void Update()
@@ -48,6 +50,16 @@ namespace HaoFuSurvivor
 			UIKit.OpenPanel<UILevelUpPanel>(
 				assetBundleName: "uileveluppanel_prefab",
 				prefabName: UILevelUpPanel.Name);
+		}
+
+		private void OnRunEnded(RunEndedEvent runEndedEvent)
+		{
+			if (runEndedEvent.Phase != RunPhase.Defeat) return;
+			UIKit.ClosePanel<UIGameHUDPanel>();
+			UIKit.ClosePanel<UILevelUpPanel>();
+			UIKit.OpenPanel<UIGameOverPanel>(
+				assetBundleName: "uigameoverpanel_prefab",
+				prefabName: UIGameOverPanel.Name);
 		}
 
 		private void Start()

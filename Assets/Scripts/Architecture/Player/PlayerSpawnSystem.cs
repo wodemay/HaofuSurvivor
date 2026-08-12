@@ -34,10 +34,13 @@ namespace HaoFuSurvivor
 			}
 
 			EnsurePlayerComponents(playerObject);
-			Object.Instantiate(character.PlayerPrefab, characterRoot);
+			var characterObject = Object.Instantiate(character.PlayerPrefab, characterRoot);
+			var legacyController = characterObject.GetComponent<PlayerController>();
+			if (legacyController != null) Object.Destroy(legacyController);
+			this.GetSystem<PlayerSystem>().Register(playerObject, playerObject.transform.position, character);
 			if (!this.GetSystem<PlayerLoadoutSystem>().EquipInitialSkillGroup(playerObject, character.SkillGroupId))
 			{
-				this.GetSystem<PlayerSystem>().Unregister();
+				this.GetSystem<PlayerSystem>().Unregister(playerObject);
 				Object.Destroy(playerObject);
 				Debug.LogError($"Player spawn failed because skill group {character.SkillGroupId} could not be equipped.");
 				return false;
@@ -55,8 +58,12 @@ namespace HaoFuSurvivor
 
 		public void DespawnCurrentCharacter()
 		{
-			this.GetSystem<PlayerSystem>().Unregister();
-			if (mCurrentPlayer != null) Object.Destroy(mCurrentPlayer);
+			if (mCurrentPlayer != null)
+			{
+				this.GetSystem<PlayerSystem>().Unregister(mCurrentPlayer);
+				mCurrentPlayer.SetActive(false);
+				Object.Destroy(mCurrentPlayer);
+			}
 			mCurrentPlayer = null;
 		}
 

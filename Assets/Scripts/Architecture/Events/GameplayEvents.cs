@@ -22,6 +22,16 @@ namespace HaoFuSurvivor
 		}
 	}
 
+	public struct RunSettledEvent
+	{
+		public readonly RunSettlementData Data;
+
+		public RunSettledEvent(RunSettlementData data)
+		{
+			Data = data;
+		}
+	}
+
 	public struct RunTimerUpdatedEvent
 	{
 		public readonly int ElapsedSeconds;
