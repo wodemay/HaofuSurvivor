@@ -18,7 +18,7 @@ namespace HaoFuSurvivor
 			mData = uiData as UICharacterSelectPanelData ?? new UICharacterSelectPanelData();
 			UICharacterSelectItem.SetActive(false);
 			Button_ConfirmCharacter.onClick.AddListener(ConfirmSelection);
-			Button_Back.onClick.AddListener(Back);
+			Button_Back.onClick.AddListener(ReturnToMainMenu);
 			BuildCharacterItems();
 		}
 		
@@ -38,7 +38,7 @@ namespace HaoFuSurvivor
 		protected override void OnClose()
 		{
 			Button_ConfirmCharacter.onClick.RemoveListener(ConfirmSelection);
-			Button_Back.onClick.RemoveListener(Back);
+			Button_Back.onClick.RemoveListener(ReturnToMainMenu);
 		}
 
 		private void BuildCharacterItems()
@@ -79,6 +79,14 @@ namespace HaoFuSurvivor
 			this.SendCommand<ConfirmCharacterSelectionCommand>();
 			this.SendCommand<StartSelectedCharacterRunCommand>();
 			CloseSelf();
+		}
+
+		private void ReturnToMainMenu()
+		{
+			CloseSelf();
+			UIKit.OpenPanel<UIMainMenuPanel>(
+				assetBundleName: "uimainmenupanel_prefab",
+				prefabName: UIMainMenuPanel.Name);
 		}
 	}
 
