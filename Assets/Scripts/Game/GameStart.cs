@@ -64,9 +64,9 @@ namespace HaoFuSurvivor
 
 		private void Start()
 		{
-			UIKit.OpenPanel<UICharacterSelectPanel>(
-				assetBundleName: "uicharacterselectpanel_prefab",
-				prefabName: UICharacterSelectPanel.Name);
+			UIKit.OpenPanel<UIMainMenuPanel>(
+				assetBundleName: "uimainmenupanel_prefab",
+				prefabName: UIMainMenuPanel.Name);
 		}
 
 	}

@@ -15,7 +15,7 @@ namespace HaoFuSurvivor
 		{
 			mData = uiData as UIGameOverPanelData ?? new UIGameOverPanelData();
 			Button_Restart.onClick.AddListener(Restart);
-			Button_Return.onClick.AddListener(ReturnToCharacterSelection);
+			Button_Return.onClick.AddListener(ReturnToMainMenu);
 		}
 		
 		protected override void OnOpen(IUIData uiData = null)
@@ -33,7 +33,7 @@ namespace HaoFuSurvivor
 		protected override void OnClose()
 		{
 			Button_Restart.onClick.RemoveListener(Restart);
-			Button_Return.onClick.RemoveListener(ReturnToCharacterSelection);
+			Button_Return.onClick.RemoveListener(ReturnToMainMenu);
 		}
 
 		private void Restart()
@@ -42,13 +42,13 @@ namespace HaoFuSurvivor
 			CloseSelf();
 		}
 
-		private void ReturnToCharacterSelection()
+		private void ReturnToMainMenu()
 		{
 			this.SendCommand(new ExitRunToCharacterSelectionCommand());
 			CloseSelf();
-			UIKit.OpenPanel<UICharacterSelectPanel>(
-				assetBundleName: "uicharacterselectpanel_prefab",
-				prefabName: UICharacterSelectPanel.Name);
+			UIKit.OpenPanel<UIMainMenuPanel>(
+				assetBundleName: "uimainmenupanel_prefab",
+				prefabName: UIMainMenuPanel.Name);
 		}
 	}
 }
