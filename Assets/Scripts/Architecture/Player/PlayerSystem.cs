@@ -5,7 +5,7 @@ namespace HaoFuSurvivor
 {
 	public class PlayerSystem : AbstractSystem
 	{
-		public void Register(Vector2 initialPosition, CharacterConfig character)
+		public void Register(GameObject runtimeRoot, Vector2 initialPosition, CharacterConfig character)
 		{
 			var playerModel = this.GetModel<PlayerModel>();
 			var statModel = this.GetModel<PlayerStatModel>();
@@ -18,6 +18,7 @@ namespace HaoFuSurvivor
 			statModel.ExperienceAbsorbMaxSpeed = Mathf.Max(0.01f, character.BaseExperienceAbsorbMaxSpeed);
 			playerModel.CharacterId = character.Id;
 			playerModel.Position = initialPosition;
+			playerModel.RuntimeRoot = runtimeRoot;
 			playerModel.CurrentHealth = statModel.MaxHealth;
 			playerModel.DamageInvulnerabilityRemaining = 0f;
 			playerModel.IsDead = false;
@@ -25,11 +26,14 @@ namespace HaoFuSurvivor
 			playerModel.IsRegistered = true;
 		}
 
-		public void Unregister()
+		public void Unregister(GameObject runtimeRoot)
 		{
 			var playerModel = this.GetModel<PlayerModel>();
+			if (playerModel.RuntimeRoot != runtimeRoot) return;
+
 			playerModel.IsRegistered = false;
 			playerModel.IsDead = false;
+			playerModel.RuntimeRoot = null;
 			this.GetModel<InputModel>().Movement = Vector2.zero;
 			this.GetSystem<PlayerLoadoutSystem>().Reset();
 		}

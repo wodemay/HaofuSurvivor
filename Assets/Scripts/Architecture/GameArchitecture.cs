@@ -8,6 +8,7 @@ namespace HaoFuSurvivor
 		{
 			RegisterModel(new RunModel());
 			RegisterModel(new RunTimerModel());
+			RegisterModel(new RunSettlementModel());
 			RegisterModel(new PlayerModel());
 			RegisterModel(new EnemyModel());
 			RegisterModel(new PlayerStatModel());
@@ -30,6 +31,7 @@ namespace HaoFuSurvivor
 
 			RegisterSystem(new RunSystem());
 			RegisterSystem(new RunTimerSystem());
+			RegisterSystem(new RunSettlementSystem());
 			RegisterSystem(new InputSystem());
 			RegisterSystem(new PlayerSystem());
 			RegisterSystem(new PlayerSpawnSystem());

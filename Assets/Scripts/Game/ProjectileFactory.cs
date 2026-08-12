@@ -40,6 +40,15 @@ namespace HaoFuSurvivor
 			mPools[prefab].Enqueue(projectile);
 		}
 
+		public void ReleaseAllActive()
+		{
+			PruneDestroyedProjectiles();
+			foreach (var projectile in new List<ProjectileController>(mPrefabs.Keys))
+			{
+				if (projectile != null && projectile.gameObject.activeInHierarchy) Release(projectile);
+			}
+		}
+
 		private ProjectileController Get(ProjectileAttackParameterConfig parameters)
 		{
 			if (parameters.ProjectilePrefab == null) return null;

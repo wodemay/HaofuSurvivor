@@ -126,6 +126,14 @@ namespace HaoFuSurvivor
 		}
 	}
 
+	public class RestartSelectedCharacterRunCommand : AbstractCommand
+	{
+		protected override void OnExecute()
+		{
+			this.GetSystem<RunSystem>().RestartSelectedCharacterRun();
+		}
+	}
+
 	public class RegisterAttackCommand : AbstractCommand
 	{
 		private readonly int mRuntimeId;
@@ -311,26 +319,35 @@ namespace HaoFuSurvivor
 
 	public class RegisterPlayerCommand : AbstractCommand
 	{
+		private readonly GameObject mRuntimeRoot;
 		private readonly Vector2 mInitialPosition;
 		private readonly CharacterConfig mCharacter;
 
-		public RegisterPlayerCommand(Vector2 initialPosition, CharacterConfig character)
+		public RegisterPlayerCommand(GameObject runtimeRoot, Vector2 initialPosition, CharacterConfig character)
 		{
+			mRuntimeRoot = runtimeRoot;
 			mInitialPosition = initialPosition;
 			mCharacter = character;
 		}
 
 		protected override void OnExecute()
 		{
-			this.GetSystem<PlayerSystem>().Register(mInitialPosition, mCharacter);
+			this.GetSystem<PlayerSystem>().Register(mRuntimeRoot, mInitialPosition, mCharacter);
 		}
 	}
 
 	public class UnregisterPlayerCommand : AbstractCommand
 	{
+		private readonly GameObject mRuntimeRoot;
+
+		public UnregisterPlayerCommand(GameObject runtimeRoot)
+		{
+			mRuntimeRoot = runtimeRoot;
+		}
+
 		protected override void OnExecute()
 		{
-			this.GetSystem<PlayerSystem>().Unregister();
+			this.GetSystem<PlayerSystem>().Unregister(mRuntimeRoot);
 		}
 	}
 

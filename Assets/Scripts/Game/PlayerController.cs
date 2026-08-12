@@ -13,9 +13,6 @@ namespace HaoFuSurvivor
 		private void Awake()
 		{
 			mRigidbody = GetComponent<Rigidbody2D>();
-			var selectedCharacterId = this.GetModel<CharacterSelectionModel>().SelectedCharacterId;
-			var character = this.GetUtility<CharacterCatalog>().Get(selectedCharacterId);
-			this.SendCommand(new RegisterPlayerCommand(transform.position, character));
 		}
 
 		private void Update()
@@ -40,10 +37,7 @@ namespace HaoFuSurvivor
 
 		private void OnDestroy()
 		{
-			if (GameArchitecture.Interface.GetModel<PlayerModel>().IsRegistered)
-			{
-				this.SendCommand<UnregisterPlayerCommand>();
-			}
+			this.SendCommand(new UnregisterPlayerCommand(gameObject));
 		}
 	}
 }

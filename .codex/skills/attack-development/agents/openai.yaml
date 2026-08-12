@@ -1,0 +1,4 @@
+interface:
+  display_name: "Attack Development"
+  short_description: "按照QFramework架构独立开发和接入攻击逻辑"
+  default_prompt: "根据攻击形式设计并接入符合项目QFramework架构的攻击逻辑"
