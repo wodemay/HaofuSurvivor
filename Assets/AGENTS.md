@@ -227,3 +227,5 @@ ew DodgeCatalog().Get(1) 已验证返回 Dodge_Basic|1|HaoFuSurvivor.DodgeConfig
 - 2026-08-13 | 按核心模块/可选能力策略完成第一阶段运行时隔离：PlayerLoadoutSystem.EquipInitialSkillGroup() 改为返回 SkillGroupEquipResult；SkillGroupConfig.RequireStartingWeapons 控制初始 Weapon 是否必需，Skill/Dodge 为可选；Dodge 装备失败会清空状态并降级禁用，不再阻止玩家生成；存档恢复跳过无效 Dodge/单个 Weapon，全部 Weapon 无法恢复时回滚到 RunPhase.None 并保留原存档；Dodge 配置运行中丢失会清理激活状态。同步更新 Docs/Guides/ModularityAudit.zh-CN.md。代码审查通过；文档查看器生成 19 个文档；git diff --check 通过；dotnet build Assembly-CSharp.csproj --no-restore --disable-build-servers 通过（0 errors，2 条既有程序集版本警告）。
 
 - 2026-08-13 | 复核运行时隔离改造：技能组缺失现在视为核心 Weapon 装配失败并阻止启动；RequireStartingWeapons 默认 true；存档恢复统计有效 Weapon，全部无效时返回失败；同步 SkillGroup.zh-CN.md 与 ScriptReference.zh-CN.md，重新生成 19 个文档分片。代码审查确认无新增 QFramework 边界、空引用或 UI 结构问题；git diff --check 通过；dotnet build 0 errors，2 条既有程序集版本警告。
+
+- 2026-08-13 | 提交并推送 af22d2（efactor(runtime): isolate optional abilities）到 eat/unified-game-clock，排除本地 Packages/manifest.json、Packages/packages-lock.json 和 Packages/unity-mcp-beta/。已创建 PR #11：https://github.com/wodemay/HaofuSurvivor/pull/11，目标 main；等待用户审核和合并，未自行合并。
