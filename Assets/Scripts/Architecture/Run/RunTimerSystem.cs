@@ -21,6 +21,14 @@ namespace HaoFuSurvivor
 			this.SendEvent(new RunTimerUpdatedEvent(0));
 		}
 
+		public void Restore(float elapsedSeconds, int stageIndex)
+		{
+			var timer = this.GetModel<RunTimerModel>();
+			timer.ElapsedSeconds = Mathf.Max(0f, elapsedSeconds);
+			timer.CurrentStageIndex = -1;
+			ApplyReachedStages(timer);
+		}
+
 		public void Pause()
 		{
 			var timer = this.GetModel<RunTimerModel>();

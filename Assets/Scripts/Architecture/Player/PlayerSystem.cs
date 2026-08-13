@@ -21,8 +21,8 @@ namespace HaoFuSurvivor
 			playerModel.RuntimeRoot = runtimeRoot;
 			playerModel.CurrentHealth = statModel.MaxHealth;
 			playerModel.DamageInvulnerabilityRemaining = 0f;
+			playerModel.DodgeInvulnerabilityRemaining = 0f;
 			playerModel.IsDead = false;
-			playerModel.DamageInvulnerabilityRemaining = 0f;
 			playerModel.IsRegistered = true;
 		}
 
@@ -44,6 +44,7 @@ namespace HaoFuSurvivor
 			var playerModel = this.GetModel<PlayerModel>();
 			if (!playerModel.IsRegistered || playerModel.IsDead) return;
 			if (deltaTime <= 0f || !this.GetSystem<RunTimerSystem>().IsRunning()) return;
+			if (this.GetModel<DodgeModel>().Runtime?.IsActive == true) return;
 
 			var direction = this.GetModel<InputModel>().Movement;
 			playerModel.Position += direction * this.GetSystem<StatSystem>().GetMoveSpeed() * deltaTime;
@@ -52,7 +53,7 @@ namespace HaoFuSurvivor
 		public void ApplyDamage(float damage)
 		{
 			var playerModel = this.GetModel<PlayerModel>();
-			if (!playerModel.IsRegistered || playerModel.IsDead || damage <= 0f || playerModel.DamageInvulnerabilityRemaining > 0f) return;
+			if (!playerModel.IsRegistered || playerModel.IsDead || damage <= 0f || playerModel.DamageInvulnerabilityRemaining > 0f || playerModel.DodgeInvulnerabilityRemaining > 0f) return;
 
 			playerModel.CurrentHealth = Mathf.Max(0f, playerModel.CurrentHealth - damage);
 			playerModel.DamageInvulnerabilityRemaining = this.GetModel<PlayerStatModel>().DamageInvulnerabilityDuration;
@@ -71,6 +72,7 @@ namespace HaoFuSurvivor
 			if (deltaTime <= 0f) return;
 			var playerModel = this.GetModel<PlayerModel>();
 			playerModel.DamageInvulnerabilityRemaining = Mathf.Max(0f, playerModel.DamageInvulnerabilityRemaining - deltaTime);
+			playerModel.DodgeInvulnerabilityRemaining = Mathf.Max(0f, playerModel.DodgeInvulnerabilityRemaining - deltaTime);
 		}
 
 		protected override void OnInit()

@@ -38,13 +38,16 @@ namespace HaoFuSurvivor
 			var legacyController = characterObject.GetComponent<PlayerController>();
 			if (legacyController != null) Object.Destroy(legacyController);
 			this.GetSystem<PlayerSystem>().Register(playerObject, playerObject.transform.position, character);
-			if (!this.GetSystem<PlayerLoadoutSystem>().EquipInitialSkillGroup(playerObject, character.SkillGroupId))
+			var loadoutResult = this.GetSystem<PlayerLoadoutSystem>().EquipInitialSkillGroup(playerObject, character.SkillGroupId);
+			if (!loadoutResult.CoreSucceeded)
 			{
 				this.GetSystem<PlayerSystem>().Unregister(playerObject);
 				Object.Destroy(playerObject);
 				Debug.LogError($"Player spawn failed because skill group {character.SkillGroupId} could not be equipped.");
 				return false;
 			}
+			if (!loadoutResult.DodgeEquipped && character.SkillGroupId != 0)
+				Debug.LogWarning($"Character {character.Id} started without dodge.");
 			if (rootConfig.HealthBarPrefab != null)
 			{
 				var healthBar = Object.Instantiate(rootConfig.HealthBarPrefab, healthBarAnchor);

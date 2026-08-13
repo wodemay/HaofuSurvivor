@@ -7,18 +7,16 @@ namespace HaoFuSurvivor
 	public class UIMainMenuPanelData : UIPanelData
 	{
 	}
-	public partial class UIMainMenuPanel : UIPanel
+	public partial class UIMainMenuPanel : UIPanel, IController
 	{
-		private Button mStartGameButton;
-		private Button mQuitGameButton;
+		public IArchitecture GetArchitecture() => GameArchitecture.Interface;
 
 		protected override void OnInit(IUIData uiData = null)
 		{
 			mData = uiData as UIMainMenuPanelData ?? new UIMainMenuPanelData();
-			mStartGameButton = transform.Find("BG/Button_StartGame").GetComponent<Button>();
-			mQuitGameButton = transform.Find("BG/Button_QuitGame").GetComponent<Button>();
-			mStartGameButton.onClick.AddListener(StartGame);
-			mQuitGameButton.onClick.AddListener(QuitGame);
+			Button_StartGame.onClick.AddListener(StartGame);
+			Button_ContinueGame.onClick.AddListener(ContinueGame);
+			Button_QuitGame.onClick.AddListener(QuitGame);
 		}
 		
 		protected override void OnOpen(IUIData uiData = null)
@@ -27,6 +25,7 @@ namespace HaoFuSurvivor
 		
 		protected override void OnShow()
 		{
+			Button_ContinueGame.gameObject.SetActive(this.SendQuery(new HasSavedRunQuery()).HasSave);
 		}
 		
 		protected override void OnHide()
@@ -35,8 +34,9 @@ namespace HaoFuSurvivor
 		
 		protected override void OnClose()
 		{
-			mStartGameButton.onClick.RemoveListener(StartGame);
-			mQuitGameButton.onClick.RemoveListener(QuitGame);
+			Button_StartGame.onClick.RemoveListener(StartGame);
+			Button_ContinueGame.onClick.RemoveListener(ContinueGame);
+			Button_QuitGame.onClick.RemoveListener(QuitGame);
 		}
 
 		private void StartGame()
@@ -45,6 +45,13 @@ namespace HaoFuSurvivor
 			UIKit.OpenPanel<UICharacterSelectPanel>(
 				assetBundleName: "uicharacterselectpanel_prefab",
 				prefabName: UICharacterSelectPanel.Name);
+		}
+
+		private void ContinueGame()
+		{
+			if (!this.SendQuery(new HasSavedRunQuery()).HasSave) return;
+			CloseSelf();
+			this.SendCommand<ContinueSavedRunCommand>();
 		}
 
 		private void QuitGame()

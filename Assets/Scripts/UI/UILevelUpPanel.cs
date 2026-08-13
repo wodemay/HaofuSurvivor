@@ -60,7 +60,7 @@ namespace HaoFuSurvivor
 
 		private void SelectWeapon(LevelUpWeaponOption option)
 		{
-			this.SendCommand(new CompleteLevelUpWeaponCommand(option.RuntimeId, option.IsEvolution));
+			this.SendCommand(new CompleteLevelUpWeaponCommand(option.RuntimeId, option.IsEvolution, option.IsDodge));
 			if (this.SendQuery(new GetLevelUpStateQuery()).PendingSelectionCount > 0)
 			{
 				RefreshOptions();

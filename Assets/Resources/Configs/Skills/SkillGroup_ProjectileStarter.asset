@@ -16,4 +16,4 @@ MonoBehaviour:
   StartingWeaponIds:
   - 1
   StartingSkillIds: []
-  StartingDodgeId: 0
+  StartingDodgeId: 1

@@ -9,6 +9,7 @@ namespace HaoFuSurvivor
 		public int CharacterId { get; internal set; }
 		public float CurrentHealth { get; internal set; }
 		public float DamageInvulnerabilityRemaining { get; internal set; }
+		public float DodgeInvulnerabilityRemaining { get; internal set; }
 		public Vector2 Position { get; internal set; }
 		public GameObject RuntimeRoot { get; internal set; }
 
@@ -19,6 +20,7 @@ namespace HaoFuSurvivor
 			CharacterId = -1;
 			CurrentHealth = 0f;
 			DamageInvulnerabilityRemaining = 0f;
+			DodgeInvulnerabilityRemaining = 0f;
 			Position = Vector2.zero;
 			RuntimeRoot = null;
 		}
