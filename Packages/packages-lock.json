@@ -1,9 +1,9 @@
 {
   "dependencies": {
     "com.coplaydev.unity-mcp": {
-      "version": "file:D:/HaofuGame/SpaghettiStacker/unity-mcp-beta/MCPForUnity",
+      "version": "https://github.com/CoplayDev/unity-mcp.git?path=MCPForUnity#93f6d3d311db288a8f07403a7057f519f4b9bf3e",
       "depth": 0,
-      "source": "local",
+      "source": "git",
       "dependencies": {
         "com.unity.modules.animation": "1.0.0",
         "com.unity.modules.imageconversion": "1.0.0",
@@ -14,7 +14,9 @@
         "com.unity.modules.unitywebrequest": "1.0.0",
         "com.unity.nuget.newtonsoft-json": "3.0.2",
         "com.unity.test-framework": "1.1.31"
-      }
+      },
+      "hash": "93f6d3d311db288a8f07403a7057f519f4b9bf3e",
+      "url": "https://github.com/CoplayDev/unity-mcp.git?path=MCPForUnity"
     },
     "com.unity.2d.animation": {
       "version": "9.2.0",
