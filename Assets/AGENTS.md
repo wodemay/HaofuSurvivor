@@ -229,3 +229,5 @@ ew DodgeCatalog().Get(1) 已验证返回 Dodge_Basic|1|HaoFuSurvivor.DodgeConfig
 - 2026-08-13 | 复核运行时隔离改造：技能组缺失现在视为核心 Weapon 装配失败并阻止启动；RequireStartingWeapons 默认 true；存档恢复统计有效 Weapon，全部无效时返回失败；同步 SkillGroup.zh-CN.md 与 ScriptReference.zh-CN.md，重新生成 19 个文档分片。代码审查确认无新增 QFramework 边界、空引用或 UI 结构问题；git diff --check 通过；dotnet build 0 errors，2 条既有程序集版本警告。
 
 - 2026-08-13 | 提交并推送 af22d2（efactor(runtime): isolate optional abilities）到 eat/unified-game-clock，排除本地 Packages/manifest.json、Packages/packages-lock.json 和 Packages/unity-mcp-beta/。已创建 PR #11：https://github.com/wodemay/HaofuSurvivor/pull/11，目标 main；等待用户审核和合并，未自行合并。
+
+- 2026-08-14 | 处理 PR #11 与 origin/main 冲突：六个冲突文件（AGENTS、主菜单 Prefab/测试场景、GameStart、UIMainMenuPanel 及 Designer）保留当前分支的继续游戏、存档查询、Bind 和应用生命周期保存逻辑，未改 UI 层级；生成合并提交 656b1f2。dotnet build Assembly-CSharp.csproj --no-restore --disable-build-servers 通过（0 errors，2 条既有程序集版本警告）。推送因代理 TLS unexpected EOF 暂未成功，PR #11 仍指向旧提交 cb3528a，需网络恢复后执行 git push origin feat/unified-game-clock。
