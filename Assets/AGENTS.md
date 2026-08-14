@@ -235,3 +235,11 @@ ew DodgeCatalog().Get(1) 已验证返回 Dodge_Basic|1|HaoFuSurvivor.DodgeConfig
 - 2026-08-14 | Local main fast-forwarded to origin/main at 52abff5; ahead/behind count is 0/0. User-local MCP package changes remain uncommitted in Packages/manifest.json, Packages/packages-lock.json, and Packages/unity-mcp-beta/. The pre-sync AGENTS snapshot remains in stash@{0}.
 
 - 2026-08-14 | 提交并推送本地 Unity MCP 包：Packages/manifest.json、Packages/packages-lock.json 与 Packages/unity-mcp-beta/ 已提交为 b1e0a04，推送分支 feat/add-unity-mcp-package，并创建 PR #12（https://github.com/wodemay/HaofuSurvivor/pull/12）。包目录约 2,185 个文件、26 MB；git diff --cached --check 仅报告 MCP 上游文件已有尾随空格，未改动其内容。
+
+- 2026-08-14 | 统一整理 Docs Markdown 格式：为 Attack、Projectile、Character、Enemy、LevelUp、Weapon、SkillGroup、RunTime、RunSave、Experience 和 Dodge 指南补齐范围说明及稳定的二级章节；统一资源路径、验证章节和扩展边界，未改变玩法语义。重新运行 Tools/GenerateDocsViewer.ps1，生成 19 个文档分片；git diff --check -- Docs Tools 通过。
+
+- 2026-08-14 | 补齐文档统一格式的第二轮：LevelUp、RunTime、SkillGroup、WeaponSystem、WeaponUpgrade 增加统一范围说明并明确相互引用；再次生成 19 个文档分片，git diff --check -- Docs Tools 通过。
+
+- 2026-08-14 | Documentation synchronized with the unified GameLoop runtime: GameStart now sends only root frame/physics commands; RunTimerSystem remains the sole gameplay-time source; GameLoopSystem dispatches only registered IRunUpdateable/IRunFixedUpdateable systems; InputSystem reads left/right Shift for dodge; ProjectileAttackTrigger was removed in favor of automatic projectile executors and ProjectileSystem batch ticking. Rewrote all 19 Docs Markdown files, regenerated Docs viewer data, and verified git diff --check for Docs and Tools. No UI, prefab, scene, asset, code, commit, push, or PR change was made by the documentation pass.
+
+- 2026-08-14 | Prepared feat/unified-game-loop for review: focused lifecycle and QFramework review found no stale gameplay Update/FixedUpdate or removed legacy Tick references; user prefab edits retained; docs viewer regenerated. git diff --check and dotnet build Assembly-CSharp.csproj --no-restore --disable-build-servers passed with 0 errors and 2 existing MCP assembly-version warning groups.

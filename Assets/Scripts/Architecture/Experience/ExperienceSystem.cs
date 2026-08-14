@@ -26,7 +26,7 @@ namespace HaoFuSurvivor
 		}
 	}
 
-	public class ExperienceSystem : AbstractSystem
+	public class ExperienceSystem : AbstractSystem, IRunUpdateable
 	{
 		private readonly List<ActiveExperienceDrop> mDrops = new();
 
@@ -34,17 +34,15 @@ namespace HaoFuSurvivor
 		{
 			foreach (var drop in mDrops) ExperienceFactory.Instance.Release(drop.Config, drop.Controller);
 			mDrops.Clear();
+			this.GetSystem<GameLoopSystem>().UnregisterUpdateable(this);
 			var config = this.GetUtility<ExperienceProgressionCatalog>().Config;
 			this.GetModel<ExperienceModel>().Reset(config == null ? 1 : config.GetRequiredExperience(1));
 		}
 
-		public void Tick()
+		public void OnRunUpdate(float deltaTime)
 		{
-			if (!this.GetSystem<RunTimerSystem>().IsRunning()) return;
 			var player = this.GetModel<PlayerModel>();
 			if (!player.IsRegistered || player.IsDead) return;
-			var deltaTime = this.GetModel<RunTimerModel>().DeltaTime;
-			if (deltaTime <= 0f) return;
 			var playerStats = this.GetModel<PlayerStatModel>();
 			var radius = playerStats.ExperienceAbsorbRadius;
 			for (var index = mDrops.Count - 1; index >= 0; index--)
@@ -73,6 +71,7 @@ namespace HaoFuSurvivor
 					drop.AbsorbSpeed + playerStats.ExperienceAbsorbAcceleration * deltaTime);
 				drop.Controller.MoveTowards(player.Position, drop.AbsorbSpeed * deltaTime);
 			}
+			if (mDrops.Count == 0) this.GetSystem<GameLoopSystem>().UnregisterUpdateable(this);
 		}
 
 		private void OnEnemyDied(EnemyDiedEvent enemyDiedEvent)
@@ -83,6 +82,7 @@ namespace HaoFuSurvivor
 			if (controller == null) return;
 			controller.Configure(config.BaseExperience);
 			mDrops.Add(new ActiveExperienceDrop(config, controller));
+			if (this.GetSystem<RunTimerSystem>().IsRunning()) this.GetSystem<GameLoopSystem>().RegisterUpdateable(this);
 		}
 
 		private void Collect(ActiveExperienceDrop drop)

@@ -35,6 +35,11 @@ namespace HaoFuSurvivor
 		void Execute(AttackExecutionContext context);
 	}
 
+	public interface IAutomaticAttackExecutor
+	{
+		CombatEntity FindTarget(AttackExecutionContext context);
+	}
+
 	public class AttackExecutorRegistry : IUtility
 	{
 		private readonly Dictionary<string, IAttackExecutor> mExecutors = new();
@@ -76,16 +81,21 @@ namespace HaoFuSurvivor
 		}
 	}
 
-	public class ProjectileAttackExecutor : IAttackExecutor
+	public class ProjectileAttackExecutor : IAttackExecutor, IAutomaticAttackExecutor
 	{
 		public string Id => "projectile";
 
 		public void ConfigureOwner(GameObject owner, AttackConfig config, CombatFaction ownerFaction, int weaponRuntimeId = 0)
 		{
-			if (config.ExecutorParameterConfig is not ProjectileAttackParameterConfig parameters) return;
-			var trigger = AttackTriggerUtility.Find<ProjectileAttackTrigger>(owner, config.Id, weaponRuntimeId);
-			if (trigger == null) trigger = owner.AddComponent<ProjectileAttackTrigger>();
-			trigger.Initialize(config.Id, ownerFaction, parameters.AttackRange, weaponRuntimeId);
+			if (config.ExecutorParameterConfig is not ProjectileAttackParameterConfig) return;
+			GameArchitecture.Interface.GetSystem<AttackSystem>().RegisterAutomatic(owner, config, ownerFaction, weaponRuntimeId);
+		}
+
+		public CombatEntity FindTarget(AttackExecutionContext context)
+		{
+			if (context.Config.ExecutorParameterConfig is not ProjectileAttackParameterConfig parameters || context.Owner == null) return null;
+			return GameArchitecture.Interface.SendQuery(
+				new FindClosestCombatTargetQuery(context.Owner.transform.position, context.OwnerFaction, parameters.AttackRange));
 		}
 
 		public void Execute(AttackExecutionContext context)
@@ -137,6 +147,7 @@ namespace HaoFuSurvivor
 		public static void Remove(GameObject owner, int weaponRuntimeId)
 		{
 			if (owner == null) return;
+			GameArchitecture.Interface.GetSystem<AttackSystem>().UnregisterOwner(owner, weaponRuntimeId);
 			foreach (var component in owner.GetComponents<MonoBehaviour>())
 			{
 				if (component is not IAttackTrigger trigger || trigger.WeaponRuntimeId != weaponRuntimeId) continue;

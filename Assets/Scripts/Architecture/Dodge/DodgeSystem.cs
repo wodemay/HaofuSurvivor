@@ -3,14 +3,17 @@ using UnityEngine;
 
 namespace HaoFuSurvivor
 {
-	public class DodgeSystem : AbstractSystem
+	public class DodgeSystem : AbstractSystem, IRunFixedUpdateable
 	{
+		public bool IsEquipped => this.GetModel<DodgeModel>().Runtime != null;
+
 		public bool Equip(int dodgeId)
 		{
 			Reset();
 			if (dodgeId == 0) return true;
 			if (this.GetUtility<DodgeCatalog>().Get(dodgeId) == null) return false;
 			this.GetModel<DodgeModel>().Runtime = new DodgeRuntimeData(dodgeId);
+			if (this.GetSystem<RunTimerSystem>().IsRunning()) this.GetSystem<GameLoopSystem>().RegisterFixedUpdateable(this);
 			return true;
 		}
 
@@ -34,11 +37,10 @@ namespace HaoFuSurvivor
 			return true;
 		}
 
-		public void AdvanceFixed()
+		public void OnRunFixedUpdate(float deltaTime)
 		{
-			var deltaTime = this.GetModel<RunTimerModel>().FixedDeltaTime;
 			var runtime = this.GetModel<DodgeModel>().Runtime;
-			if (deltaTime <= 0f || runtime == null) return;
+			if (runtime == null) return;
 			runtime.CooldownRemaining = Mathf.Max(0f, runtime.CooldownRemaining - deltaTime);
 			if (!runtime.IsActive) return;
 			var config = this.GetUtility<DodgeCatalog>().Get(runtime.DodgeId);
@@ -85,6 +87,7 @@ namespace HaoFuSurvivor
 		{
 			this.GetModel<DodgeModel>().Reset();
 			this.GetModel<PlayerModel>().DodgeInvulnerabilityRemaining = 0f;
+			this.GetSystem<GameLoopSystem>().UnregisterFixedUpdateable(this);
 		}
 
 		private DodgeLevelUpgrade GetUpgrade(DodgeConfig config, int level)

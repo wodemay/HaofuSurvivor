@@ -1,16 +1,22 @@
-# 统一运行时间
+# 统一运行时间与 Tick 调度
 
-`RunTimerSystem` 是所有局内时间的唯一来源。
+本文只说明局内时间来源和调度规则；各玩法如何消费 Tick 由所属模块文档说明。
 
-## 输出
+## 时间来源
 
-- `DeltaTime`：逻辑帧增量。
-- `FixedDeltaTime`：物理帧增量。
-- `ElapsedSeconds`：对局累计时间。
-- 当前阶段倍率：敌人生命、伤害、移动速度和生成速率。
+`RunTimerSystem` 是局内逻辑时间的唯一来源，维护 `DeltaTime`、`FixedDeltaTime`、`ElapsedSeconds` 和时间阶段倍率。业务代码不得直接使用 `Time.deltaTime`、`Time.fixedDeltaTime` 或 `Time.fixedUnscaledDeltaTime` 计算玩法进度。
 
-## 使用规则
+暂停与升级选择会将逻辑增量归零并设置 `Time.timeScale = 0`；恢复后才重新输出有效增量。因此暂停期间不会补算移动、冷却、投射物寿命或经验吸附。
 
-玩家、敌人、投射物、攻击冷却、经验吸附和无敌帧只能读取 `RunTimerModel` 的增量。禁止在业务逻辑中直接使用 `Time.deltaTime` 或 `Time.fixedUnscaledDeltaTime`。
+## 调度器
 
-暂停和升级选择会让两个逻辑增量归零，并同步 `Time.timeScale = 0`。恢复后重新输出增量。
+`GameStart` 只将 Unity 的帧和物理帧输入 `TickGameLoopCommand`、`TickGamePhysicsCommand`。`GameLoopSystem` 先推进 `RunTimerSystem`，随后仅在 Active 状态调用：
+
+- `IRunUpdateable.OnRunUpdate(deltaTime)`：输入、自动攻击、经验、存档、投射物寿命等。
+- `IRunFixedUpdateable.OnRunFixedUpdate(deltaTime)`：玩家、敌人、闪避和投射物物理位移等。
+
+System 通过 `RegisterUpdateable` / `RegisterFixedUpdateable` 按需加入列表，在无活动对象、卸载能力或对局结束时注销。没有时间职责的模块不会进入 Tick 列表。
+
+## 接入规则
+
+新能力先判断需要帧 Tick、物理 Tick 或两者都不需要；仅实现对应接口并在生命周期中注册。不要为单个能力新增业务 MonoBehaviour 的 `Update` / `FixedUpdate`。

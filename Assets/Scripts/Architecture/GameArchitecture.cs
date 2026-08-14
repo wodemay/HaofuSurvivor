@@ -33,6 +33,7 @@ namespace HaoFuSurvivor
 			RegisterUtility(new DodgeCatalog());
 
 			RegisterSystem(new RunSystem());
+			RegisterSystem(new GameLoopSystem());
 			RegisterSystem(new RunTimerSystem());
 			RegisterSystem(new RunSettlementSystem());
 			RegisterSystem(new InputSystem());
@@ -41,6 +42,7 @@ namespace HaoFuSurvivor
 			RegisterSystem(new EnemySystem());
 			RegisterSystem(new EnemyHealthSystem());
 			RegisterSystem(new AttackSystem());
+			RegisterSystem(new ProjectileSystem());
 			RegisterSystem(new CombatTargetSystem());
 			RegisterSystem(new PlayerLoadoutSystem());
 			RegisterSystem(new StatSystem());

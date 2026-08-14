@@ -1,13 +1,31 @@
 # Attack 运行流程
 
-Attack 配置位于 `Resources/Configs/Combat/AttackCatalog.asset`，`ExecutorId` 决定具体行为。攻击不绑定固定目标阵营，由运行时拥有者推导敌对阵营。
+本文说明共享 Attack 的运行职责；新增攻击步骤见 `NewAttack.zh-CN.md`。
 
-## 通用链路
+## 配置边界
+
+所有 Attack 由 `Resources/Configs/Combat/AttackCatalog.asset` 以数字 ID 索引。`ExecutorId` 选择具体实现；目标阵营从运行时拥有者的 `CombatFaction` 推导，配置不写目标阵营，也不使用 AttackType 分支。
+
+## 碰撞攻击
 
 ```text
-配置 -> Trigger -> RegisterAttackCommand -> AttackSystem -> Executor -> DamageSystem
+CollisionAttackTrigger -> Register/TryExecuteAttackCommand -> AttackSystem -> CollisionAttackExecutor -> DamageSystem
 ```
 
-Trigger 只负责感知触发条件；AttackSystem 负责运行时、冷却和阵营校验；Executor 负责具体攻击表现；DamageSystem 将伤害交给玩家或敌人生命系统。
+`CollisionAttackTrigger` 只处理碰撞感知与注册。`AttackSystem` 保存运行时、校验阵营和冷却，然后调用 Executor；`DamageSystem` 是唯一伤害入口。对象池回收时，Trigger 注销运行时而不是重复添加组件。
 
-当前 ID 1001 使用 `collision`，ID 1002 使用 `projectile`。新增攻击应新增 Executor 和对应 Trigger，不增加 AttackType 分支。
+## 自动攻击与投射物
+
+```text
+Executor.ConfigureOwner -> AttackSystem.RegisterAutomatic -> GameLoopSystem
+-> AttackSystem.OnRunUpdate -> IAutomaticAttackExecutor.FindTarget -> Execute
+```
+
+自动攻击没有逐攻击的 Update Trigger。`AttackSystem` 仅在存在 AttackRuntime 时注册帧 Tick；冷却结束后，自动 Executor 查找目标并执行。当前 `projectile` Executor 采用此路径；投射物移动和生命周期由 `ProjectileSystem` 批量调度。
+
+## 扩展约束
+
+- Executor 实现具体攻击和必要的目标选择。
+- 碰撞类攻击可以使用 Trigger；自动攻击实现 `IAutomaticAttackExecutor`。
+- AttackSystem 统一拥有运行时、冷却和生命周期。
+- DamageSystem 统一路由伤害。

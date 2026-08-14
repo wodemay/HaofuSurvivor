@@ -16,6 +16,7 @@ namespace HaoFuSurvivor
 			this.GetSystem<EnemySystem>().Reset();
 			this.GetSystem<ExperienceSystem>().Reset();
 			this.GetSystem<LevelUpSystem>().Reset();
+			this.GetSystem<GameLoopSystem>().BeginRun();
 			this.SendEvent(new RunStartedEvent());
 		}
 
@@ -26,6 +27,7 @@ namespace HaoFuSurvivor
 
 			runModel.Phase = RunPhase.Victory;
 			this.GetSystem<RunTimerSystem>().Stop();
+			this.GetSystem<GameLoopSystem>().EndRun();
 			this.GetSystem<RunSaveSystem>().Clear();
 			this.GetSystem<RunSettlementSystem>().Settle(RunPhase.Victory);
 			this.SendEvent(new RunEndedEvent(RunPhase.Victory));
@@ -38,6 +40,7 @@ namespace HaoFuSurvivor
 
 			runModel.Phase = RunPhase.Defeat;
 			this.GetSystem<RunTimerSystem>().Stop();
+			this.GetSystem<GameLoopSystem>().EndRun();
 			this.GetSystem<RunSaveSystem>().Clear();
 			this.GetSystem<RunSettlementSystem>().Settle(RunPhase.Defeat);
 			this.SendEvent(new RunEndedEvent(RunPhase.Defeat));
@@ -50,6 +53,7 @@ namespace HaoFuSurvivor
 
 			runModel.Phase = RunPhase.Paused;
 			this.GetSystem<RunTimerSystem>().Pause();
+			this.GetSystem<InputSystem>().Clear();
 			this.GetSystem<RunSaveSystem>().SaveCurrentRun();
 			this.SendEvent(new RunPausedEvent());
 		}
@@ -90,6 +94,7 @@ namespace HaoFuSurvivor
 			this.GetSystem<RunSaveSystem>().SaveCurrentRun();
 			runModel.Phase = RunPhase.None;
 			this.GetSystem<RunTimerSystem>().Stop();
+			this.GetSystem<GameLoopSystem>().EndRun();
 			ReleaseRunRuntime();
 		}
 
@@ -122,11 +127,12 @@ namespace HaoFuSurvivor
 
 		private void ReleaseRunRuntime()
 		{
+			this.GetSystem<GameLoopSystem>().EndRun();
 			this.GetSystem<EnemySystem>().Reset();
 			this.GetSystem<ExperienceSystem>().Reset();
 			this.GetSystem<LevelUpSystem>().Reset();
 			this.GetSystem<DodgeSystem>().Reset();
-			ProjectileFactory.Instance.ReleaseAllActive();
+			this.GetSystem<ProjectileSystem>().Reset();
 			this.GetSystem<PlayerSpawnSystem>().DespawnCurrentCharacter();
 		}
 
