@@ -1,9 +1,14 @@
 # 新增 Character
 
-1. 在 `Assets/Resources/Configs/Characters/` 创建 CharacterConfig。
-2. 分配未使用的数字 `Id`。
-3. 填写显示信息、基础属性、`SkillGroupId` 和 `PlayerPrefab`。
-4. PlayerPrefab 只负责角色内容；必须由 PlayerRoot 在运行时承载。
-5. 如需开局武器，在 `Resources/Configs/Skills/` 配置 SkillGroupConfig，并确保 Weapon/Attack ID 有效。
+本文只说明角色配置和内容 Prefab 接入；PlayerRoot、技能组和 UI 由现有模块维护。
 
-不要修改 PlayerRoot、HealthBarAnchor、CharacterRoot 或 UI 层级。角色生成由 `PlayerSpawnSystem` 统一完成。
+## 配置资产
+
+1. 在 `Resources/Configs/Characters/` 创建 CharacterConfig。
+2. 分配未使用的数字 `Id`，填写显示信息、基础属性、`SkillGroupId` 与 `PlayerPrefab`。
+3. `PlayerPrefab` 只放角色内容与表现，不承担玩家注册、输入或移动。
+4. 需要初始能力时，在 `Resources/Configs/Skills/` 配置 SkillGroup，并确认必需 Weapon 与 Attack ID 有效。
+
+## 运行约束
+
+`PlayerSpawnSystem` 创建 PlayerRoot，挂载角色内容并让 `PlayerSystem` 管理移动；`GameLoopSystem` 只调度 PlayerSystem，不调度角色内容 Prefab。不要修改 PlayerRoot、CharacterRoot、HealthBarAnchor 或 UI 层级。

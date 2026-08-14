@@ -22,7 +22,7 @@ namespace HaoFuSurvivor
 		}
 	}
 
-	public class RunSaveSystem : AbstractSystem
+	public class RunSaveSystem : AbstractSystem, IRunUpdateable
 	{
 		private const float AutoSaveIntervalSeconds = 30f;
 		private float mAutoSaveElapsed;
@@ -32,10 +32,8 @@ namespace HaoFuSurvivor
 			mAutoSaveElapsed = 0f;
 		}
 
-		public void TickAutoSave()
+		public void OnRunUpdate(float deltaTime)
 		{
-			var deltaTime = this.GetModel<RunTimerModel>().DeltaTime;
-			if (deltaTime <= 0f) return;
 			mAutoSaveElapsed += deltaTime;
 			if (mAutoSaveElapsed < AutoSaveIntervalSeconds) return;
 			mAutoSaveElapsed = 0f;

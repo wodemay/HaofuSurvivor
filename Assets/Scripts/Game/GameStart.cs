@@ -21,23 +21,12 @@ namespace HaoFuSurvivor
 
 		private void Update()
 		{
-			GameArchitecture.Interface.SendCommand(new TickRunTimerCommand(Time.unscaledDeltaTime));
-			GameArchitecture.Interface.GetSystem<RunSaveSystem>().TickAutoSave();
-			if (!GameArchitecture.Interface.SendQuery(new GetRunTimeStateQuery()).IsRunning) return;
-			GameArchitecture.Interface.SendCommand(new TickExperienceCommand());
-			if (!GameArchitecture.Interface.SendQuery(new GetRunTimeStateQuery()).IsRunning) return;
-
-			GameArchitecture.Interface.SendCommand(new TickAttacksCommand());
-			GameArchitecture.Interface.SendCommand(new TickPlayerDamageInvulnerabilityCommand());
+			GameArchitecture.Interface.SendCommand(new TickGameLoopCommand(Time.unscaledDeltaTime));
 		}
 
 		private void FixedUpdate()
 		{
-			GameArchitecture.Interface.SendCommand(new TickRunPhysicsCommand(Time.fixedDeltaTime));
-			if (!GameArchitecture.Interface.SendQuery(new GetRunTimeStateQuery()).IsRunning) return;
-
-			GameArchitecture.Interface.SendCommand(new TickDodgeCommand());
-			GameArchitecture.Interface.SendCommand(new TickEnemiesCommand());
+			GameArchitecture.Interface.SendCommand(new TickGamePhysicsCommand(Time.fixedDeltaTime));
 		}
 
 		private void OpenGameHud()
@@ -81,26 +70,5 @@ namespace HaoFuSurvivor
 			GameArchitecture.Interface.GetSystem<RunSaveSystem>().SaveCurrentRun();
 		}
 
-	}
-
-	public class CameraFollow : MonoBehaviour
-	{
-		private Transform mTarget;
-		private float mZPosition;
-
-		public void Bind(Transform target)
-		{
-			mTarget = target;
-			mZPosition = transform.position.z;
-		}
-
-		private void LateUpdate()
-		{
-			if (mTarget == null) return;
-
-			var position = mTarget.position;
-			position.z = mZPosition;
-			transform.position = position;
-		}
 	}
 }

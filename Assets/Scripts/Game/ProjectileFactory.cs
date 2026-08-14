@@ -29,11 +29,13 @@ namespace HaoFuSurvivor
 			if (projectile == null) return;
 			projectile.gameObject.SetActive(true);
 			projectile.Launch(position, direction, ownerFaction, damage, moveSpeed, parameters.Lifetime, pierce);
+			GameArchitecture.Interface.GetSystem<ProjectileSystem>().Register(projectile);
 		}
 
 		public void Release(ProjectileController projectile)
 		{
 			if (projectile == null || !mPrefabs.TryGetValue(projectile, out var prefab)) return;
+			GameArchitecture.Interface.GetSystem<ProjectileSystem>().Unregister(projectile);
 			projectile.ResetState();
 			projectile.gameObject.SetActive(false);
 			projectile.transform.SetParent(GetContainer(), false);

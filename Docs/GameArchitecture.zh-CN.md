@@ -1,40 +1,38 @@
 # ProjectSurvivor 架构边界
 
-本文只定义架构边界，不重复具体运行流程和资源创建步骤。
+本文只定义职责归属；运行顺序见 `GameLogic.zh-CN.md`，资源接入步骤见 `Guides/`。
 
 ## QFramework 分层
+
+`GameArchitecture` 是唯一的业务模块注册点。
 
 ```text
 Controller/View -> Command -> System -> Model/Utility
                          \-> Query/Event
 ```
 
-- Model 保存可变状态，不调用 System。
-- System 负责领域行为和生命周期。
-- Command 表达改变状态的请求。
-- Query 只返回查询结果。
-- Event 只通知已经发生的事实。
-- Controller 和 UI 只负责 Unity 桥接。
+- Model 保存可变状态；System 负责领域行为和生命周期。
+- Command 改变状态，Query 只读，Event 表示已发生的事实。
+- Unity 组件只承担对象、输入、表现或物理桥接。
 
 ## 当前模块职责
 
 | 模块 | 唯一职责 |
 | --- | --- |
-| Run | 对局阶段、统一时间、结算边界和存档时机 |
-| Player | PlayerRoot、移动、生命、死亡 |
-| Enemy | 敌人配置、生成、移动、生命和对象池 |
-| Combat | Attack 配置、Executor、目标和伤害路由 |
-| Skill | 技能组、Weapon 容器和运行时 Attack 内容 |
-| Experience | 经验掉落、吸附和经验计算 |
-| LevelUp | 升级队列、候选项和选择阶段 |
-| Save | 局内快照序列化与恢复 |
-| UI | 显示和输入；层级、Prefab、Bind 由用户维护 |
+| Run | 对局阶段、逻辑时间、Tick 调度、结算边界 |
+| Player | PlayerRoot 注册、移动、生命、死亡 |
+| Enemy | 配置、生成、移动、生命、对象池 |
+| Combat | Attack 配置、执行器、目标、伤害、投射物 |
+| Skill | 技能组和运行时 Weapon 容器 |
+| Dodge | 闪避状态、冷却、位移、升级 |
+| Experience / LevelUp | 掉落与吸附；升级队列与选择 |
+| Save | 局内快照序列化和恢复 |
+| UI | 显示与输入绑定；层级和 Bind 仍由用户维护 |
 
-## 数据边界
+## 统一 Tick 规则
 
-- ScriptableObject 只保存不可变配置。
-- Model 只保存运行时可变状态。
-- 存档禁止保存 Unity 场景对象引用。
-- 当前存档使用一个 PlayerPrefs JSON 槽位。
+`GameStart` 是唯一的游戏业务 `Update` / `FixedUpdate` 宿主，只发送两个根 Command 到 `GameLoopSystem`。需要随时间运行的 System 实现 `IRunUpdateable` 或 `IRunFixedUpdateable`，仅在实际需要时注册；禁止新增分散的业务 `MonoBehaviour.Update` 或 `FixedUpdate`。
 
-新增业务必须进入对应 System，并通过 Command、Query 或 Event 暴露；禁止增加无架构约束的全局管理器。
+## 数据与扩展规则
+
+ScriptableObject 只保存静态定义，Model 只保存局内状态，存档只保存 ID 和数值。内容通过数字 ID 与 Catalog 接入；攻击行为通过 `ExecutorId` 扩展，禁止 AttackType 枚举和无架构约束的全局管理器。

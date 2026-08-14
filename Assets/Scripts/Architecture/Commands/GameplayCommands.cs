@@ -4,14 +4,6 @@ using UnityEngine;
 
 namespace HaoFuSurvivor
 {
-	public class StartRunCommand : AbstractCommand
-	{
-		protected override void OnExecute()
-		{
-			this.GetSystem<RunSystem>().StartRun();
-		}
-	}
-
 	public class StartSelectedCharacterRunCommand : AbstractCommand
 	{
 		protected override void OnExecute()
@@ -23,41 +15,33 @@ namespace HaoFuSurvivor
 		}
 	}
 
-	public class TickRunTimerCommand : AbstractCommand
+	public class TickGameLoopCommand : AbstractCommand
 	{
 		private readonly float mDeltaTime;
 
-		public TickRunTimerCommand(float deltaTime)
+		public TickGameLoopCommand(float deltaTime)
 		{
 			mDeltaTime = deltaTime;
 		}
 
 		protected override void OnExecute()
 		{
-			this.GetSystem<RunTimerSystem>().Advance(mDeltaTime);
+			this.GetSystem<GameLoopSystem>().TickFrame(mDeltaTime);
 		}
 	}
 
-	public class TickEnemiesCommand : AbstractCommand
+	public class TickGamePhysicsCommand : AbstractCommand
 	{
-		protected override void OnExecute()
-		{
-			this.GetSystem<EnemySystem>().Tick();
-		}
-	}
+		private readonly float mFixedDeltaTime;
 
-	public class TickRunPhysicsCommand : AbstractCommand
-	{
-		private readonly float mUnscaledFixedDeltaTime;
-
-		public TickRunPhysicsCommand(float unscaledFixedDeltaTime)
+		public TickGamePhysicsCommand(float fixedDeltaTime)
 		{
-			mUnscaledFixedDeltaTime = unscaledFixedDeltaTime;
+			mFixedDeltaTime = fixedDeltaTime;
 		}
 
 		protected override void OnExecute()
 		{
-			this.GetSystem<RunTimerSystem>().AdvanceFixed(mUnscaledFixedDeltaTime);
+			this.GetSystem<GameLoopSystem>().TickFixed(mFixedDeltaTime);
 		}
 	}
 
@@ -77,29 +61,6 @@ namespace HaoFuSurvivor
 		}
 	}
 
-	public class TickAttacksCommand : AbstractCommand
-	{
-		protected override void OnExecute()
-		{
-			this.GetSystem<AttackSystem>().Advance();
-		}
-	}
-
-	public class TickPlayerDamageInvulnerabilityCommand : AbstractCommand
-	{
-		protected override void OnExecute()
-		{
-			this.GetSystem<PlayerSystem>().AdvanceDamageInvulnerability();
-		}
-	}
-
-	public class TickExperienceCommand : AbstractCommand
-	{
-		protected override void OnExecute()
-		{
-			this.GetSystem<ExperienceSystem>().Tick();
-		}
-	}
 
 	public class CompleteLevelUpWeaponCommand : AbstractCommand
 	{
@@ -131,11 +92,6 @@ namespace HaoFuSurvivor
 	public class RequestDodgeCommand : AbstractCommand
 	{
 		protected override void OnExecute() { this.GetSystem<DodgeSystem>().TryStart(); }
-	}
-
-	public class TickDodgeCommand : AbstractCommand
-	{
-		protected override void OnExecute() { this.GetSystem<DodgeSystem>().AdvanceFixed(); }
 	}
 
 	public class UpgradeDodgeCommand : AbstractCommand
@@ -376,28 +332,6 @@ namespace HaoFuSurvivor
 		}
 	}
 
-	public class SetMovementInputCommand : AbstractCommand
-	{
-		private readonly Vector2 mMovement;
-
-		public SetMovementInputCommand(Vector2 movement)
-		{
-			mMovement = movement;
-		}
-
-		protected override void OnExecute()
-		{
-			this.GetSystem<InputSystem>().SetMovement(mMovement);
-		}
-	}
-
-	public class MovePlayerCommand : AbstractCommand
-	{
-		protected override void OnExecute()
-		{
-			this.GetSystem<PlayerSystem>().Move();
-		}
-	}
 
 	public class SelectCharacterCommand : AbstractCommand
 	{

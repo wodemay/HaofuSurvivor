@@ -80,7 +80,6 @@ namespace HaoFuSurvivor
 			if (rigidbody == null) rigidbody = playerObject.AddComponent<Rigidbody2D>();
 			rigidbody.bodyType = RigidbodyType2D.Kinematic;
 			rigidbody.gravityScale = 0f;
-			if (playerObject.GetComponent<PlayerController>() == null) playerObject.AddComponent<PlayerController>();
 		}
 
 		private static void BindCamera(Transform playerTransform)

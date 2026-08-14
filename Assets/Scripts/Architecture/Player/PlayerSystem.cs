@@ -3,8 +3,10 @@ using UnityEngine;
 
 namespace HaoFuSurvivor
 {
-	public class PlayerSystem : AbstractSystem
+	public class PlayerSystem : AbstractSystem, IRunUpdateable, IRunFixedUpdateable
 	{
+		private Rigidbody2D mRigidbody;
+
 		public void Register(GameObject runtimeRoot, Vector2 initialPosition, CharacterConfig character)
 		{
 			var playerModel = this.GetModel<PlayerModel>();
@@ -19,6 +21,7 @@ namespace HaoFuSurvivor
 			playerModel.CharacterId = character.Id;
 			playerModel.Position = initialPosition;
 			playerModel.RuntimeRoot = runtimeRoot;
+			mRigidbody = runtimeRoot.GetComponent<Rigidbody2D>();
 			playerModel.CurrentHealth = statModel.MaxHealth;
 			playerModel.DamageInvulnerabilityRemaining = 0f;
 			playerModel.DodgeInvulnerabilityRemaining = 0f;
@@ -34,20 +37,26 @@ namespace HaoFuSurvivor
 			playerModel.IsRegistered = false;
 			playerModel.IsDead = false;
 			playerModel.RuntimeRoot = null;
+			mRigidbody = null;
 			this.GetModel<InputModel>().Movement = Vector2.zero;
 			this.GetSystem<PlayerLoadoutSystem>().Reset();
 		}
 
-		public void Move()
+		private void Move(float deltaTime)
 		{
-			var deltaTime = this.GetModel<RunTimerModel>().FixedDeltaTime;
 			var playerModel = this.GetModel<PlayerModel>();
 			if (!playerModel.IsRegistered || playerModel.IsDead) return;
-			if (deltaTime <= 0f || !this.GetSystem<RunTimerSystem>().IsRunning()) return;
 			if (this.GetModel<DodgeModel>().Runtime?.IsActive == true) return;
 
 			var direction = this.GetModel<InputModel>().Movement;
 			playerModel.Position += direction * this.GetSystem<StatSystem>().GetMoveSpeed() * deltaTime;
+		}
+
+		private void SyncRuntimePosition()
+		{
+			var playerModel = this.GetModel<PlayerModel>();
+			if (mRigidbody != null) mRigidbody.MovePosition(playerModel.Position);
+			else if (playerModel.RuntimeRoot != null) playerModel.RuntimeRoot.transform.position = playerModel.Position;
 		}
 
 		public void ApplyDamage(float damage)
@@ -66,13 +75,17 @@ namespace HaoFuSurvivor
 			this.GetSystem<RunSystem>().EndWithDefeat();
 		}
 
-		public void AdvanceDamageInvulnerability()
+		public void OnRunUpdate(float deltaTime)
 		{
-			var deltaTime = this.GetModel<RunTimerModel>().DeltaTime;
-			if (deltaTime <= 0f) return;
 			var playerModel = this.GetModel<PlayerModel>();
 			playerModel.DamageInvulnerabilityRemaining = Mathf.Max(0f, playerModel.DamageInvulnerabilityRemaining - deltaTime);
 			playerModel.DodgeInvulnerabilityRemaining = Mathf.Max(0f, playerModel.DodgeInvulnerabilityRemaining - deltaTime);
+		}
+
+		public void OnRunFixedUpdate(float deltaTime)
+		{
+			Move(deltaTime);
+			SyncRuntimePosition();
 		}
 
 		protected override void OnInit()

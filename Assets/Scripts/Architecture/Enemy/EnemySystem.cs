@@ -3,7 +3,7 @@ using QFramework;
 using UnityEngine;
 namespace HaoFuSurvivor
 {
-	public class EnemySystem : AbstractSystem
+	public class EnemySystem : AbstractSystem, IRunFixedUpdateable
 	{
 		private readonly List<Transform> mEnemies = new();
         private readonly Dictionary<Transform, float> mMoveSpeeds = new();
@@ -28,10 +28,8 @@ namespace HaoFuSurvivor
 			EnemyFactory.Instance.Release(enemy);
 			this.GetModel<EnemyModel>().AliveCount = mEnemies.Count;
 		}
-		public void Tick()
+		public void OnRunFixedUpdate(float deltaTime)
 		{
-			var deltaTime = this.GetModel<RunTimerModel>().FixedDeltaTime;
-			if (deltaTime <= 0f || !this.GetSystem<RunTimerSystem>().IsRunning()) return;
 			var player = this.GetModel<PlayerModel>();
 			var catalog = this.GetUtility<EnemyCatalog>();
 			var stageIndex = this.GetModel<RunTimerModel>().CurrentStageIndex;

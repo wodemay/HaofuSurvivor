@@ -120,6 +120,7 @@ namespace HaoFuSurvivor
 				mPools.Add(enemyId, pool);
 			}
 
+			GameArchitecture.Interface.GetSystem<AttackSystem>().UnregisterOwner(enemyRoot, 0);
 			enemyRoot.SetActive(false);
 			enemyRoot.transform.SetParent(GetContainer(), false);
 			pool.Enqueue(enemyRoot);

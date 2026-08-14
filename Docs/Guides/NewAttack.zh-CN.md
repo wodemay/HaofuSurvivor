@@ -1,20 +1,25 @@
 # 新增 Attack
 
-## Unity 资源
+本文是新 Attack 的资源、代码和验证清单；运行职责见 `AttackFlow.zh-CN.md`。
 
-1. 在 `Assets/Resources/Configs/Combat/` 创建 `Attack_<技能名称>.asset`。
-2. 分配未使用的数字 `Id`。
-3. 填写基础伤害、冷却和参数资源。
-4. 将配置加入 `AttackCatalog.asset`。
+## 配置资产
 
-Attack 配置不写角色、敌人或用途名称，因为同一攻击可被不同拥有者复用。
+1. 在 `Resources/Configs/Combat/` 创建 `Attack_<技能名称>.asset`。
+2. 分配未使用的数字 `Id`，填写伤害、冷却和参数资产。
+3. 使用唯一 `ExecutorId`，并把资产加入 `AttackCatalog.asset`。
+4. 将 ID 配给 Enemy 的 `AttackIds`，或作为 Weapon 的 Attack 内容。
+
+Attack 不写角色、敌人、用途或目标阵营；同一配置可由不同拥有者复用。
 
 ## 代码接入
 
-在 `Assets/Scripts/Architecture/Combat/` 或 `Assets/Scripts/Game/` 创建 Executor/Trigger。Executor 实现 `IAttackExecutor`，使用唯一 `ExecutorId` 注册到 `AttackExecutorRegistry`；Trigger 只负责触发条件和运行时注册。
+在 `Architecture/Combat/` 实现 `IAttackExecutor` 并注册到 `AttackExecutorRegistry`：
 
-不要添加 AttackType 枚举、目标阵营字段或集中式攻击分支。攻击目标从运行时拥有者阵营推导。
+- 碰撞型攻击：Executor 在 `ConfigureOwner()` 创建或复用 `CollisionAttackTrigger` 一类的感知桥接，并由该桥接发送注册和执行 Command。
+- 自动攻击：Executor 同时实现 `IAutomaticAttackExecutor`。在 `FindTarget()` 返回目标；`AttackSystem` 会按冷却在统一帧 Tick 中调用它，禁止为此新增 Update Trigger。
+
+需要投射物时复用 `ProjectileFactory` 与 `ProjectileSystem`，不要自行创建逐实例 Update。
 
 ## 验证
 
-检查 AttackCatalog 引用、Executor 注册、Trigger 生命周期、对象池回收和 `dotnet build Assembly-CSharp.csproj --no-restore --disable-build-servers`。
+核对 Catalog 引用、Executor 注册、拥有者卸载/对象池回收时的注销、自动攻击 Tick 注册与 `dotnet build Assembly-CSharp.csproj --no-restore --disable-build-servers`。不改 UI、Prefab 或场景层级。
