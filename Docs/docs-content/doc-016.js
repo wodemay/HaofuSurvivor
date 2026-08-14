@@ -1,0 +1,1 @@
+window.DOC_CONTENT = "# Weapon 容器\n\nWeapon 是角色持有的运行时容器，Attack 是容器中的攻击内容。角色可以拥有多把 Weapon；敌人通常直接使用 `EnemyConfig.AttackIds`。\n\n## 数据边界\n\n- `WeaponConfig`：静态模板、初始 Attack、等级规则和升级限制。\n- `WeaponRuntimeData`：当前局的等级、Attack 列表和属性修正。\n- `PlayerLoadoutSystem`：装备、替换、升级、进化和清理 Trigger。\n\n升级和进化只修改运行时数据。进化保留原 WeaponRuntime 槽位，替换为 1 级且不可升级的新 Weapon。\n";

@@ -1,0 +1,1 @@
+window.DOC_CONTENT = "# 新增 Enemy\n\n1. 在 `Assets/Resources/Configs/Enemies/` 创建 EnemyConfig。\n2. 分配未使用的数字 `Id`。\n3. 填写内容 Prefab、基础生命、移动速度、攻击 ID 和经验掉落配置。\n4. 将 EnemyConfig 加入 EnemyCatalog。\n5. Enemy 内容 Prefab 只负责表现；运行时由 EnemyRoot 承载并进入按 ID 划分的对象池。\n\n时间阶段通过 `RunTimelineConfig` 指定哪些 Enemy ID 可以生成。移动、生命、攻击注册和回收由 EnemySystem、EnemyFactory 与 EnemyHealthSystem 负责。\n";

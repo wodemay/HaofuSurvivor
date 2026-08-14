@@ -11,6 +11,7 @@ namespace HaoFuSurvivor
 
 			runModel.Phase = RunPhase.Active;
 			this.GetSystem<RunTimerSystem>().StartTimer();
+			this.GetSystem<RunSaveSystem>().ResetAutoSaveTimer();
 			this.GetSystem<RunSettlementSystem>().Reset();
 			this.GetSystem<EnemySystem>().Reset();
 			this.GetSystem<ExperienceSystem>().Reset();
@@ -25,6 +26,7 @@ namespace HaoFuSurvivor
 
 			runModel.Phase = RunPhase.Victory;
 			this.GetSystem<RunTimerSystem>().Stop();
+			this.GetSystem<RunSaveSystem>().Clear();
 			this.GetSystem<RunSettlementSystem>().Settle(RunPhase.Victory);
 			this.SendEvent(new RunEndedEvent(RunPhase.Victory));
 		}
@@ -36,6 +38,7 @@ namespace HaoFuSurvivor
 
 			runModel.Phase = RunPhase.Defeat;
 			this.GetSystem<RunTimerSystem>().Stop();
+			this.GetSystem<RunSaveSystem>().Clear();
 			this.GetSystem<RunSettlementSystem>().Settle(RunPhase.Defeat);
 			this.SendEvent(new RunEndedEvent(RunPhase.Defeat));
 		}
@@ -47,6 +50,7 @@ namespace HaoFuSurvivor
 
 			runModel.Phase = RunPhase.Paused;
 			this.GetSystem<RunTimerSystem>().Pause();
+			this.GetSystem<RunSaveSystem>().SaveCurrentRun();
 			this.SendEvent(new RunPausedEvent());
 		}
 
@@ -83,6 +87,7 @@ namespace HaoFuSurvivor
 			var runModel = this.GetModel<RunModel>();
 			if (runModel.Phase == RunPhase.None) return;
 
+			this.GetSystem<RunSaveSystem>().SaveCurrentRun();
 			runModel.Phase = RunPhase.None;
 			this.GetSystem<RunTimerSystem>().Stop();
 			ReleaseRunRuntime();
@@ -97,11 +102,30 @@ namespace HaoFuSurvivor
 			StartRun();
 		}
 
+		public void ContinueSavedRun()
+		{
+			var save = this.GetSystem<RunSaveSystem>().Load();
+			if (save == null) return;
+			this.GetModel<CharacterSelectionModel>().SelectedCharacterId = save.CharacterId;
+			ReleaseRunRuntime();
+			if (!this.GetSystem<PlayerSpawnSystem>().SpawnSelectedCharacter()) return;
+			StartRun();
+			if (!this.GetSystem<RunSaveSystem>().Restore(save))
+			{
+				ReleaseRunRuntime();
+				this.GetModel<RunModel>().Phase = RunPhase.None;
+				this.GetSystem<RunTimerSystem>().Stop();
+				return;
+			}
+			this.GetUtility<RunSaveStorage>().Clear();
+		}
+
 		private void ReleaseRunRuntime()
 		{
 			this.GetSystem<EnemySystem>().Reset();
 			this.GetSystem<ExperienceSystem>().Reset();
 			this.GetSystem<LevelUpSystem>().Reset();
+			this.GetSystem<DodgeSystem>().Reset();
 			ProjectileFactory.Instance.ReleaseAllActive();
 			this.GetSystem<PlayerSpawnSystem>().DespawnCurrentCharacter();
 		}

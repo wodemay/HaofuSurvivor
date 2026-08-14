@@ -22,6 +22,7 @@ namespace HaoFuSurvivor
 		private void Update()
 		{
 			GameArchitecture.Interface.SendCommand(new TickRunTimerCommand(Time.unscaledDeltaTime));
+			GameArchitecture.Interface.GetSystem<RunSaveSystem>().TickAutoSave();
 			if (!GameArchitecture.Interface.SendQuery(new GetRunTimeStateQuery()).IsRunning) return;
 			GameArchitecture.Interface.SendCommand(new TickExperienceCommand());
 			if (!GameArchitecture.Interface.SendQuery(new GetRunTimeStateQuery()).IsRunning) return;
@@ -35,6 +36,7 @@ namespace HaoFuSurvivor
 			GameArchitecture.Interface.SendCommand(new TickRunPhysicsCommand(Time.fixedDeltaTime));
 			if (!GameArchitecture.Interface.SendQuery(new GetRunTimeStateQuery()).IsRunning) return;
 
+			GameArchitecture.Interface.SendCommand(new TickDodgeCommand());
 			GameArchitecture.Interface.SendCommand(new TickEnemiesCommand());
 		}
 
@@ -67,6 +69,16 @@ namespace HaoFuSurvivor
 			UIKit.OpenPanel<UIMainMenuPanel>(
 				assetBundleName: "uimainmenupanel_prefab",
 				prefabName: UIMainMenuPanel.Name);
+		}
+
+		private void OnApplicationPause(bool pauseStatus)
+		{
+			if (pauseStatus) GameArchitecture.Interface.GetSystem<RunSaveSystem>().SaveCurrentRun();
+		}
+
+		private void OnApplicationQuit()
+		{
+			GameArchitecture.Interface.GetSystem<RunSaveSystem>().SaveCurrentRun();
 		}
 
 	}

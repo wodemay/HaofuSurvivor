@@ -13,6 +13,28 @@ namespace HaoFuSurvivor
 		public bool CanUpgrade { get; internal set; }
 		public IReadOnlyList<int> AttackIds => mAttackIds;
 
+		public IEnumerable<WeaponModifierSnapshot> GetModifierSnapshots()
+		{
+			foreach (var attack in mAttackModifiers)
+				foreach (var modifier in attack.Value)
+					yield return new WeaponModifierSnapshot(attack.Key, modifier.Key, modifier.Value);
+		}
+
+		internal void RestoreModifiers(IEnumerable<WeaponModifierSnapshot> modifiers)
+		{
+			mAttackModifiers.Clear();
+			if (modifiers == null) return;
+			foreach (var modifier in modifiers)
+			{
+				if (!mAttackModifiers.TryGetValue(modifier.AttackId, out var values))
+				{
+					values = new Dictionary<string, float>();
+					mAttackModifiers.Add(modifier.AttackId, values);
+				}
+				values[modifier.Key] = modifier.Value;
+			}
+		}
+
 		public WeaponRuntimeData(int runtimeId, int weaponId, bool canUpgrade, IEnumerable<int> attackIds)
 		{
 			RuntimeId = runtimeId;
@@ -56,6 +78,20 @@ namespace HaoFuSurvivor
 		internal void ResetModifiers()
 		{
 			mAttackModifiers.Clear();
+		}
+	}
+
+	public readonly struct WeaponModifierSnapshot
+	{
+		public readonly int AttackId;
+		public readonly string Key;
+		public readonly float Value;
+
+		public WeaponModifierSnapshot(int attackId, string key, float value)
+		{
+			AttackId = attackId;
+			Key = key;
+			Value = value;
 		}
 	}
 }

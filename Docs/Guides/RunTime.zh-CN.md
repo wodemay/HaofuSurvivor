@@ -1,19 +1,16 @@
-# 局内统一时间
+# 统一运行时间
 
-`RunTimerSystem` 是局内唯一的逻辑时间源。业务代码不得自行使用 `Time.deltaTime`、`Time.fixedDeltaTime` 或直接修改 `Time.timeScale`。
+`RunTimerSystem` 是所有局内时间的唯一来源。
 
-## 时间推进
+## 输出
 
-`GameStart` 每帧发送 `TickRunTimerCommand(Time.unscaledDeltaTime)`，每个物理帧发送 `TickRunPhysicsCommand(Time.fixedUnscaledDeltaTime)`。
+- `DeltaTime`：逻辑帧增量。
+- `FixedDeltaTime`：物理帧增量。
+- `ElapsedSeconds`：对局累计时间。
+- 当前阶段倍率：敌人生命、伤害、移动速度和生成速率。
 
-- 普通逻辑从 `RunTimerModel.DeltaTime` 读取帧时间，例如攻击冷却、投射物寿命、无敌帧。
-- 物理移动从 `RunTimerModel.FixedDeltaTime` 读取物理时间，例如玩家、敌人和投射物的 `Rigidbody2D.MovePosition`。
-- Controller 读取时间必须使用 `GetRunTimeStateQuery`；System 可读取 `RunTimerModel`。
+## 使用规则
 
-## 暂停
+玩家、敌人、投射物、攻击冷却、经验吸附和无敌帧只能读取 `RunTimerModel` 的增量。禁止在业务逻辑中直接使用 `Time.deltaTime` 或 `Time.fixedUnscaledDeltaTime`。
 
-暂停入口是 `PauseRunCommand`，恢复入口是 `ResumeRunCommand`。它们通过 `RunSystem` 改变 `RunPhase`，再由 `RunTimerSystem` 将逻辑增量清零并同步 Unity 的 `Time.timeScale`。
-
-暂停期间 `RunTimerSystem.IsRunning()` 为 `false`。攻击执行、冷却、伤害无敌帧、敌人刷新/移动、玩家移动和投射物移动/寿命均不得推进。未来暂停 UI 只负责发送这两个 Command，不能自行冻结业务模块。
-
-维护暂停功能时，不应新增绕过 `RunTimerSystem` 的局部计时器。
+暂停和升级选择会让两个逻辑增量归零，并同步 `Time.timeScale = 0`。恢复后重新输出增量。

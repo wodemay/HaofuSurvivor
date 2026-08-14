@@ -4,27 +4,60 @@ using UnityEngine;
 
 namespace HaoFuSurvivor
 {
+	public readonly struct SkillGroupEquipResult
+	{
+		public readonly bool CoreSucceeded;
+		public readonly int EquippedWeaponCount;
+		public readonly int EquippedSkillCount;
+		public readonly bool DodgeEquipped;
+
+		public SkillGroupEquipResult(bool coreSucceeded, int equippedWeaponCount, int equippedSkillCount, bool dodgeEquipped)
+		{
+			CoreSucceeded = coreSucceeded;
+			EquippedWeaponCount = equippedWeaponCount;
+			EquippedSkillCount = equippedSkillCount;
+			DodgeEquipped = dodgeEquipped;
+		}
+	}
+
 	public class PlayerLoadoutSystem : AbstractSystem
 	{
-		public bool EquipInitialSkillGroup(GameObject owner, int skillGroupId)
+		public SkillGroupEquipResult EquipInitialSkillGroup(GameObject owner, int skillGroupId)
 		{
 			Reset();
 			this.GetModel<PlayerLoadoutModel>().BindOwner(owner);
-			if (skillGroupId == 0) return true;
+			if (skillGroupId == 0) return new SkillGroupEquipResult(true, 0, 0, false);
 			var skillGroup = this.GetUtility<SkillGroupCatalog>().Get(skillGroupId);
 			if (skillGroup == null)
 			{
-				Debug.LogError($"Skill group {skillGroupId} was not found.");
-				return false;
+				Debug.LogError($"Skill group {skillGroupId} was not found; required weapon loadout cannot be resolved.");
+				return new SkillGroupEquipResult(false, 0, 0, false);
 			}
 
+			var equippedWeapons = 0;
 			foreach (var weaponId in skillGroup.StartingWeaponIds)
 			{
-				if (!EquipWeapon(owner, weaponId)) return false;
+				if (EquipWeapon(owner, weaponId))
+				{
+					equippedWeapons++;
+					continue;
+				}
+				if (skillGroup.RequireStartingWeapons)
+				{
+					Reset();
+					return new SkillGroupEquipResult(false, equippedWeapons, 0, false);
+				}
+				Debug.LogWarning($"Optional weapon {weaponId} was skipped.");
 			}
-			foreach (var skillId in skillGroup.StartingSkillIds) AddSkill(skillId);
-			SetDodge(skillGroup.StartingDodgeId);
-			return true;
+			var equippedSkills = 0;
+			foreach (var skillId in skillGroup.StartingSkillIds)
+			{
+				if (skillId == 0) continue;
+				AddSkill(skillId);
+				equippedSkills++;
+			}
+			var dodgeEquipped = SetDodge(skillGroup.StartingDodgeId);
+			return new SkillGroupEquipResult(true, equippedWeapons, equippedSkills, dodgeEquipped);
 		}
 
 		public bool EquipWeapon(GameObject owner, int weaponId)
@@ -41,6 +74,25 @@ namespace HaoFuSurvivor
 			var runtime = model.AddWeapon(weaponId, weapon.CanUpgrade && weapon.MaxLevel > 1, weapon.InitialAttackIds);
 			ConfigureAttacks(owner, runtime);
 			this.SendEvent(new WeaponEquippedEvent(runtime.RuntimeId, weaponId));
+			return true;
+		}
+
+		public WeaponRuntimeData GetOrEquipWeapon(int weaponId)
+		{
+			foreach (var weapon in this.GetModel<PlayerLoadoutModel>().Weapons)
+				if (weapon.WeaponId == weaponId) return weapon;
+			return EquipWeapon(this.GetModel<PlayerLoadoutModel>().Owner, weaponId)
+				? this.GetModel<PlayerLoadoutModel>().Weapons[this.GetModel<PlayerLoadoutModel>().Weapons.Count - 1]
+				: null;
+		}
+
+		public bool RestoreWeapon(WeaponRuntimeData runtime, WeaponSaveData data)
+		{
+			if (runtime == null || data == null) return false;
+			if (!ReplaceWeaponAttacks(runtime.RuntimeId, data.AttackIds)) return false;
+			runtime.Level = Mathf.Max(1, data.Level);
+			runtime.CanUpgrade = data.CanUpgrade;
+			runtime.RestoreModifiers(data.Modifiers.ConvertAll(item => new WeaponModifierSnapshot(item.AttackId, item.Key, item.Value)));
 			return true;
 		}
 
@@ -120,9 +172,24 @@ namespace HaoFuSurvivor
 			if (!skills.Contains(skillId)) skills.Add(skillId);
 		}
 
-		public void SetDodge(int dodgeId)
+		public bool SetDodge(int dodgeId)
 		{
 			this.GetModel<PlayerLoadoutModel>().DodgeId = dodgeId;
+			if (this.GetSystem<DodgeSystem>().Equip(dodgeId)) return true;
+			this.GetModel<PlayerLoadoutModel>().DodgeId = 0;
+			this.GetSystem<DodgeSystem>().Reset();
+			Debug.LogWarning($"Dodge {dodgeId} could not be equipped; dodge is disabled.");
+			return false;
+		}
+
+		public bool RemoveWeapon(int runtimeId)
+		{
+			var model = this.GetModel<PlayerLoadoutModel>();
+			var runtime = model.GetWeapon(runtimeId);
+			if (runtime == null) return false;
+			ReleaseAttacks(model.Owner, runtime.RuntimeId);
+			model.RemoveWeapon(runtime);
+			return true;
 		}
 
 		public bool HasUpgradeableWeapon()
@@ -148,6 +215,7 @@ namespace HaoFuSurvivor
 			var model = this.GetModel<PlayerLoadoutModel>();
 			foreach (var weapon in model.Weapons) ReleaseAttacks(model.Owner, weapon.RuntimeId);
 			model.Reset();
+			this.GetSystem<DodgeSystem>().Reset();
 		}
 
 		private bool ValidateAttackIds(IEnumerable<int> attackIds, int weaponId)

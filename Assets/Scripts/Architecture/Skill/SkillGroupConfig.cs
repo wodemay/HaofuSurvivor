@@ -10,5 +10,6 @@ namespace HaoFuSurvivor
 		public List<int> StartingWeaponIds = new();
 		public List<int> StartingSkillIds = new();
 		public int StartingDodgeId;
+		public bool RequireStartingWeapons = true;
 	}
 }

@@ -13,6 +13,7 @@ namespace HaoFuSurvivor
 		public readonly string Description;
 		public readonly Sprite Icon;
 		public readonly bool IsEvolution;
+		public readonly bool IsDodge;
 		public readonly string LevelText;
 
 		public LevelUpWeaponOption(WeaponRuntimeData runtime, WeaponConfig config, string description, bool isEvolution = false)
@@ -24,7 +25,21 @@ namespace HaoFuSurvivor
 			Description = string.IsNullOrWhiteSpace(description) ? config.Description : description;
 			Icon = config.Icon;
 			IsEvolution = isEvolution;
+			IsDodge = false;
 			LevelText = isEvolution ? $"Level{runtime.Level}->Evolve" : $"Level{runtime.Level}->Level{runtime.Level + 1}";
+		}
+
+		public LevelUpWeaponOption(DodgeRuntimeData runtime, DodgeConfig config, string description)
+		{
+			RuntimeId = 0;
+			WeaponId = config.Id;
+			CurrentLevel = runtime.Level;
+			DisplayName = string.IsNullOrWhiteSpace(config.DisplayName) ? $"Dodge {runtime.DodgeId}" : config.DisplayName;
+			Description = string.IsNullOrWhiteSpace(description) ? config.Description : description;
+			Icon = config.Icon;
+			IsEvolution = false;
+			IsDodge = true;
+			LevelText = $"Level{runtime.Level}->Level{runtime.Level + 1}";
 		}
 	}
 
@@ -71,6 +86,13 @@ namespace HaoFuSurvivor
 					options.Add(new LevelUpWeaponOption(runtime, target, target.Description, true));
 				}
 			}
+			var dodge = this.GetModel<DodgeModel>().Runtime;
+			var dodgeConfig = dodge == null ? null : GameArchitecture.Interface.GetUtility<DodgeCatalog>().Get(dodge.DodgeId);
+			if (dodge != null && dodgeConfig != null && this.GetSystem<DodgeSystem>().HasUpgrade())
+			{
+				var upgrade = dodgeConfig.LevelUpgrades.Find(item => item != null && item.Level == dodge.Level + 1);
+				options.Add(new LevelUpWeaponOption(dodge, dodgeConfig, upgrade?.Description));
+			}
 			return options;
 		}
 	}
@@ -82,12 +104,13 @@ namespace HaoFuSurvivor
 			this.GetModel<LevelUpModel>().Reset();
 		}
 
-		public bool CompleteWeaponUpgrade(int weaponRuntimeId, bool isEvolution)
+		public bool CompleteWeaponUpgrade(int weaponRuntimeId, bool isEvolution, bool isDodge = false)
 		{
 			var model = this.GetModel<LevelUpModel>();
 			if (model.PendingSelectionCount <= 0) return false;
 			var loadout = this.GetSystem<PlayerLoadoutSystem>();
-			if (isEvolution ? !loadout.TryEvolveWeapon(weaponRuntimeId) : !loadout.UpgradeWeapon(weaponRuntimeId)) return false;
+			var completed = isDodge ? this.GetSystem<DodgeSystem>().Upgrade() : isEvolution ? loadout.TryEvolveWeapon(weaponRuntimeId) : loadout.UpgradeWeapon(weaponRuntimeId);
+			if (!completed) return false;
 
 			model.CompleteCurrent();
 			PresentNextSelection();
@@ -128,7 +151,7 @@ namespace HaoFuSurvivor
 			{
 				if (loadout.HasEvolution(runtime.RuntimeId)) return true;
 			}
-			return loadout.HasUpgradeableWeapon();
+			return loadout.HasUpgradeableWeapon() || this.GetSystem<DodgeSystem>().HasUpgrade();
 		}
 
 		protected override void OnInit()

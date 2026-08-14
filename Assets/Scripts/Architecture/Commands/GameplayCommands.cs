@@ -105,16 +105,18 @@ namespace HaoFuSurvivor
 	{
 		private readonly int mWeaponRuntimeId;
 		private readonly bool mIsEvolution;
+		private readonly bool mIsDodge;
 
-		public CompleteLevelUpWeaponCommand(int weaponRuntimeId, bool isEvolution)
+		public CompleteLevelUpWeaponCommand(int weaponRuntimeId, bool isEvolution, bool isDodge = false)
 		{
 			mWeaponRuntimeId = weaponRuntimeId;
 			mIsEvolution = isEvolution;
+			mIsDodge = isDodge;
 		}
 
 		protected override void OnExecute()
 		{
-			this.GetSystem<LevelUpSystem>().CompleteWeaponUpgrade(mWeaponRuntimeId, mIsEvolution);
+			this.GetSystem<LevelUpSystem>().CompleteWeaponUpgrade(mWeaponRuntimeId, mIsEvolution, mIsDodge);
 		}
 	}
 
@@ -123,6 +125,29 @@ namespace HaoFuSurvivor
 		protected override void OnExecute()
 		{
 			this.GetSystem<RunSystem>().ExitToCharacterSelection();
+		}
+	}
+
+	public class RequestDodgeCommand : AbstractCommand
+	{
+		protected override void OnExecute() { this.GetSystem<DodgeSystem>().TryStart(); }
+	}
+
+	public class TickDodgeCommand : AbstractCommand
+	{
+		protected override void OnExecute() { this.GetSystem<DodgeSystem>().AdvanceFixed(); }
+	}
+
+	public class UpgradeDodgeCommand : AbstractCommand
+	{
+		protected override void OnExecute() { this.GetSystem<DodgeSystem>().Upgrade(); }
+	}
+
+	public class ContinueSavedRunCommand : AbstractCommand
+	{
+		protected override void OnExecute()
+		{
+			this.GetSystem<RunSystem>().ContinueSavedRun();
 		}
 	}
 

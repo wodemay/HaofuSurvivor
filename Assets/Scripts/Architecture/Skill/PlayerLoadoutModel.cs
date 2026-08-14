@@ -51,6 +51,11 @@ namespace HaoFuSurvivor
 			weapon?.SetAttackIds(attackIds);
 		}
 
+		public void RemoveWeapon(WeaponRuntimeData weapon)
+		{
+			if (weapon != null) mWeapons.Remove(weapon);
+		}
+
 		public void Reset()
 		{
 			mWeapons.Clear();

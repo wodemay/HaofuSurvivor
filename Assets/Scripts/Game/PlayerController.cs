@@ -25,6 +25,7 @@ namespace HaoFuSurvivor
 
 			var movement = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
 			this.SendCommand(new SetMovementInputCommand(movement));
+			if (Input.GetKeyDown(KeyCode.Space)) this.SendCommand<RequestDodgeCommand>();
 		}
 
 		private void FixedUpdate()
