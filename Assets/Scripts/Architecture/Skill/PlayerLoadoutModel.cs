@@ -7,10 +7,12 @@ namespace HaoFuSurvivor
 	public class PlayerLoadoutModel : AbstractModel
 	{
 		private readonly List<WeaponRuntimeData> mWeapons = new();
+		private readonly List<SkillRuntimeData> mSkills = new();
 		private int mNextWeaponRuntimeId = 1;
+		private int mNextSkillRuntimeId = -1;
 
 		public IReadOnlyList<WeaponRuntimeData> Weapons => mWeapons;
-		public readonly List<int> SkillIds = new();
+		public IReadOnlyList<SkillRuntimeData> Skills => mSkills;
 		public int DodgeId { get; internal set; }
 		public GameObject Owner { get; private set; }
 
@@ -29,6 +31,13 @@ namespace HaoFuSurvivor
 		public WeaponRuntimeData GetWeapon(int runtimeId)
 		{
 			return mWeapons.Find(weapon => weapon.RuntimeId == runtimeId);
+		}
+
+		public SkillRuntimeData AddSkill(int skillId, bool canUpgrade, IEnumerable<int> attackIds)
+		{
+			var skill = new SkillRuntimeData(mNextSkillRuntimeId--, skillId, canUpgrade, attackIds);
+			mSkills.Add(skill);
+			return skill;
 		}
 
 		public void SetWeaponLevel(WeaponRuntimeData weapon, int level)
@@ -59,10 +68,11 @@ namespace HaoFuSurvivor
 		public void Reset()
 		{
 			mWeapons.Clear();
-			SkillIds.Clear();
+			mSkills.Clear();
 			DodgeId = 0;
 			Owner = null;
 			mNextWeaponRuntimeId = 1;
+			mNextSkillRuntimeId = -1;
 		}
 
 		protected override void OnInit()
