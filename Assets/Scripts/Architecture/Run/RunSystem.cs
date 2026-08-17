@@ -16,6 +16,7 @@ namespace HaoFuSurvivor
 			this.GetSystem<EnemySystem>().Reset();
 			this.GetSystem<ExperienceSystem>().Reset();
 			this.GetSystem<LevelUpSystem>().Reset();
+			this.GetSystem<BarrageProjectileSystem>().Reset();
 			this.GetSystem<GameLoopSystem>().BeginRun();
 			this.SendEvent(new RunStartedEvent());
 		}
@@ -133,6 +134,7 @@ namespace HaoFuSurvivor
 			this.GetSystem<LevelUpSystem>().Reset();
 			this.GetSystem<DodgeSystem>().Reset();
 			this.GetSystem<ProjectileSystem>().Reset();
+			this.GetSystem<BarrageProjectileSystem>().Reset();
 			this.GetSystem<PlayerSpawnSystem>().DespawnCurrentCharacter();
 		}
 

@@ -22,6 +22,8 @@ namespace HaoFuSurvivor
 			SetMovement(movement);
 			if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift))
 				GameArchitecture.Interface.SendCommand(new RequestDodgeCommand());
+			if (Input.GetKeyDown(KeyCode.Space))
+				GameArchitecture.Interface.SendCommand(new RequestSkillCommand());
 		}
 
 		protected override void OnInit()

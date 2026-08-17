@@ -53,8 +53,8 @@ namespace HaoFuSurvivor
 			foreach (var skillId in skillGroup.StartingSkillIds)
 			{
 				if (skillId == 0) continue;
-				AddSkill(skillId);
-				equippedSkills++;
+				if (EquipSkill(owner, skillId)) equippedSkills++;
+				else Debug.LogWarning($"Optional skill {skillId} was skipped.");
 			}
 			var dodgeEquipped = SetDodge(skillGroup.StartingDodgeId);
 			return new SkillGroupEquipResult(true, equippedWeapons, equippedSkills, dodgeEquipped);
@@ -165,11 +165,23 @@ namespace HaoFuSurvivor
 			return true;
 		}
 
-		public void AddSkill(int skillId)
+		public bool EquipSkill(GameObject owner, int skillId)
 		{
-			if (skillId == 0) return;
-			var skills = this.GetModel<PlayerLoadoutModel>().SkillIds;
-			if (!skills.Contains(skillId)) skills.Add(skillId);
+			var skill = this.GetUtility<SkillCatalog>().Get(skillId);
+			if (owner == null || skill == null || !ValidateAttackIds(skill.InitialAttackIds, $"Skill {skillId}")) return false;
+			foreach (var existingSkill in this.GetModel<PlayerLoadoutModel>().Skills)
+				if (existingSkill.SkillId == skillId) return true;
+			var runtime = this.GetModel<PlayerLoadoutModel>().AddSkill(skill.Id, skill.CanUpgrade && skill.MaxLevel > 1, skill.InitialAttackIds);
+			ConfigureAttacks(owner, runtime.AttackIds, runtime.RuntimeId);
+			return true;
+		}
+
+		public void TryUseSkills()
+		{
+			var model = this.GetModel<PlayerLoadoutModel>();
+			if (model.Owner == null) return;
+			foreach (var skill in model.Skills)
+				this.GetSystem<AttackSystem>().TryExecuteLoadout(model.Owner, skill.RuntimeId);
 		}
 
 		public bool SetDodge(int dodgeId)
@@ -214,11 +226,12 @@ namespace HaoFuSurvivor
 		{
 			var model = this.GetModel<PlayerLoadoutModel>();
 			foreach (var weapon in model.Weapons) ReleaseAttacks(model.Owner, weapon.RuntimeId);
+			foreach (var skill in model.Skills) ReleaseAttacks(model.Owner, skill.RuntimeId);
 			model.Reset();
 			this.GetSystem<DodgeSystem>().Reset();
 		}
 
-		private bool ValidateAttackIds(IEnumerable<int> attackIds, int weaponId)
+		private bool ValidateAttackIds(IEnumerable<int> attackIds, object ownerId)
 		{
 			if (attackIds == null) return true;
 			foreach (var attackId in attackIds)
@@ -226,7 +239,7 @@ namespace HaoFuSurvivor
 				var attack = this.GetUtility<AttackCatalog>().Get(attackId);
 				var executor = attack == null ? null : this.GetUtility<AttackExecutorRegistry>().Get(attack.ExecutorId);
 				if (executor != null) continue;
-				Debug.LogError($"Weapon {weaponId} references an unavailable attack {attackId}.");
+				Debug.LogError($"{ownerId} references an unavailable attack {attackId}.");
 				return false;
 			}
 			return true;
@@ -234,12 +247,18 @@ namespace HaoFuSurvivor
 
 		private void ConfigureAttacks(GameObject owner, WeaponRuntimeData runtime)
 		{
-			if (owner == null || runtime == null) return;
-			foreach (var attackId in runtime.AttackIds)
+			if (runtime == null) return;
+			ConfigureAttacks(owner, runtime.AttackIds, runtime.RuntimeId);
+		}
+
+		private void ConfigureAttacks(GameObject owner, IEnumerable<int> attackIds, int runtimeId)
+		{
+			if (owner == null || attackIds == null) return;
+			foreach (var attackId in attackIds)
 			{
 				var attack = this.GetUtility<AttackCatalog>().Get(attackId);
-				this.GetUtility<AttackExecutorRegistry>().Get(attack.ExecutorId)
-					.ConfigureOwner(owner, attack, CombatFaction.Player, runtime.RuntimeId);
+				var executor = attack == null ? null : this.GetUtility<AttackExecutorRegistry>().Get(attack.ExecutorId);
+				executor?.ConfigureOwner(owner, attack, CombatFaction.Player, runtimeId);
 			}
 		}
 

@@ -9,12 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d8979efb90a7c484e95969d484e59ee9, type: 3}
-  m_Name: SkillGroup_ProjectileStarter
-  m_EditorClassIdentifier: 
-  Id: 1
-  StartingWeaponIds:
-  - 1
-  StartingSkillIds:
-  - 1
-  StartingDodgeId: 1
+  m_Script: {fileID: 11500000, guid: 1c3e0df7a2b9479ab65e128f90d4c703, type: 3}
+  m_Name: SkillCatalog
+  m_EditorClassIdentifier:
+  Skills:
+  - {fileID: 11400000, guid: b1294cd780ba47249d8e215ef43c76b9, type: 2}

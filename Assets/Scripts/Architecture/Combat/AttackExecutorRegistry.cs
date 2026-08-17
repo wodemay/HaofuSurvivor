@@ -31,6 +31,7 @@ namespace HaoFuSurvivor
 	public interface IAttackExecutor
 	{
 		string Id { get; }
+		bool RequiresTarget { get; }
 		void ConfigureOwner(GameObject owner, AttackConfig config, CombatFaction ownerFaction, int weaponRuntimeId = 0);
 		void Execute(AttackExecutionContext context);
 	}
@@ -48,6 +49,7 @@ namespace HaoFuSurvivor
 		{
 			Register(new CollisionAttackExecutor());
 			Register(new ProjectileAttackExecutor());
+			Register(new BarrageProjectileAttackExecutor());
 		}
 
 		public void Register(IAttackExecutor executor)
@@ -64,6 +66,7 @@ namespace HaoFuSurvivor
 	public class CollisionAttackExecutor : IAttackExecutor
 	{
 		public string Id => "collision";
+		public bool RequiresTarget => true;
 
 		public void ConfigureOwner(GameObject owner, AttackConfig config, CombatFaction ownerFaction, int weaponRuntimeId = 0)
 		{
@@ -84,6 +87,7 @@ namespace HaoFuSurvivor
 	public class ProjectileAttackExecutor : IAttackExecutor, IAutomaticAttackExecutor
 	{
 		public string Id => "projectile";
+		public bool RequiresTarget => true;
 
 		public void ConfigureOwner(GameObject owner, AttackConfig config, CombatFaction ownerFaction, int weaponRuntimeId = 0)
 		{
@@ -120,6 +124,28 @@ namespace HaoFuSurvivor
 				ProjectileFactory.Instance.Spawn(parameters, context.Owner.transform.position, projectileDirection,
 					context.OwnerFaction, damage * multiplier, speed, pierce);
 			}
+		}
+	}
+
+	public class BarrageProjectileAttackExecutor : IAttackExecutor
+	{
+		public string Id => "barrage-projectile";
+		public bool RequiresTarget => false;
+
+		public void ConfigureOwner(GameObject owner, AttackConfig config, CombatFaction ownerFaction, int weaponRuntimeId = 0)
+		{
+			if (config.ExecutorParameterConfig is not BarrageProjectileAttackParameterConfig) return;
+			GameArchitecture.Interface.GetSystem<AttackSystem>().RegisterManual(owner, config, ownerFaction, weaponRuntimeId);
+		}
+
+		public void Execute(AttackExecutionContext context)
+		{
+			if (context.Config.ExecutorParameterConfig is not BarrageProjectileAttackParameterConfig parameters || context.Owner == null) return;
+			var multiplier = context.OwnerFaction == CombatFaction.Enemy
+				? GameArchitecture.Interface.GetModel<RunTimerModel>().EnemyDamageMultiplier
+				: 1f;
+			GameArchitecture.Interface.GetSystem<BarrageProjectileSystem>().Schedule(
+				context.Owner, context.OwnerFaction, parameters, context.Config.Damage * multiplier);
 		}
 	}
 

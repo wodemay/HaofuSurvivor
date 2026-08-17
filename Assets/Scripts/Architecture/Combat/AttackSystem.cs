@@ -8,6 +8,7 @@ namespace HaoFuSurvivor
 	{
 		private readonly Dictionary<int, AttackRuntime> mRuntimes = new();
 		private readonly List<int> mRuntimeIdsToRemove = new();
+		private readonly List<int> mRuntimeIdsToExecute = new();
 		private int mNextAutomaticRuntimeId = -1;
 		public bool HasRuntimes => mRuntimes.Count > 0;
 
@@ -20,6 +21,26 @@ namespace HaoFuSurvivor
 		}
 
 		public int RegisterAutomatic(GameObject owner, AttackConfig config, CombatFaction ownerFaction, int weaponRuntimeId)
+		{
+			return RegisterGenerated(owner, config, ownerFaction, weaponRuntimeId);
+		}
+
+		public int RegisterManual(GameObject owner, AttackConfig config, CombatFaction ownerFaction, int weaponRuntimeId)
+		{
+			return RegisterGenerated(owner, config, ownerFaction, weaponRuntimeId);
+		}
+
+		public void TryExecuteLoadout(GameObject owner, int weaponRuntimeId)
+		{
+			if (owner == null || !this.GetSystem<RunTimerSystem>().IsRunning()) return;
+			mRuntimeIdsToExecute.Clear();
+			foreach (var pair in mRuntimes)
+				if (pair.Value.Owner == owner && pair.Value.WeaponRuntimeId == weaponRuntimeId) mRuntimeIdsToExecute.Add(pair.Key);
+			foreach (var runtimeId in mRuntimeIdsToExecute) TryExecute(runtimeId, null);
+			mRuntimeIdsToExecute.Clear();
+		}
+
+		private int RegisterGenerated(GameObject owner, AttackConfig config, CombatFaction ownerFaction, int weaponRuntimeId)
 		{
 			if (owner == null || config == null) return 0;
 			while (mRuntimes.ContainsKey(mNextAutomaticRuntimeId)) mNextAutomaticRuntimeId--;
@@ -50,10 +71,9 @@ namespace HaoFuSurvivor
 		{
 			if (!this.GetSystem<RunTimerSystem>().IsRunning()) return;
 			if (!mRuntimes.TryGetValue(runtimeId, out var runtime)) return;
-			if (target == null || runtime.OwnerFaction == target.Faction || runtime.CooldownRemaining > 0f) return;
-
 			var executor = this.GetUtility<AttackExecutorRegistry>().Get(runtime.Config.ExecutorId);
 			if (executor == null) return;
+			if ((target == null && executor.RequiresTarget) || (target != null && runtime.OwnerFaction == target.Faction) || runtime.CooldownRemaining > 0f) return;
 
 			var weaponRuntime = runtime.WeaponRuntimeId == 0 ? null : this.GetModel<PlayerLoadoutModel>().GetWeapon(runtime.WeaponRuntimeId);
 			var cooldownMultiplier = weaponRuntime == null
@@ -70,9 +90,10 @@ namespace HaoFuSurvivor
 				var runtime = pair.Value;
 				runtime.CooldownRemaining = Mathf.Max(0f, runtime.CooldownRemaining - deltaTime);
 				if (runtime.CooldownRemaining > 0f) continue;
-				if (this.GetUtility<AttackExecutorRegistry>().Get(runtime.Config.ExecutorId) is not IAutomaticAttackExecutor executor) continue;
+				var attackExecutor = this.GetUtility<AttackExecutorRegistry>().Get(runtime.Config.ExecutorId);
+				if (attackExecutor is not IAutomaticAttackExecutor executor) continue;
 				var target = executor.FindTarget(new AttackExecutionContext(runtime.Owner, runtime.OwnerFaction, null, runtime.Config, GetWeaponRuntime(runtime)));
-				if (target != null) TryExecute(pair.Key, target);
+				if (target != null || !attackExecutor.RequiresTarget) TryExecute(pair.Key, target);
 			}
 		}
 
