@@ -4,7 +4,7 @@ namespace HaoFuSurvivor
 {
 	public class EnemyFactory : MonoBehaviour
 	{
-		private const string EnemyRootConfigPath = "Configs/EnemyRoot";
+		private const string EnemyRootConfigPath = "Configs/Enemy/EnemyRoot";
 		private const string CharacterRootName = "CharacterRoot";
 		private const string EnemyContainerName = "EnemyContainer";
 		private static EnemyFactory sInstance;

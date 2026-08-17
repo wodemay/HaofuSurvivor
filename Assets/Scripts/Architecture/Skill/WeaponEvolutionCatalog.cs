@@ -9,7 +9,7 @@ namespace HaoFuSurvivor
 
 		public WeaponEvolutionCatalog()
 		{
-			Config = Resources.Load<WeaponEvolutionCatalogConfig>("Configs/Weapon/WeaponEvolutionCatalog");
+			Config = Resources.Load<WeaponEvolutionCatalogConfig>("Configs/Combat/Weapon/WeaponEvolutionCatalog");
 		}
 
 		public WeaponEvolutionConfig Get(int sourceWeaponId, int level)

@@ -9,7 +9,7 @@ namespace HaoFuSurvivor
 
 		public AttackCatalog()
 		{
-			Config = Resources.Load<AttackCatalogConfig>("Configs/Combat/AttackCatalog");
+			Config = Resources.Load<AttackCatalogConfig>("Configs/Combat/Attack/AttackCatalog");
 		}
 
 		public AttackConfig Get(int id)

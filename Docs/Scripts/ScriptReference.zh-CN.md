@@ -11,7 +11,7 @@
 - `Run/RunTimerModel.cs`、`RunTimerSystem.cs`：统一逻辑时间和时间线阶段。
 - `Run/GameLoopSystem.cs`：`IRunUpdateable` / `IRunFixedUpdateable` 接口及按需 Tick 注册表。
 - `Run/RunSettlementModel.cs`、`RunSettlementSystem.cs`：本局结算快照。
-- `Save/RunSaveData.cs`、`RunSaveStorage.cs`、`RunSaveSystem.cs`：存档 DTO、PlayerPrefs 读写、自动保存与恢复。
+- `Save/RunSaveData.cs`、`RunSaveStorage.cs`、`RunSaveSystem.cs`：角色、Weapon、Skill、Dodge 快照 DTO，PlayerPrefs 读写、自动保存与恢复。
 
 ## 角色、玩家与敌人
 
@@ -30,7 +30,7 @@
 - `Combat/AttackExecutorRegistry.cs`：Executor 注册；含碰撞、定向投射物与手动无目标环形弹幕 Executor。
 - `Combat/AttackSystem.cs`：AttackRuntime、冷却、自动目标选择和执行。
 - `Combat/ProjectileSystem.cs`：活跃投射物的帧/物理批量推进。
-- `Combat/BarrageProjectileAttackParameterConfig.cs`、`BarrageProjectileSystem.cs`：环形弹幕参数和连续轮次调度。
+- `Combat/BarrageProjectileAttackParameterConfig.cs`、`BarrageProjectileSystem.cs`：环绕发射圆的随机投射物参数与持续调度。
 - `Combat/CombatTargetSystem.cs`、`CombatFaction.cs`：目标查询和阵营。
 - `Skill/SkillGroupConfig.cs`、`SkillGroupCatalog.cs`：开局技能组。
 - `Skill/SkillConfig.cs`、`SkillCatalogConfig.cs`、`SkillCatalog.cs`、`SkillRuntimeData.cs`：技能静态配置、目录和独立运行时容器。

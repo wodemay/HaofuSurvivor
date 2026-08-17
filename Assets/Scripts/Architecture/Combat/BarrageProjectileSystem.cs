@@ -12,8 +12,8 @@ namespace HaoFuSurvivor
 		{
 			if (owner == null || parameters == null || parameters.ProjectilePrefab == null) return;
 			var runtime = new BarrageRuntime(owner, ownerFaction, parameters, damage);
-			LaunchBurst(runtime);
-			if (runtime.BurstsRemaining <= 0) return;
+			LaunchProjectile(runtime);
+			runtime.TimeUntilNextProjectile = Mathf.Max(0.01f, parameters.ProjectileInterval);
 			mPendingBarrages.Add(runtime);
 			this.GetSystem<GameLoopSystem>().RegisterUpdateable(this);
 		}
@@ -28,13 +28,15 @@ namespace HaoFuSurvivor
 					mPendingBarrages.RemoveAt(index);
 					continue;
 				}
-				runtime.TimeUntilNextBurst -= deltaTime;
-				while (runtime.BurstsRemaining > 0 && runtime.TimeUntilNextBurst <= 0f)
+				runtime.DurationRemaining -= deltaTime;
+				runtime.OrbitAngle -= runtime.Parameters.OrbitDegreesPerSecond * deltaTime;
+				runtime.TimeUntilNextProjectile -= deltaTime;
+				while (runtime.DurationRemaining > 0f && runtime.TimeUntilNextProjectile <= 0f)
 				{
-					LaunchBurst(runtime);
-					if (runtime.BurstsRemaining > 0) runtime.TimeUntilNextBurst += Mathf.Max(0.01f, runtime.Parameters.BurstInterval);
+					LaunchProjectile(runtime);
+					runtime.TimeUntilNextProjectile += Mathf.Max(0.01f, runtime.Parameters.ProjectileInterval);
 				}
-				if (runtime.BurstsRemaining <= 0) mPendingBarrages.RemoveAt(index);
+				if (runtime.DurationRemaining <= 0f) mPendingBarrages.RemoveAt(index);
 			}
 			if (mPendingBarrages.Count == 0) this.GetSystem<GameLoopSystem>().UnregisterUpdateable(this);
 		}
@@ -45,19 +47,13 @@ namespace HaoFuSurvivor
 			this.GetSystem<GameLoopSystem>().UnregisterUpdateable(this);
 		}
 
-		private static void LaunchBurst(BarrageRuntime runtime)
+		private void LaunchProjectile(BarrageRuntime runtime)
 		{
-			var projectileCount = Mathf.Max(1, runtime.Parameters.ProjectilesPerBurst);
-			var angleStep = 360f / projectileCount;
-			var position = (Vector2)runtime.Owner.transform.position;
-			for (var index = 0; index < projectileCount; index++)
-			{
-				var angle = angleStep * index * Mathf.Deg2Rad;
-				var direction = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
-				ProjectileFactory.Instance.Spawn(runtime.Parameters, position, direction, runtime.OwnerFaction,
-					runtime.Damage, runtime.Parameters.MoveSpeed, 0);
-			}
-			runtime.BurstsRemaining--;
+			var orbitDirection = new Vector2(Mathf.Cos(runtime.OrbitAngle * Mathf.Deg2Rad), Mathf.Sin(runtime.OrbitAngle * Mathf.Deg2Rad));
+			var position = (Vector2)runtime.Owner.transform.position + orbitDirection * runtime.Parameters.OrbitRadius +
+				Random.insideUnitCircle * runtime.Parameters.EmissionRadius;
+			ProjectileFactory.Instance.Spawn(runtime.Parameters, position, orbitDirection, runtime.OwnerFaction,
+				runtime.Damage, runtime.Parameters.MoveSpeed, 0);
 		}
 
 		protected override void OnInit()
@@ -71,8 +67,9 @@ namespace HaoFuSurvivor
 			public readonly CombatFaction OwnerFaction;
 			public readonly BarrageProjectileAttackParameterConfig Parameters;
 			public readonly float Damage;
-			public int BurstsRemaining;
-			public float TimeUntilNextBurst;
+			public float DurationRemaining;
+			public float TimeUntilNextProjectile;
+			public float OrbitAngle;
 
 			public BarrageRuntime(GameObject owner, CombatFaction ownerFaction, BarrageProjectileAttackParameterConfig parameters, float damage)
 			{
@@ -80,8 +77,9 @@ namespace HaoFuSurvivor
 				OwnerFaction = ownerFaction;
 				Parameters = parameters;
 				Damage = damage;
-				BurstsRemaining = Mathf.Max(1, parameters.BurstCount);
-				TimeUntilNextBurst = Mathf.Max(0.01f, parameters.BurstInterval);
+				DurationRemaining = Mathf.Max(0.01f, parameters.Duration);
+				TimeUntilNextProjectile = 0f;
+				OrbitAngle = Random.Range(0f, 360f);
 			}
 		}
 	}

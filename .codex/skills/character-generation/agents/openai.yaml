@@ -1,0 +1,4 @@
+interface:
+  display_name: "Character Generation"
+  short_description: "Create a playable character package from a design brief."
+  default_prompt: "Use $character-generation to design and integrate a new playable character."

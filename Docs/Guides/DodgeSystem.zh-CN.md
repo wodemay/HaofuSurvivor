@@ -4,7 +4,7 @@
 
 ## 配置与装备
 
-配置位于 `Resources/Configs/Dodge/`：`DodgeCatalog.asset` 管理 ID，`Dodge_Basic.asset` 是当前 `Id = 1` 的普通闪避。`DodgeConfig` 定义冷却、持续时间、距离、无敌时间和升级增量。
+配置位于 `Resources/Configs/Combat/Dodge/`：`DodgeCatalog.asset` 管理 ID，`Dodge_Basic.asset` 是当前 `Id = 1` 的普通闪避。`DodgeConfig` 定义冷却、持续时间、距离、无敌时间和升级增量。
 
 角色经 `SkillGroupConfig.StartingDodgeId` 装备闪避。`PlayerLoadoutSystem.SetDodge()` 调用 `DodgeSystem.Equip()` 创建 `DodgeRuntimeData`；Dodge 缺失属于可选能力失败，只清空闪避并保留对局启动。
 

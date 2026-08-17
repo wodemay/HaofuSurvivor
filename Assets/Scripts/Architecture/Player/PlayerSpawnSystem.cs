@@ -5,7 +5,7 @@ namespace HaoFuSurvivor
 {
 	public class PlayerSpawnSystem : AbstractSystem
 	{
-		private const string PlayerRootConfigPath = "Configs/PlayerRoot";
+		private const string PlayerRootConfigPath = "Configs/Player/PlayerRoot";
 		private const string CharacterRootName = "CharacterRoot";
 		private const string HealthBarAnchorName = "HealthBarAnchor";
 		private GameObject mCurrentPlayer;
@@ -19,7 +19,7 @@ namespace HaoFuSurvivor
 			var rootConfig = Resources.Load<PlayerRootConfig>(PlayerRootConfigPath);
 			if (character == null || character.PlayerPrefab == null || rootConfig == null || rootConfig.PlayerPrefab == null)
 			{
-				Debug.LogError("Player spawn requires a selected character and Resources/Configs/PlayerRoot configuration.");
+				Debug.LogError("Player spawn requires a selected character and Resources/Configs/Player/PlayerRoot configuration.");
 				return false;
 			}
 

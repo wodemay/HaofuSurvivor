@@ -4,7 +4,7 @@
 
 ## 配置
 
-创建 `Resources/Configs/Combat/Attack_<技能名称>.asset`，在 AttackCatalog 注册唯一数字 ID，并将 `ExecutorId` 设为 `projectile`。参数资产引用子弹 Prefab，提供基础速度、生命周期、射程、穿透和池容量；这些基础值不可在升级时修改。
+创建 `Resources/Configs/Combat/Attack/Attack_<技能名称>.asset`，在 AttackCatalog 注册唯一数字 ID，并将 `ExecutorId` 设为 `projectile`。参数资产引用子弹 Prefab，提供基础速度、生命周期、射程、穿透和池容量；这些基础值不可在升级时修改。
 
 ## 运行方式
 

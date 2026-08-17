@@ -7,11 +7,11 @@ namespace HaoFuSurvivor.Editor
 {
 	public class ConfigurationCreatorWindow : EditorWindow
 	{
-		private const string CharacterConfigFolder = "Assets/Resources/Configs/Characters";
-		private const string EnemyConfigFolder = "Assets/Resources/Configs/Enemies";
+		private const string CharacterConfigFolder = "Assets/Resources/Configs/Character";
+		private const string EnemyConfigFolder = "Assets/Resources/Configs/Enemy";
 		private const string CharacterPrefabFolder = "Assets/Art/Prefabs/Characters";
 		private const string EnemyPrefabFolder = "Assets/Art/Prefabs/Enemies";
-		private const string EnemyCatalogPath = "Assets/Resources/Configs/Enemies/EnemyCatalog.asset";
+		private const string EnemyCatalogPath = "Assets/Resources/Configs/Enemy/EnemyCatalog.asset";
 
 		private int mTab;
 		private int mCharacterId;
@@ -182,22 +182,22 @@ namespace HaoFuSurvivor.Editor
 
 		private static int GetNextCharacterId()
 		{
-			return Resources.LoadAll<CharacterConfig>("Configs/Characters").Select(config => config.Id).DefaultIfEmpty(0).Max() + 1;
+			return Resources.LoadAll<CharacterConfig>("Configs/Character").Select(config => config.Id).DefaultIfEmpty(0).Max() + 1;
 		}
 
 		private static int GetNextEnemyId()
 		{
-			return Resources.LoadAll<EnemyConfig>("Configs/Enemies").Select(config => config.Id).DefaultIfEmpty(0).Max() + 1;
+			return Resources.LoadAll<EnemyConfig>("Configs/Enemy").Select(config => config.Id).DefaultIfEmpty(0).Max() + 1;
 		}
 
 		private static bool CharacterIdExists(int id)
 		{
-			return Resources.LoadAll<CharacterConfig>("Configs/Characters").Any(config => config.Id == id);
+			return Resources.LoadAll<CharacterConfig>("Configs/Character").Any(config => config.Id == id);
 		}
 
 		private static bool EnemyIdExists(int id)
 		{
-			return Resources.LoadAll<EnemyConfig>("Configs/Enemies").Any(config => config.Id == id);
+			return Resources.LoadAll<EnemyConfig>("Configs/Enemy").Any(config => config.Id == id);
 		}
 	}
 }

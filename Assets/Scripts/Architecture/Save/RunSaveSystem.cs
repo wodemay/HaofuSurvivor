@@ -59,9 +59,12 @@ namespace HaoFuSurvivor
 				CurrentExperience = experience.CurrentExperience,
 				RequiredExperience = experience.RequiredExperience,
 				DodgeId = this.GetModel<PlayerLoadoutModel>().DodgeId,
-				DodgeLevel = this.GetModel<DodgeModel>().Runtime?.Level ?? 0
+				DodgeLevel = this.GetModel<DodgeModel>().Runtime?.Level ?? 0,
+				HasSkillSnapshot = true
 			};
 
+			foreach (var skill in this.GetModel<PlayerLoadoutModel>().Skills)
+				data.Skills.Add(new SkillSaveData { SkillId = skill.SkillId, Level = skill.Level });
 			foreach (var weapon in this.GetModel<PlayerLoadoutModel>().Weapons)
 			{
 				var weaponData = new WeaponSaveData
@@ -100,6 +103,7 @@ namespace HaoFuSurvivor
 
 			var loadout = this.GetSystem<PlayerLoadoutSystem>();
 			loadout.Reset();
+			this.GetModel<PlayerLoadoutModel>().BindOwner(player.RuntimeRoot);
 			loadout.SetDodge(data.DodgeId);
 			var dodge = this.GetModel<DodgeModel>().Runtime;
 			if (dodge != null) dodge.Level = Mathf.Max(1, data.DodgeLevel);
@@ -117,7 +121,33 @@ namespace HaoFuSurvivor
 				}
 				restoredWeaponCount++;
 			}
+			RestoreSkills(loadout, data, player.RuntimeRoot);
 			return data.Weapons == null || data.Weapons.Count == 0 || restoredWeaponCount > 0;
+		}
+
+		private void RestoreSkills(PlayerLoadoutSystem loadout, RunSaveData data, GameObject owner)
+		{
+			if (data.HasSkillSnapshot)
+			{
+				foreach (var skill in data.Skills ?? new List<SkillSaveData>()) RestoreSkill(loadout, owner, skill);
+				return;
+			}
+
+			var character = this.GetUtility<CharacterCatalog>().Get(data.CharacterId);
+			var skillGroup = character == null ? null : this.GetUtility<SkillGroupCatalog>().Get(character.SkillGroupId);
+			foreach (var skillId in skillGroup?.StartingSkillIds ?? new List<int>())
+				RestoreSkill(loadout, owner, new SkillSaveData { SkillId = skillId, Level = 1 });
+		}
+
+		private void RestoreSkill(PlayerLoadoutSystem loadout, GameObject owner, SkillSaveData data)
+		{
+			if (data == null || data.SkillId == 0 || !loadout.EquipSkill(owner, data.SkillId))
+			{
+				if (data != null && data.SkillId != 0) Debug.LogWarning($"Saved skill {data.SkillId} was skipped during restore.");
+				return;
+			}
+			foreach (var skill in this.GetModel<PlayerLoadoutModel>().Skills)
+				if (skill.SkillId == data.SkillId) skill.Level = Mathf.Max(1, data.Level);
 		}
 
 		protected override void OnInit()

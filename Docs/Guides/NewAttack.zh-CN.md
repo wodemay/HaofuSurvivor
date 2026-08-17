@@ -4,7 +4,7 @@
 
 ## 配置资产
 
-1. 在 `Resources/Configs/Combat/` 创建 `Attack_<技能名称>.asset`。
+1. 在 `Resources/Configs/Combat/Attack/` 创建 `Attack_<技能名称>.asset`。
 2. 分配未使用的数字 `Id`，填写伤害、冷却和参数资产。
 3. 使用唯一 `ExecutorId`，并把资产加入 `AttackCatalog.asset`。
 4. 将 ID 配给 Enemy 的 `AttackIds`，或作为 Weapon 的 Attack 内容。

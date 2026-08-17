@@ -4,7 +4,7 @@
 
 ## 配置资产
 
-1. 在 `Resources/Configs/Enemies/` 创建 EnemyConfig。
+1. 在 `Resources/Configs/Enemy/` 创建 EnemyConfig。
 2. 分配未使用的数字 `Id`，填写内容 Prefab、生命、移动速度、Attack IDs 与经验掉落配置。
 3. 将 EnemyConfig 加入 EnemyCatalog。
 4. 在 RunTimelineConfig 的目标时间阶段填入该 Enemy ID，才会进入生成候选。

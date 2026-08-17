@@ -22,7 +22,7 @@ namespace HaoFuSurvivor
 
 		public ExperienceProgressionCatalog()
 		{
-			Config = Resources.Load<ExperienceProgressionConfig>("Configs/ExperienceProgression");
+			Config = Resources.Load<ExperienceProgressionConfig>("Configs/Progression/Experience/ExperienceProgression");
 		}
 	}
 }

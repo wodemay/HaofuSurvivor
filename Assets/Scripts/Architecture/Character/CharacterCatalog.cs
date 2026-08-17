@@ -10,7 +10,7 @@ namespace HaoFuSurvivor
 
 		public CharacterCatalog()
 		{
-			mCharacters = new List<CharacterConfig>(Resources.LoadAll<CharacterConfig>("Configs/Characters"));
+			mCharacters = new List<CharacterConfig>(Resources.LoadAll<CharacterConfig>("Configs/Character"));
 			mCharacters.Sort((left, right) => left.SortOrder.CompareTo(right.SortOrder));
 		}
 

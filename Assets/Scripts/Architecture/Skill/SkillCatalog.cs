@@ -9,7 +9,7 @@ namespace HaoFuSurvivor
 
 		public SkillCatalog()
 		{
-			Config = Resources.Load<SkillCatalogConfig>("Configs/Skills/SkillCatalog");
+			Config = Resources.Load<SkillCatalogConfig>("Configs/Combat/Skill/SkillCatalog");
 		}
 
 		public SkillConfig Get(int id)
