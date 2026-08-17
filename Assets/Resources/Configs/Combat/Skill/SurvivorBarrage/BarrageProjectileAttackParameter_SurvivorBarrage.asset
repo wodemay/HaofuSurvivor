@@ -13,10 +13,12 @@ MonoBehaviour:
   m_Name: BarrageProjectileAttackParameter_SurvivorBarrage
   m_EditorClassIdentifier:
   ProjectilePrefab: {fileID: 560411590149111249, guid: 4814bfee8fe45d945acf8c985386789d, type: 3}
-  MoveSpeed: 8
+  MoveSpeed: 16
   Lifetime: 2
   AttackRange: 0
   PoolCapacity: 32
-  BurstCount: 3
-  ProjectilesPerBurst: 8
-  BurstInterval: 0.15
+  Duration: 3
+  ProjectileInterval: 0.025
+  OrbitRadius: 1.25
+  EmissionRadius: 0.35
+  OrbitDegreesPerSecond: 720

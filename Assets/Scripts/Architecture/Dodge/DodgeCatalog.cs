@@ -9,8 +9,8 @@ namespace HaoFuSurvivor
 
 		public DodgeCatalog()
 		{
-			mConfig = Resources.Load<DodgeCatalogConfig>("Configs/Dodge/DodgeCatalog");
-			if (mConfig == null) Debug.LogError("DodgeCatalog could not load Configs/Dodge/DodgeCatalog.");
+			mConfig = Resources.Load<DodgeCatalogConfig>("Configs/Combat/Dodge/DodgeCatalog");
+			if (mConfig == null) Debug.LogError("DodgeCatalog could not load Configs/Combat/Dodge/DodgeCatalog.");
 		}
 
 		public DodgeConfig Get(int id)
@@ -21,10 +21,10 @@ namespace HaoFuSurvivor
 				if (configured != null) return configured;
 			}
 
-			foreach (var config in Resources.LoadAll<DodgeConfig>("Configs/Dodge"))
+			foreach (var config in Resources.LoadAll<DodgeConfig>("Configs/Combat/Dodge"))
 				if (config != null && config.Id == id) return config;
 
-			Debug.LogError($"Dodge config {id} was not found in Configs/Dodge.");
+			Debug.LogError($"Dodge config {id} was not found in Configs/Combat/Dodge.");
 			return null;
 		}
 	}

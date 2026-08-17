@@ -4,7 +4,7 @@
 
 ## 配置边界
 
-所有 Attack 由 `Resources/Configs/Combat/AttackCatalog.asset` 以数字 ID 索引。`ExecutorId` 选择具体实现；目标阵营从运行时拥有者的 `CombatFaction` 推导，配置不写目标阵营，也不使用 AttackType 分支。
+所有 Attack 由 `Resources/Configs/Combat/Attack/AttackCatalog.asset` 以数字 ID 索引。`ExecutorId` 选择具体实现；目标阵营从运行时拥有者的 `CombatFaction` 推导，配置不写目标阵营，也不使用 AttackType 分支。
 
 ## 碰撞攻击
 

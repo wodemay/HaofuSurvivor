@@ -4,10 +4,10 @@
 
 ## 配置资产
 
-1. 在 `Resources/Configs/Characters/` 创建 CharacterConfig。
+1. 在 `Resources/Configs/Character/` 创建 CharacterConfig。
 2. 分配未使用的数字 `Id`，填写显示信息、基础属性、`SkillGroupId` 与 `PlayerPrefab`。
 3. `PlayerPrefab` 只放角色内容与表现，不承担玩家注册、输入或移动。
-4. 需要初始能力时，在 `Resources/Configs/Skills/` 配置 SkillGroup，并确认必需 Weapon 与 Attack ID 有效。
+4. 需要初始能力时，在 `Resources/Configs/Combat/Skill/` 配置 SkillGroup，并确认必需 Weapon 与 Attack ID 有效。
 
 ## 运行约束
 

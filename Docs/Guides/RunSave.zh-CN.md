@@ -12,10 +12,11 @@
 - 玩家生命和二维位置。
 - 等级、当前经验、下一等级阈值。
 - 每个 WeaponRuntime 的 Weapon ID、等级、Attack 内容和属性修正。
+- 每个 SkillRuntime 的 Skill ID 与等级。
 - Dodge ID 与等级。
 
 ## 时机与恢复
 
 `RunSaveSystem` 是按需注册的 `IRunUpdateable`，每 30 秒逻辑时间自动保存；暂停、返回主菜单、切后台和退出应用也立即保存。胜利或失败结算会清除未完成对局存档。
 
-主菜单通过 `HasSavedRunQuery` 决定是否显示继续入口。`ContinueSavedRunCommand` 重建 PlayerRoot、恢复快照，并按已恢复的时间重新驱动敌人生成。单个无效 Weapon 或 Dodge 会跳过；所有 Weapon 无效则恢复失败并回滚运行时。
+主菜单通过 `HasSavedRunQuery` 决定是否显示继续入口。`ContinueSavedRunCommand` 重建 PlayerRoot、恢复快照，并按已恢复的时间重新驱动敌人生成。恢复会重新绑定 Loadout Owner，再重新注册已保存的 Skill 和 Weapon Attack；单个无效 Skill、Weapon 或 Dodge 会跳过；所有 Weapon 无效则恢复失败并回滚运行时。旧快照没有技能字段时，会回退装配角色技能组中的初始技能。

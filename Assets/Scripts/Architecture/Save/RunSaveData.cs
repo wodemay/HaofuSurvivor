@@ -17,7 +17,16 @@ namespace HaoFuSurvivor
 		public int RequiredExperience;
 		public int DodgeId;
 		public int DodgeLevel;
+		public bool HasSkillSnapshot;
+		public List<SkillSaveData> Skills = new();
 		public List<WeaponSaveData> Weapons = new();
+	}
+
+	[Serializable]
+	public class SkillSaveData
+	{
+		public int SkillId;
+		public int Level;
 	}
 
 	[Serializable]
