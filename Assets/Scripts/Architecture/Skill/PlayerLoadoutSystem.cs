@@ -176,6 +176,14 @@ namespace HaoFuSurvivor
 			return true;
 		}
 
+		public void TryUseSkills()
+		{
+			var model = this.GetModel<PlayerLoadoutModel>();
+			if (model.Owner == null) return;
+			foreach (var skill in model.Skills)
+				this.GetSystem<AttackSystem>().TryExecuteLoadout(model.Owner, skill.RuntimeId);
+		}
+
 		public bool SetDodge(int dodgeId)
 		{
 			this.GetModel<PlayerLoadoutModel>().DodgeId = dodgeId;

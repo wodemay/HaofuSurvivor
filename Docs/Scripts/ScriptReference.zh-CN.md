@@ -27,7 +27,7 @@
 ## 战斗、成长与闪避
 
 - `Combat/AttackConfig.cs`、`AttackCatalog.cs`、`AttackCatalogConfig.cs`：Attack 配置目录。
-- `Combat/AttackExecutorRegistry.cs`：Executor 注册；含碰撞、定向投射物与无目标环形弹幕 Executor。
+- `Combat/AttackExecutorRegistry.cs`：Executor 注册；含碰撞、定向投射物与手动无目标环形弹幕 Executor。
 - `Combat/AttackSystem.cs`：AttackRuntime、冷却、自动目标选择和执行。
 - `Combat/ProjectileSystem.cs`：活跃投射物的帧/物理批量推进。
 - `Combat/BarrageProjectileAttackParameterConfig.cs`、`BarrageProjectileSystem.cs`：环形弹幕参数和连续轮次调度。

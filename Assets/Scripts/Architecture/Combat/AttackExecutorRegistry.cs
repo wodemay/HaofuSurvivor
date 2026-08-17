@@ -31,13 +31,13 @@ namespace HaoFuSurvivor
 	public interface IAttackExecutor
 	{
 		string Id { get; }
+		bool RequiresTarget { get; }
 		void ConfigureOwner(GameObject owner, AttackConfig config, CombatFaction ownerFaction, int weaponRuntimeId = 0);
 		void Execute(AttackExecutionContext context);
 	}
 
 	public interface IAutomaticAttackExecutor
 	{
-		bool RequiresTarget { get; }
 		CombatEntity FindTarget(AttackExecutionContext context);
 	}
 
@@ -66,6 +66,7 @@ namespace HaoFuSurvivor
 	public class CollisionAttackExecutor : IAttackExecutor
 	{
 		public string Id => "collision";
+		public bool RequiresTarget => true;
 
 		public void ConfigureOwner(GameObject owner, AttackConfig config, CombatFaction ownerFaction, int weaponRuntimeId = 0)
 		{
@@ -126,7 +127,7 @@ namespace HaoFuSurvivor
 		}
 	}
 
-	public class BarrageProjectileAttackExecutor : IAttackExecutor, IAutomaticAttackExecutor
+	public class BarrageProjectileAttackExecutor : IAttackExecutor
 	{
 		public string Id => "barrage-projectile";
 		public bool RequiresTarget => false;
@@ -134,12 +135,7 @@ namespace HaoFuSurvivor
 		public void ConfigureOwner(GameObject owner, AttackConfig config, CombatFaction ownerFaction, int weaponRuntimeId = 0)
 		{
 			if (config.ExecutorParameterConfig is not BarrageProjectileAttackParameterConfig) return;
-			GameArchitecture.Interface.GetSystem<AttackSystem>().RegisterAutomatic(owner, config, ownerFaction, weaponRuntimeId);
-		}
-
-		public CombatEntity FindTarget(AttackExecutionContext context)
-		{
-			return null;
+			GameArchitecture.Interface.GetSystem<AttackSystem>().RegisterManual(owner, config, ownerFaction, weaponRuntimeId);
 		}
 
 		public void Execute(AttackExecutionContext context)

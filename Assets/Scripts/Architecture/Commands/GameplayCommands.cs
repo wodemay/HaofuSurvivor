@@ -94,6 +94,11 @@ namespace HaoFuSurvivor
 		protected override void OnExecute() { this.GetSystem<DodgeSystem>().TryStart(); }
 	}
 
+	public class RequestSkillCommand : AbstractCommand
+	{
+		protected override void OnExecute() { this.GetSystem<PlayerLoadoutSystem>().TryUseSkills(); }
+	}
+
 	public class UpgradeDodgeCommand : AbstractCommand
 	{
 		protected override void OnExecute() { this.GetSystem<DodgeSystem>().Upgrade(); }

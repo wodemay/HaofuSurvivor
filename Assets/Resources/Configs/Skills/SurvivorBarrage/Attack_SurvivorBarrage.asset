@@ -16,4 +16,4 @@ MonoBehaviour:
   ExecutorId: barrage-projectile
   ExecutorParameterConfig: {fileID: 11400000, guid: f7a1d5e2c8434b9eb40cf76a39d8b215, type: 2}
   Damage: 5
-  Cooldown: 5
+  Cooldown: 15
