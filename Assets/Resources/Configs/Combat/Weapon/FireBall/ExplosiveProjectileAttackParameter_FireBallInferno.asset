@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28ff304e74754d71a0a5258777be548a, type: 3}
+  m_Name: ExplosiveProjectileAttackParameter_FireBallInferno
+  m_EditorClassIdentifier: 
+  ProjectilePrefab: {fileID: 560411590149111249, guid: 2b1ea8007d35b0c459124b9a287fbf07, type: 3}
+  MoveSpeed: 12
+  Lifetime: 2.5
+  AttackRange: 10
+  PoolCapacity: 8
+  ExplosionPrefab: {fileID: 5296970072318257254, guid: dc3b32ee744608248a591a0b901b6607, type: 3}
+  ExplosionVisualDuration: 0.25
+  ExplosionRadius: 2.5
+  GroundFlamePrefab: {fileID: 5296970072318257254, guid: 091e2b0069257394fbd8b252b14155f1, type: 3}
+  GroundFlameRadius: 1.9
+  GroundFlameDuration: 3
+  GroundFlameTickInterval: 0.5
+  GroundFlameDamageMultiplier: 0.222222

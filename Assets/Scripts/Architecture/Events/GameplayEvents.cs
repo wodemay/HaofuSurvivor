@@ -78,6 +78,22 @@ namespace HaoFuSurvivor
 	{
 	}
 
+	public struct PlayerHealedEvent
+	{
+		public readonly float Amount;
+		public readonly float CurrentHealth;
+
+		public PlayerHealedEvent(float amount, float currentHealth)
+		{
+			Amount = amount;
+			CurrentHealth = currentHealth;
+		}
+	}
+
+	public struct PlayerHealthRestoredEvent
+	{
+	}
+
 	public struct EnemyDamagedEvent
 	{
 		public readonly CombatEntity Enemy;
@@ -106,11 +122,11 @@ namespace HaoFuSurvivor
 
 	public struct ExperienceCollectedEvent
 	{
-		public readonly int Amount;
-		public readonly int CurrentExperience;
-		public readonly int RequiredExperience;
+		public readonly float Amount;
+		public readonly float CurrentExperience;
+		public readonly float RequiredExperience;
 
-		public ExperienceCollectedEvent(int amount, int currentExperience, int requiredExperience)
+		public ExperienceCollectedEvent(float amount, float currentExperience, float requiredExperience)
 		{
 			Amount = amount;
 			CurrentExperience = currentExperience;
@@ -124,6 +140,18 @@ namespace HaoFuSurvivor
 
 		public PlayerLevelUpEvent(int level)
 		{
+			Level = level;
+		}
+	}
+
+	public struct PlayerStatUpgradedEvent
+	{
+		public readonly int UpgradeId;
+		public readonly int Level;
+
+		public PlayerStatUpgradedEvent(int upgradeId, int level)
+		{
+			UpgradeId = upgradeId;
 			Level = level;
 		}
 	}
@@ -170,17 +198,51 @@ namespace HaoFuSurvivor
 		}
 	}
 
-	public struct WeaponEvolvedEvent
+	public struct WeaponCombinedEvent
 	{
-		public readonly int WeaponRuntimeId;
-		public readonly int SourceWeaponId;
+		public readonly int CombinationId;
 		public readonly int TargetWeaponId;
 
-		public WeaponEvolvedEvent(int weaponRuntimeId, int sourceWeaponId, int targetWeaponId)
+		public WeaponCombinedEvent(int combinationId, int targetWeaponId)
 		{
-			WeaponRuntimeId = weaponRuntimeId;
-			SourceWeaponId = sourceWeaponId;
+			CombinationId = combinationId;
 			TargetWeaponId = targetWeaponId;
+		}
+	}
+
+	public struct SkillUpgradedEvent
+	{
+		public readonly int SkillRuntimeId;
+		public readonly int SkillId;
+		public readonly int Level;
+
+		public SkillUpgradedEvent(int skillRuntimeId, int skillId, int level)
+		{
+			SkillRuntimeId = skillRuntimeId;
+			SkillId = skillId;
+			Level = level;
+		}
+	}
+
+	public struct SkillUsedEvent
+	{
+		public readonly int SkillId;
+
+		public SkillUsedEvent(int skillId)
+		{
+			SkillId = skillId;
+		}
+	}
+
+	public struct CharacterExclusivePerkUpgradedEvent
+	{
+		public readonly int PerkId;
+		public readonly int Level;
+
+		public CharacterExclusivePerkUpgradedEvent(int perkId, int level)
+		{
+			PerkId = perkId;
+			Level = level;
 		}
 	}
 

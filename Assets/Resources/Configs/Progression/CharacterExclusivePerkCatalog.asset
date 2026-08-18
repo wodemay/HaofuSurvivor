@@ -1,0 +1,75 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 243aa6e12ef24dc9a7c2a42dc999f001, type: 3}
+  m_Name: CharacterExclusivePerkCatalog
+  m_EditorClassIdentifier: 
+  Perks:
+  - Id: 1
+    CharacterId: 1
+    Type: 0
+    DisplayName: 绝境意志
+    Description: 生命值不高于50%时，所有伤害提高。
+    Icon: {fileID: 0}
+    CandidateWeight: 2
+    HealthThreshold: 0.5
+    TriggerDodgeId: 0
+    TriggerSkillId: 0
+    LevelUpgrades:
+    - Level: 1
+      Value: 0.15
+      Duration: 0
+    - Level: 2
+      Value: 0.3
+      Duration: 0
+    - Level: 3
+      Value: 0.45
+      Duration: 0
+  - Id: 2
+    CharacterId: 1
+    Type: 1
+    DisplayName: 战术翻滚
+    Description: 闪避结束后2秒内，武器子弹数量增加。
+    Icon: {fileID: 0}
+    CandidateWeight: 2
+    HealthThreshold: 0.5
+    TriggerDodgeId: 1
+    TriggerSkillId: 0
+    LevelUpgrades:
+    - Level: 1
+      Value: 1
+      Duration: 2
+    - Level: 2
+      Value: 2
+      Duration: 2
+    - Level: 3
+      Value: 3
+      Duration: 2
+  - Id: 3
+    CharacterId: 1
+    Type: 2
+    DisplayName: 环流蓄能
+    Description: 施放环形弹幕后，武器攻击冷却缩减。
+    Icon: {fileID: 0}
+    CandidateWeight: 2
+    HealthThreshold: 0.5
+    TriggerDodgeId: 0
+    TriggerSkillId: 1
+    LevelUpgrades:
+    - Level: 1
+      Value: 0.12
+      Duration: 3
+    - Level: 2
+      Value: 0.18
+      Duration: 4
+    - Level: 3
+      Value: 0.24
+      Duration: 5

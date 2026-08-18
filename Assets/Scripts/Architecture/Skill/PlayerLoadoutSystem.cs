@@ -64,7 +64,7 @@ namespace HaoFuSurvivor
 		{
 			var model = this.GetModel<PlayerLoadoutModel>();
 			var weapon = this.GetUtility<WeaponCatalog>().Get(weaponId);
-			if (owner == null || weapon == null)
+			if (owner == null || weapon == null || !model.HasAvailableWeaponSlot || model.HasWeapon(weaponId))
 			{
 				Debug.LogError($"Weapon {weaponId} could not be equipped.");
 				return false;
@@ -75,6 +75,18 @@ namespace HaoFuSurvivor
 			ConfigureAttacks(owner, runtime);
 			this.SendEvent(new WeaponEquippedEvent(runtime.RuntimeId, weaponId));
 			return true;
+		}
+
+		public bool CanAcquireWeapon(int weaponId)
+		{
+			var model = this.GetModel<PlayerLoadoutModel>();
+			var weapon = this.GetUtility<WeaponCatalog>().Get(weaponId);
+			return weapon != null && weapon.CanAcquireDuringRun && model.HasAvailableWeaponSlot && !model.HasWeapon(weaponId) && !model.IsWeaponRetired(weaponId);
+		}
+
+		public bool AcquireWeapon(int weaponId)
+		{
+			return CanAcquireWeapon(weaponId) && EquipWeapon(this.GetModel<PlayerLoadoutModel>().Owner, weaponId);
 		}
 
 		public WeaponRuntimeData GetOrEquipWeapon(int weaponId)
@@ -122,20 +134,61 @@ namespace HaoFuSurvivor
 			return true;
 		}
 
-		public bool TryEvolveWeapon(int runtimeId)
+		public bool CombineWeapons(IReadOnlyList<int> sourceRuntimeIds, int targetWeaponId)
 		{
-			var runtime = this.GetModel<PlayerLoadoutModel>().GetWeapon(runtimeId);
-			if (runtime == null) return false;
-			var evolution = this.GetUtility<WeaponEvolutionCatalog>().Get(runtime.WeaponId, runtime.Level);
-			var targetConfig = evolution == null ? null : this.GetUtility<WeaponCatalog>().Get(evolution.TargetWeaponId);
-			if (targetConfig == null || targetConfig.CanUpgrade || targetConfig.MaxLevel != 1)
+			var model = this.GetModel<PlayerLoadoutModel>();
+			var target = this.GetUtility<WeaponCatalog>().Get(targetWeaponId);
+			if (sourceRuntimeIds == null || sourceRuntimeIds.Count == 0 || model.Owner == null || target == null ||
+				target.CanUpgrade || target.MaxLevel != 1 || model.HasWeapon(targetWeaponId) || !ValidateAttackIds(target.InitialAttackIds, targetWeaponId)) return false;
+			var sources = new List<WeaponRuntimeData>();
+			foreach (var runtimeId in sourceRuntimeIds)
 			{
-				if (evolution != null) Debug.LogError($"Evolution target weapon {evolution.TargetWeaponId} must be level 1 and non-upgradeable.");
-				return false;
+				var source = model.GetWeapon(runtimeId);
+				if (source == null || sources.Contains(source)) return false;
+				sources.Add(source);
 			}
-			if (!ReplaceWeapon(runtimeId, evolution.TargetWeaponId)) return false;
-			this.SendEvent(new WeaponEvolvedEvent(runtimeId, evolution.SourceWeaponId, evolution.TargetWeaponId));
+			if (sources.Count == 1)
+			{
+				var sourceWeaponId = sources[0].WeaponId;
+				if (!ReplaceWeapon(sources[0].RuntimeId, targetWeaponId)) return false;
+				model.RetireWeapon(sourceWeaponId);
+				return true;
+			}
+			foreach (var source in sources) ReleaseAttacks(model.Owner, source.RuntimeId);
+			foreach (var source in sources)
+			{
+				model.RetireWeapon(source.WeaponId);
+				model.RemoveWeapon(source);
+			}
+			var runtime = model.AddWeapon(target.Id, false, target.InitialAttackIds);
+			ConfigureAttacks(model.Owner, runtime);
+			this.SendEvent(new WeaponEquippedEvent(runtime.RuntimeId, target.Id));
 			return true;
+		}
+
+		public WeaponRuntimeData RestoreWeapon(GameObject owner, WeaponSaveData data)
+		{
+			var model = this.GetModel<PlayerLoadoutModel>();
+			var weapon = data == null ? null : this.GetUtility<WeaponCatalog>().Get(data.WeaponId);
+			if (owner == null || data == null || weapon == null || !model.HasAvailableWeaponSlot || model.HasWeapon(data.WeaponId) ||
+				!ValidateAttackIds(weapon.InitialAttackIds, data.WeaponId)) return null;
+			var runtime = model.AddWeapon(weapon.Id, weapon.CanUpgrade && weapon.MaxLevel > 1, weapon.InitialAttackIds, data.RuntimeId);
+			ConfigureAttacks(owner, runtime);
+			if (RestoreWeapon(runtime, data)) return runtime;
+			RemoveWeapon(runtime.RuntimeId);
+			return null;
+		}
+
+		public void RestoreRetiredWeaponsFromCombinations()
+		{
+			var combinations = this.GetUtility<WeaponCombinationCatalog>().Config;
+			if (combinations == null) return;
+			foreach (var combination in combinations.Combinations)
+			{
+				if (combination == null || !this.GetModel<PlayerLoadoutModel>().HasWeapon(combination.TargetWeaponId)) continue;
+				foreach (var requirement in combination.RequiredWeapons)
+					this.GetModel<PlayerLoadoutModel>().RetireWeapon(requirement?.WeaponId ?? 0);
+			}
 		}
 
 		public bool ReplaceWeapon(int runtimeId, int targetWeaponId)
@@ -143,7 +196,7 @@ namespace HaoFuSurvivor
 			var model = this.GetModel<PlayerLoadoutModel>();
 			var runtime = model.GetWeapon(runtimeId);
 			var targetConfig = this.GetUtility<WeaponCatalog>().Get(targetWeaponId);
-			if (runtime == null || targetConfig == null || !ValidateAttackIds(targetConfig.InitialAttackIds, targetWeaponId)) return false;
+			if (runtime == null || targetConfig == null || (runtime.WeaponId != targetWeaponId && model.HasWeapon(targetWeaponId)) || !ValidateAttackIds(targetConfig.InitialAttackIds, targetWeaponId)) return false;
 
 			ReleaseAttacks(model.Owner, runtime.RuntimeId);
 			model.ReplaceWeapon(runtime, targetConfig.Id, targetConfig.CanUpgrade && targetConfig.MaxLevel > 1, targetConfig.InitialAttackIds);
@@ -165,13 +218,13 @@ namespace HaoFuSurvivor
 			return true;
 		}
 
-		public bool EquipSkill(GameObject owner, int skillId)
+		public bool EquipSkill(GameObject owner, int skillId, int runtimeId = 0)
 		{
 			var skill = this.GetUtility<SkillCatalog>().Get(skillId);
 			if (owner == null || skill == null || !ValidateAttackIds(skill.InitialAttackIds, $"Skill {skillId}")) return false;
 			foreach (var existingSkill in this.GetModel<PlayerLoadoutModel>().Skills)
 				if (existingSkill.SkillId == skillId) return true;
-			var runtime = this.GetModel<PlayerLoadoutModel>().AddSkill(skill.Id, skill.CanUpgrade && skill.MaxLevel > 1, skill.InitialAttackIds);
+			var runtime = this.GetModel<PlayerLoadoutModel>().AddSkill(skill.Id, skill.CanUpgrade && skill.MaxLevel > 1, skill.InitialAttackIds, runtimeId);
 			ConfigureAttacks(owner, runtime.AttackIds, runtime.RuntimeId);
 			return true;
 		}
@@ -182,6 +235,24 @@ namespace HaoFuSurvivor
 			if (model.Owner == null) return;
 			foreach (var skill in model.Skills)
 				this.GetSystem<AttackSystem>().TryExecuteLoadout(model.Owner, skill.RuntimeId);
+		}
+
+		public bool UpgradeSkill(int runtimeId)
+		{
+			var runtime = this.GetModel<PlayerLoadoutModel>().GetSkill(runtimeId);
+			var config = runtime == null ? null : this.GetUtility<SkillCatalog>().Get(runtime.SkillId);
+			if (runtime == null || config == null || !runtime.CanUpgrade || runtime.Level >= config.MaxLevel) return false;
+			runtime.Level++;
+			this.SendEvent(new SkillUpgradedEvent(runtime.RuntimeId, runtime.SkillId, runtime.Level));
+			return true;
+		}
+
+		public bool RestoreSkill(SkillRuntimeData runtime, int level)
+		{
+			var config = runtime == null ? null : this.GetUtility<SkillCatalog>().Get(runtime.SkillId);
+			if (runtime == null || config == null) return false;
+			runtime.Level = Mathf.Clamp(level, 1, Mathf.Max(1, config.MaxLevel));
+			return true;
 		}
 
 		public bool SetDodge(int dodgeId)
@@ -202,24 +273,6 @@ namespace HaoFuSurvivor
 			ReleaseAttacks(model.Owner, runtime.RuntimeId);
 			model.RemoveWeapon(runtime);
 			return true;
-		}
-
-		public bool HasUpgradeableWeapon()
-		{
-			foreach (var runtime in this.GetModel<PlayerLoadoutModel>().Weapons)
-			{
-				var config = this.GetUtility<WeaponCatalog>().Get(runtime.WeaponId);
-				if (config != null && runtime.CanUpgrade && runtime.Level < config.MaxLevel) return true;
-			}
-			return false;
-		}
-
-		public bool HasEvolution(int runtimeId)
-		{
-			var runtime = this.GetModel<PlayerLoadoutModel>().GetWeapon(runtimeId);
-			var evolution = runtime == null ? null : this.GetUtility<WeaponEvolutionCatalog>().Get(runtime.WeaponId, runtime.Level);
-			var target = evolution == null ? null : this.GetUtility<WeaponCatalog>().Get(evolution.TargetWeaponId);
-			return runtime != null && target != null && !target.CanUpgrade && target.MaxLevel == 1;
 		}
 
 		public void Reset()

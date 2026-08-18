@@ -1,9 +1,11 @@
 # Weapon 升级
 
-本文只说明 Weapon 的运行时升级与进化；容器边界见 `WeaponSystem.zh-CN.md`。
+本文只说明 Weapon 的运行时升级与最终形态组合；容器边界见 `WeaponSystem.zh-CN.md`。
 
 `WeaponConfig.LevelUpgrades` 为每个等级定义显示文本、增减 Attack，以及按 Attack ID 写入的属性修正。修正可影响投射物数量、伤害、速度、穿透和攻击冷却。
 
 升级由 LevelUpSystem 发起，PlayerLoadoutSystem 只修改 WeaponRuntimeData；旧 AttackRuntime 先清理，再按当前 Attack 内容重新配置。自动攻击会自行注册或注销 GameLoopSystem 的帧 Tick，不改变静态资产。
 
-进化通过 WeaponEvolutionCatalog 查找目标。目标必须 `MaxLevel = 1` 且 `CanUpgrade = false`，替换后不能再次升级。
+最终形态由 `WeaponCombinationCatalog` 配置前置 Weapon、属性条件、出现概率和目标 Weapon。条件满足后，`LevelUpSystem` 每次生成候选都按配方概率判定；命中后最终形态优先占用候选位。单 Weapon 配方替换原槽，双 Weapon 配方移除两个来源槽后创建目标槽；属性只检查等级、不消耗。目标必须 `MaxLevel = 1` 且 `CanUpgrade = false`。
+
+组合消耗或替换的来源 Weapon 会被标记为退役，不再进入局内获取候选。继续游戏时，`RunSaveSystem` 根据已保存的组合产物重建这份退役状态，因此炼狱火球存在时，火球术不会重新出现。

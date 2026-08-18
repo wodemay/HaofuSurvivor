@@ -20,4 +20,10 @@
 
 ## 扩展边界
 
-技能升级尚未接入等级选择。后续升级只能修改 `SkillRuntimeData` 中的运行时修正，不能写回 ScriptableObject；可扩展轮数、单轮数量、伤害、冷却或附加 Attack。
+技能升级通过 `SkillRuntimeData.Level` 保存运行时状态，不能写回 ScriptableObject。通用候选、专属前置与一次性升级资格由 `CharacterExclusiveSkillUpgradeSystem` 管理。
+
+## 终末环流
+
+幸存者的初始投射 Weapon 和初始 Dodge 均满级后，下一次升级的第一个候选固定为 `终末环流`；未选择时，后续每次升级仍固定出现，直至选中。投射 Weapon 替换为聚能投射后也满足 Weapon 前置。
+
+选中后，Skill ID `1` 由 Level 1 升至 Level 2：持续时间为 5 秒、发射间隔为 0.0125 秒、环绕速度为 1080 度/秒、轨道半径为 2、伤害倍率为 2、投射速度倍率为 1.5，并获得 2 次穿透。该升级状态已沿用现有 Skill 快照字段保存和恢复。

@@ -62,22 +62,18 @@ namespace HaoFuSurvivor
 	}
 
 
-	public class CompleteLevelUpWeaponCommand : AbstractCommand
+	public class CompleteLevelUpOptionCommand : AbstractCommand
 	{
-		private readonly int mWeaponRuntimeId;
-		private readonly bool mIsEvolution;
-		private readonly bool mIsDodge;
+		private readonly LevelUpOption mOption;
 
-		public CompleteLevelUpWeaponCommand(int weaponRuntimeId, bool isEvolution, bool isDodge = false)
+		public CompleteLevelUpOptionCommand(LevelUpOption option)
 		{
-			mWeaponRuntimeId = weaponRuntimeId;
-			mIsEvolution = isEvolution;
-			mIsDodge = isDodge;
+			mOption = option;
 		}
 
 		protected override void OnExecute()
 		{
-			this.GetSystem<LevelUpSystem>().CompleteWeaponUpgrade(mWeaponRuntimeId, mIsEvolution, mIsDodge);
+			this.GetSystem<LevelUpSystem>().CompleteOption(mOption);
 		}
 	}
 
@@ -192,6 +188,43 @@ namespace HaoFuSurvivor
 		}
 	}
 
+	public class SpawnExplosiveProjectileImpactCommand : AbstractCommand
+	{
+		private readonly ExplosiveProjectileAttackParameterConfig mParameters;
+		private readonly Vector2 mPosition;
+		private readonly CombatFaction mOwnerFaction;
+		private readonly float mDamage;
+
+		public SpawnExplosiveProjectileImpactCommand(ExplosiveProjectileAttackParameterConfig parameters, Vector2 position,
+			CombatFaction ownerFaction, float damage)
+		{
+			mParameters = parameters;
+			mPosition = position;
+			mOwnerFaction = ownerFaction;
+			mDamage = damage;
+		}
+
+		protected override void OnExecute()
+		{
+			this.GetSystem<ExplosiveAreaSystem>().SpawnImpact(mParameters, mPosition, mOwnerFaction, mDamage);
+		}
+	}
+
+	public class RestorePlayerHealthCommand : AbstractCommand
+	{
+		private readonly float mAmount;
+
+		public RestorePlayerHealthCommand(float amount)
+		{
+			mAmount = amount;
+		}
+
+		protected override void OnExecute()
+		{
+			this.GetSystem<PlayerSystem>().RestoreHealth(mAmount);
+		}
+	}
+
 	public class RegisterCombatTargetCommand : AbstractCommand
 	{
 		private readonly CombatEntity mEntity;
@@ -251,21 +284,6 @@ namespace HaoFuSurvivor
 		protected override void OnExecute()
 		{
 			this.GetSystem<PlayerLoadoutSystem>().UpgradeWeapon(mWeaponRuntimeId);
-		}
-	}
-
-	public class EvolveWeaponCommand : AbstractCommand
-	{
-		private readonly int mWeaponRuntimeId;
-
-		public EvolveWeaponCommand(int weaponRuntimeId)
-		{
-			mWeaponRuntimeId = weaponRuntimeId;
-		}
-
-		protected override void OnExecute()
-		{
-			this.GetSystem<PlayerLoadoutSystem>().TryEvolveWeapon(mWeaponRuntimeId);
 		}
 	}
 

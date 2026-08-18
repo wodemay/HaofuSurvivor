@@ -22,3 +22,10 @@ MonoBehaviour:
   OrbitRadius: 1.25
   EmissionRadius: 0.35
   OrbitDegreesPerSecond: 720
+  UltimateDuration: 5
+  UltimateProjectileInterval: 0.0125
+  UltimateOrbitRadius: 2
+  UltimateOrbitDegreesPerSecond: 1080
+  UltimateDamageMultiplier: 2
+  UltimateSpeedMultiplier: 1.5
+  UltimatePierce: 2

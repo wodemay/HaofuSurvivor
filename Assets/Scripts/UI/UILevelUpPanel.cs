@@ -48,7 +48,7 @@ namespace HaoFuSurvivor
 				var child = parent.GetChild(index).gameObject;
 				if (child != UILevelUpOptionItemTemplate) Destroy(child);
 			}
-			foreach (var option in this.SendQuery(new GetLevelUpWeaponOptionsQuery()))
+			foreach (var option in this.SendQuery(new GetLevelUpOptionsQuery()))
 			{
 				var itemObject = Instantiate(UILevelUpOptionItemTemplate, parent);
 				itemObject.SetActive(true);
@@ -58,9 +58,9 @@ namespace HaoFuSurvivor
 			}
 		}
 
-		private void SelectWeapon(LevelUpWeaponOption option)
+		private void SelectWeapon(LevelUpOption option)
 		{
-			this.SendCommand(new CompleteLevelUpWeaponCommand(option.RuntimeId, option.IsEvolution, option.IsDodge));
+			this.SendCommand(new CompleteLevelUpOptionCommand(option));
 			if (this.SendQuery(new GetLevelUpStateQuery()).PendingSelectionCount > 0)
 			{
 				RefreshOptions();

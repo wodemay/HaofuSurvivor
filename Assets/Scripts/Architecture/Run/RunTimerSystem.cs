@@ -5,6 +5,8 @@ namespace HaoFuSurvivor
 {
 	public class RunTimerSystem : AbstractSystem
 	{
+		private const float MaximumFrameDeltaTime = 0.05f;
+
 		public void StartTimer()
 		{
 			var timer = this.GetModel<RunTimerModel>();
@@ -75,7 +77,7 @@ namespace HaoFuSurvivor
 
 		private float GetGameDeltaTime(float unscaledDeltaTime)
 		{
-			return IsRunning() ? Mathf.Max(0f, unscaledDeltaTime) : 0f;
+			return IsRunning() ? Mathf.Min(MaximumFrameDeltaTime, Mathf.Max(0f, unscaledDeltaTime)) : 0f;
 		}
 
 		private void ApplyReachedStages(RunTimerModel timer)

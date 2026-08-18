@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31f998e1d2c44d59b08db2e3eeebcaef, type: 3}
+  m_Name: Attack_FireBallInferno
+  m_EditorClassIdentifier: 
+  Id: 1006
+  ExecutorId: explosive-projectile
+  ExecutorParameterConfig: {fileID: 11400000, guid: 6bc1b9c8825e476c81e87f3718e62566, type: 2}
+  Damage: 45
+  Cooldown: 1

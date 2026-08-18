@@ -34,6 +34,18 @@ namespace HaoFuSurvivor
 			return closest;
 		}
 
+		public IReadOnlyList<CombatEntity> FindOpponentsInRange(Vector2 position, CombatFaction ownerFaction, float range)
+		{
+			var targets = new List<CombatEntity>();
+			var rangeSquared = Mathf.Max(0f, range) * Mathf.Max(0f, range);
+			foreach (var entity in mEntities)
+			{
+				if (entity == null || !entity.isActiveAndEnabled || entity.Faction == ownerFaction) continue;
+				if (((Vector2)entity.transform.position - position).sqrMagnitude <= rangeSquared) targets.Add(entity);
+			}
+			return targets;
+		}
+
 		protected override void OnInit()
 		{
 		}
@@ -55,6 +67,25 @@ namespace HaoFuSurvivor
 		protected override CombatEntity OnDo()
 		{
 			return this.GetSystem<CombatTargetSystem>().FindClosestOpponent(mPosition, mOwnerFaction, mRange);
+		}
+	}
+
+	public class FindCombatTargetsInRangeQuery : AbstractQuery<IReadOnlyList<CombatEntity>>
+	{
+		private readonly Vector2 mPosition;
+		private readonly CombatFaction mOwnerFaction;
+		private readonly float mRange;
+
+		public FindCombatTargetsInRangeQuery(Vector2 position, CombatFaction ownerFaction, float range)
+		{
+			mPosition = position;
+			mOwnerFaction = ownerFaction;
+			mRange = range;
+		}
+
+		protected override IReadOnlyList<CombatEntity> OnDo()
+		{
+			return this.GetSystem<CombatTargetSystem>().FindOpponentsInRange(mPosition, mOwnerFaction, mRange);
 		}
 	}
 }

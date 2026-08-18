@@ -7,7 +7,7 @@ namespace HaoFuSurvivor
 	{
 		public int Id;
 		public string DisplayName;
-		public int BaseExperience = 1;
+		public float BaseExperience = 1f;
 		public GameObject Prefab;
 	}
 }

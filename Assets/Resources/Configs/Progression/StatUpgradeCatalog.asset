@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9160f38e31fc48d6bfc5c3c1b6bcedec, type: 3}
+  m_Name: StatUpgradeCatalog
+  Upgrades:
+  - Id: 1
+    Type: 0
+    DisplayName: 攻击强化
+    Description: 所有伤害提高10%
+    Icon: {fileID: 0}
+    PercentPerLevel: 0.1
+    MaxLevel: 5
+  - Id: 2
+    Type: 1
+    DisplayName: 冷却优化
+    Description: 所有冷却缩短8%
+    Icon: {fileID: 0}
+    PercentPerLevel: 0.08
+    MaxLevel: 5
+  - Id: 3
+    Type: 2
+    DisplayName: 吸收范围
+    Description: 经验吸收范围提高20%
+    Icon: {fileID: 0}
+    PercentPerLevel: 0.2
+    MaxLevel: 5
+  - Id: 4
+    Type: 3
+    DisplayName: 经验增幅
+    Description: 获得经验提高15%
+    Icon: {fileID: 0}
+    PercentPerLevel: 0.15
+    MaxLevel: 5
+  - Id: 5
+    Type: 4
+    DisplayName: 疾行
+    Description: 移动速度提高8%
+    Icon: {fileID: 0}
+    PercentPerLevel: 0.08
+    MaxLevel: 5
+  - Id: 6
+    Type: 5
+    DisplayName: 自愈
+    Description: 每秒恢复最大生命值的0.5%
+    Icon: {fileID: 0}
+    PercentPerLevel: 0.005
+    MaxLevel: 5
+  - Id: 7
+    Type: 6
+    DisplayName: 恢复效率
+    Description: 外部治疗效果提高20%
+    Icon: {fileID: 0}
+    PercentPerLevel: 0.2
+    MaxLevel: 5

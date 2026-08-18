@@ -34,6 +34,28 @@ namespace HaoFuSurvivor
 			this.GetSystem<GameLoopSystem>().UnregisterFixedUpdateable(this);
 		}
 
+		public IEnumerable<ProjectileSaveData> GetSaveData()
+		{
+			var attacks = this.GetUtility<AttackCatalog>().Config;
+			foreach (var projectile in mActiveProjectiles)
+			{
+				var parameters = ProjectileFactory.Instance.GetParameters(projectile);
+				var attack = attacks?.Attacks.Find(item => item != null && item.ExecutorParameterConfig == parameters);
+				if (projectile != null && attack != null) yield return projectile.GetSaveData(attack.Id);
+			}
+		}
+
+		public void Restore(IEnumerable<ProjectileSaveData> entries)
+		{
+			Reset();
+			if (entries == null) return;
+			foreach (var entry in entries)
+			{
+				var parameters = entry == null ? null : this.GetUtility<AttackCatalog>().Get(entry.AttackId)?.ExecutorParameterConfig as ProjectileAttackParameterConfig;
+				if (parameters != null) ProjectileFactory.Instance.SpawnRestored(parameters, entry);
+			}
+		}
+
 		public void OnRunUpdate(float deltaTime)
 		{
 			for (var index = mActiveProjectiles.Count - 1; index >= 0; index--)

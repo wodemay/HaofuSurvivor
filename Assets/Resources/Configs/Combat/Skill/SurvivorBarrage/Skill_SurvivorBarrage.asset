@@ -18,5 +18,5 @@ MonoBehaviour:
   Icon: {fileID: 0}
   InitialAttackIds:
   - 1004
-  MaxLevel: 1
-  CanUpgrade: 0
+  MaxLevel: 2
+  CanUpgrade: 1

@@ -18,6 +18,8 @@ namespace HaoFuSurvivor
 			RegisterModel(new ExperienceModel());
 			RegisterModel(new LevelUpModel());
 			RegisterModel(new DodgeModel());
+			RegisterModel(new PlayerStatUpgradeModel());
+			RegisterModel(new CharacterExclusivePerkModel());
 
 			RegisterUtility(new CharacterCatalog());
 			RegisterUtility(new CharacterSelectionStorage());
@@ -28,10 +30,13 @@ namespace HaoFuSurvivor
 			RegisterUtility(new SkillGroupCatalog());
 			RegisterUtility(new SkillCatalog());
 			RegisterUtility(new WeaponCatalog());
-			RegisterUtility(new WeaponEvolutionCatalog());
+			RegisterUtility(new WeaponCombinationCatalog());
 			RegisterUtility(new ExperienceProgressionCatalog());
 			RegisterUtility(new RunSaveStorage());
 			RegisterUtility(new DodgeCatalog());
+			RegisterUtility(new StatUpgradeCatalog());
+			RegisterUtility(new CharacterExclusiveSkillUpgradeCatalog());
+			RegisterUtility(new CharacterExclusivePerkCatalog());
 
 			RegisterSystem(new RunSystem());
 			RegisterSystem(new GameLoopSystem());
@@ -44,9 +49,11 @@ namespace HaoFuSurvivor
 			RegisterSystem(new EnemyHealthSystem());
 			RegisterSystem(new AttackSystem());
 			RegisterSystem(new ProjectileSystem());
+			RegisterSystem(new ExplosiveAreaSystem());
 			RegisterSystem(new BarrageProjectileSystem());
 			RegisterSystem(new CombatTargetSystem());
 			RegisterSystem(new PlayerLoadoutSystem());
+			RegisterSystem(new WeaponCombinationSystem());
 			RegisterSystem(new StatSystem());
 			RegisterSystem(new DamageSystem());
 			RegisterSystem(new CharacterSelectionSystem());
@@ -54,6 +61,10 @@ namespace HaoFuSurvivor
 			RegisterSystem(new LevelUpSystem());
 			RegisterSystem(new RunSaveSystem());
 			RegisterSystem(new DodgeSystem());
+			RegisterSystem(new PlayerStatUpgradeSystem());
+			RegisterSystem(new CharacterExclusivePerkSystem());
+			RegisterSystem(new PlayerRegenerationSystem());
+			RegisterSystem(new CharacterExclusiveSkillUpgradeSystem());
 		}
 	}
 }

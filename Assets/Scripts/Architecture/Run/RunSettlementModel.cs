@@ -6,11 +6,11 @@ namespace HaoFuSurvivor
 		public readonly RunPhase Result;
 		public readonly int SurvivalSeconds;
 		public readonly int Level;
-		public readonly int RunExperience;
+		public readonly float RunExperience;
 		public readonly int Coins;
 		public readonly int MetaExperience;
 
-		public RunSettlementData(int characterId, RunPhase result, int survivalSeconds, int level, int runExperience, int coins, int metaExperience)
+		public RunSettlementData(int characterId, RunPhase result, int survivalSeconds, int level, float runExperience, int coins, int metaExperience)
 		{
 			CharacterId = characterId;
 			Result = result;

@@ -13,6 +13,7 @@ namespace HaoFuSurvivor
 		public List<int> InitialAttackIds = new();
 		public int MaxLevel = 5;
 		public bool CanUpgrade = true;
+		public bool CanAcquireDuringRun;
 		public List<WeaponLevelUpgrade> LevelUpgrades = new();
 	}
 

@@ -6,7 +6,6 @@ namespace HaoFuSurvivor
 	{
 		private const string EnemyRootConfigPath = "Configs/Enemy/EnemyRoot";
 		private const string CharacterRootName = "CharacterRoot";
-		private const string EnemyContainerName = "EnemyContainer";
 		private static EnemyFactory sInstance;
 		private static Sprite sPlaceholderSprite;
 		private readonly Dictionary<int, Queue<GameObject>> mPools = new();
@@ -26,6 +25,8 @@ namespace HaoFuSurvivor
 		public Transform Create(EnemyConfig config, Vector3 position)
 		{
 			PruneDestroyedRoots();
+			var container = GetContainer();
+			if (container == null) return null;
 			var rootConfig = Resources.Load<EnemyRootConfig>(EnemyRootConfigPath);
 			if (rootConfig != null && rootConfig.EnemyPrefab != null)
 			{
@@ -35,7 +36,7 @@ namespace HaoFuSurvivor
 					{
 						var pooledRoot = pool.Dequeue();
 						if (pooledRoot == null) continue;
-						pooledRoot.transform.SetParent(GetContainer(), false);
+						pooledRoot.transform.SetParent(container, false);
 						pooledRoot.transform.SetPositionAndRotation(position, Quaternion.identity);
 						pooledRoot.SetActive(true);
 						ConfigureRoot(pooledRoot, config);
@@ -44,7 +45,7 @@ namespace HaoFuSurvivor
 					}
 				}
 
-				var enemyRoot = Instantiate(rootConfig.EnemyPrefab, position, Quaternion.identity, GetContainer());
+				var enemyRoot = Instantiate(rootConfig.EnemyPrefab, position, Quaternion.identity, container);
 				var characterRoot = enemyRoot.transform.Find(CharacterRootName);
 				if (characterRoot == null)
 				{
@@ -61,6 +62,7 @@ namespace HaoFuSurvivor
 			}
 
 			var enemy = new GameObject("Enemy");
+			enemy.transform.SetParent(container, false);
 			enemy.transform.position = position;
 			var renderer = enemy.AddComponent<SpriteRenderer>();
 			renderer.sprite = sPlaceholderSprite ??= Sprite.Create(Texture2D.whiteTexture, new Rect(0f, 0f, 1f, 1f), new Vector2(0.5f, 0.5f));
@@ -122,15 +124,14 @@ namespace HaoFuSurvivor
 
 			GameArchitecture.Interface.GetSystem<AttackSystem>().UnregisterOwner(enemyRoot, 0);
 			enemyRoot.SetActive(false);
-			enemyRoot.transform.SetParent(GetContainer(), false);
+			var container = GetContainer();
+			if (container != null) enemyRoot.transform.SetParent(container, false);
 			pool.Enqueue(enemyRoot);
 		}
 
 		private static Transform GetContainer()
 		{
-			var container = GameObject.Find(EnemyContainerName);
-			if (container != null) return container.transform;
-			return new GameObject(EnemyContainerName).transform;
+			return WorldRootLocator.Get(WorldRootSlot.Enemy);
 		}
 
 		private void PruneDestroyedRoots()

@@ -4,45 +4,6 @@ using UnityEngine;
 
 namespace HaoFuSurvivor
 {
-	public readonly struct LevelUpWeaponOption
-	{
-		public readonly int RuntimeId;
-		public readonly int WeaponId;
-		public readonly int CurrentLevel;
-		public readonly string DisplayName;
-		public readonly string Description;
-		public readonly Sprite Icon;
-		public readonly bool IsEvolution;
-		public readonly bool IsDodge;
-		public readonly string LevelText;
-
-		public LevelUpWeaponOption(WeaponRuntimeData runtime, WeaponConfig config, string description, bool isEvolution = false)
-		{
-			RuntimeId = runtime.RuntimeId;
-			WeaponId = runtime.WeaponId;
-			CurrentLevel = runtime.Level;
-			DisplayName = string.IsNullOrWhiteSpace(config.DisplayName) ? $"Weapon {runtime.WeaponId}" : config.DisplayName;
-			Description = string.IsNullOrWhiteSpace(description) ? config.Description : description;
-			Icon = config.Icon;
-			IsEvolution = isEvolution;
-			IsDodge = false;
-			LevelText = isEvolution ? $"Level{runtime.Level}->Evolve" : $"Level{runtime.Level}->Level{runtime.Level + 1}";
-		}
-
-		public LevelUpWeaponOption(DodgeRuntimeData runtime, DodgeConfig config, string description)
-		{
-			RuntimeId = 0;
-			WeaponId = config.Id;
-			CurrentLevel = runtime.Level;
-			DisplayName = string.IsNullOrWhiteSpace(config.DisplayName) ? $"Dodge {runtime.DodgeId}" : config.DisplayName;
-			Description = string.IsNullOrWhiteSpace(description) ? config.Description : description;
-			Icon = config.Icon;
-			IsEvolution = false;
-			IsDodge = true;
-			LevelText = $"Level{runtime.Level}->Level{runtime.Level + 1}";
-		}
-	}
-
 	public readonly struct LevelUpState
 	{
 		public readonly int CurrentLevel;
@@ -63,37 +24,11 @@ namespace HaoFuSurvivor
 		}
 	}
 
-	public class GetLevelUpWeaponOptionsQuery : AbstractQuery<IReadOnlyList<LevelUpWeaponOption>>
+	public class GetLevelUpOptionsQuery : AbstractQuery<IReadOnlyList<LevelUpOption>>
 	{
-		protected override IReadOnlyList<LevelUpWeaponOption> OnDo()
+		protected override IReadOnlyList<LevelUpOption> OnDo()
 		{
-			var options = new List<LevelUpWeaponOption>();
-			var catalog = GameArchitecture.Interface.GetUtility<WeaponCatalog>();
-			foreach (var runtime in this.GetModel<PlayerLoadoutModel>().Weapons)
-			{
-				var config = catalog.Get(runtime.WeaponId);
-				if (config == null) continue;
-				if (runtime.CanUpgrade && runtime.Level < config.MaxLevel)
-				{
-					var upgrade = config.LevelUpgrades.Find(item => item != null && item.Level == runtime.Level + 1);
-					options.Add(new LevelUpWeaponOption(runtime, config, upgrade?.Description));
-					continue;
-				}
-				var evolution = GameArchitecture.Interface.GetUtility<WeaponEvolutionCatalog>().Get(runtime.WeaponId, runtime.Level);
-				var target = evolution == null ? null : catalog.Get(evolution.TargetWeaponId);
-				if (target != null && !target.CanUpgrade && target.MaxLevel == 1)
-				{
-					options.Add(new LevelUpWeaponOption(runtime, target, target.Description, true));
-				}
-			}
-			var dodge = this.GetModel<DodgeModel>().Runtime;
-			var dodgeConfig = dodge == null ? null : GameArchitecture.Interface.GetUtility<DodgeCatalog>().Get(dodge.DodgeId);
-			if (dodge != null && dodgeConfig != null && this.GetSystem<DodgeSystem>().HasUpgrade())
-			{
-				var upgrade = dodgeConfig.LevelUpgrades.Find(item => item != null && item.Level == dodge.Level + 1);
-				options.Add(new LevelUpWeaponOption(dodge, dodgeConfig, upgrade?.Description));
-			}
-			return options;
+			return this.GetModel<LevelUpModel>().CurrentOptions;
 		}
 	}
 
@@ -104,13 +39,28 @@ namespace HaoFuSurvivor
 			this.GetModel<LevelUpModel>().Reset();
 		}
 
-		public bool CompleteWeaponUpgrade(int weaponRuntimeId, bool isEvolution, bool isDodge = false)
+		public bool CompleteOption(LevelUpOption option)
 		{
 			var model = this.GetModel<LevelUpModel>();
-			if (model.PendingSelectionCount <= 0) return false;
-			var loadout = this.GetSystem<PlayerLoadoutSystem>();
-			var completed = isDodge ? this.GetSystem<DodgeSystem>().Upgrade() : isEvolution ? loadout.TryEvolveWeapon(weaponRuntimeId) : loadout.UpgradeWeapon(weaponRuntimeId);
-			if (!completed) return false;
+			if (model.PendingSelectionCount <= 0 || !model.ContainsOption(option.CandidateKey)) return false;
+
+			var completed = option.Type switch
+			{
+				LevelUpOptionType.Weapon when option.IsNewWeapon => this.GetSystem<PlayerLoadoutSystem>().AcquireWeapon(option.ContentId),
+				LevelUpOptionType.Weapon => this.GetSystem<PlayerLoadoutSystem>().UpgradeWeapon(option.RuntimeId),
+				LevelUpOptionType.WeaponCombination => this.GetSystem<WeaponCombinationSystem>().Combine(option.ContentId),
+				LevelUpOptionType.Dodge => this.GetSystem<DodgeSystem>().Upgrade(),
+				LevelUpOptionType.Skill => this.GetSystem<CharacterExclusiveSkillUpgradeSystem>().Upgrade(option.ContentId),
+				LevelUpOptionType.Stat => this.GetSystem<PlayerStatUpgradeSystem>().Upgrade(option.ContentId),
+				LevelUpOptionType.CharacterPerk => this.GetSystem<CharacterExclusivePerkSystem>().Upgrade(option.ContentId),
+				_ => false
+			};
+			if (!completed)
+			{
+				GenerateCurrentOptions();
+				PresentNextSelection();
+				return false;
+			}
 
 			model.CompleteCurrent();
 			PresentNextSelection();
@@ -119,7 +69,6 @@ namespace HaoFuSurvivor
 
 		private void OnPlayerLevelUp(PlayerLevelUpEvent levelUpEvent)
 		{
-			if (!HasSelectionOptions()) return;
 			this.GetModel<LevelUpModel>().Enqueue(levelUpEvent.Level);
 			PresentNextSelection();
 		}
@@ -132,26 +81,112 @@ namespace HaoFuSurvivor
 				this.GetSystem<RunSystem>().EndLevelUpSelection();
 				return;
 			}
-			if (!HasSelectionOptions())
+			if (model.CurrentOptions.Count == 0) GenerateCurrentOptions();
+			if (model.CurrentOptions.Count == 0)
 			{
-				model.Reset();
-				this.GetSystem<RunSystem>().EndLevelUpSelection();
+				model.CompleteCurrent();
+				PresentNextSelection();
 				return;
 			}
-			if (this.GetModel<RunModel>().Phase != RunPhase.Active) return;
+			var runModel = this.GetModel<RunModel>();
+			if (runModel.Phase == RunPhase.LevelUpSelection) return;
+			if (runModel.Phase != RunPhase.Active) return;
 
 			this.GetSystem<RunSystem>().BeginLevelUpSelection();
 			this.SendEvent(new LevelUpSelectionRequestedEvent());
 		}
 
-		private bool HasSelectionOptions()
+		private void GenerateCurrentOptions()
 		{
-			var loadout = this.GetSystem<PlayerLoadoutSystem>();
+			var pool = new List<LevelUpOption>();
+			var catalog = this.GetUtility<WeaponCatalog>();
 			foreach (var runtime in this.GetModel<PlayerLoadoutModel>().Weapons)
 			{
-				if (loadout.HasEvolution(runtime.RuntimeId)) return true;
+				var config = catalog.Get(runtime.WeaponId);
+				if (config == null) continue;
+				if (runtime.CanUpgrade && runtime.Level < config.MaxLevel)
+				{
+					var upgrade = config.LevelUpgrades.Find(item => item != null && item.Level == runtime.Level + 1);
+					pool.Add(LevelUpOption.CreateWeapon(runtime, config, upgrade?.Description));
+					continue;
+				}
 			}
-			return loadout.HasUpgradeableWeapon() || this.GetSystem<DodgeSystem>().HasUpgrade();
+
+			var combinations = this.GetSystem<WeaponCombinationSystem>().GetEligible();
+			var combinationOptions = new List<LevelUpOption>();
+			foreach (var combination in combinations)
+			{
+				if (Random.value > Mathf.Clamp01(combination.CandidateChance)) continue;
+				var target = catalog.Get(combination.TargetWeaponId);
+				if (target != null) combinationOptions.Add(LevelUpOption.CreateWeaponCombination(combination, target));
+			}
+
+			var loadout = this.GetSystem<PlayerLoadoutSystem>();
+			var weaponCatalogConfig = catalog.Config;
+			if (this.GetModel<PlayerLoadoutModel>().HasAvailableWeaponSlot && weaponCatalogConfig != null)
+			{
+				foreach (var config in weaponCatalogConfig.Weapons)
+					if (config != null && loadout.CanAcquireWeapon(config.Id))
+						pool.Add(LevelUpOption.CreateWeaponAcquisition(config));
+			}
+
+			var dodge = this.GetModel<DodgeModel>().Runtime;
+			var dodgeConfig = dodge == null ? null : this.GetUtility<DodgeCatalog>().Get(dodge.DodgeId);
+			if (dodge != null && dodgeConfig != null && this.GetSystem<DodgeSystem>().HasUpgrade())
+			{
+				var upgrade = dodgeConfig.LevelUpgrades.Find(item => item != null && item.Level == dodge.Level + 1);
+				pool.Add(LevelUpOption.CreateDodge(dodge, dodgeConfig, upgrade?.Description));
+			}
+
+			var statCatalog = this.GetUtility<StatUpgradeCatalog>().Config;
+			if (statCatalog != null)
+			{
+				var statUpgrades = this.GetSystem<PlayerStatUpgradeSystem>();
+				foreach (var definition in statCatalog.Upgrades)
+					if (definition != null && statUpgrades.HasUpgrade(definition.Id))
+						pool.Add(LevelUpOption.CreateStat(definition, statUpgrades.GetLevel(definition.Id)));
+			}
+
+			var perks = this.GetSystem<CharacterExclusivePerkSystem>();
+			foreach (var definition in perks.GetEligible())
+				pool.Add(LevelUpOption.CreateCharacterPerk(definition, perks.GetLevel(definition.Id)));
+
+			var selected = new List<LevelUpOption>();
+			var exclusiveSkillUpgrade = this.GetSystem<CharacterExclusiveSkillUpgradeSystem>().GetEligible();
+			if (exclusiveSkillUpgrade != null)
+			{
+				var runtime = this.GetModel<PlayerLoadoutModel>().GetSkillById(exclusiveSkillUpgrade.SkillId);
+				if (runtime != null) selected.Add(LevelUpOption.CreateSkill(runtime, exclusiveSkillUpgrade));
+			}
+			while (combinationOptions.Count > 0 && selected.Count < 3)
+			{
+				var index = Random.Range(0, combinationOptions.Count);
+				selected.Add(combinationOptions[index]);
+				combinationOptions.RemoveAt(index);
+			}
+			while (pool.Count > 0 && selected.Count < 3)
+			{
+				selected.Add(PickWeightedOption(pool));
+			}
+			this.GetModel<LevelUpModel>().SetCurrentOptions(selected);
+		}
+
+		private static LevelUpOption PickWeightedOption(List<LevelUpOption> pool)
+		{
+			var totalWeight = 0f;
+			foreach (var option in pool) totalWeight += Mathf.Max(0.01f, option.Weight);
+			var roll = Random.value * totalWeight;
+			for (var index = 0; index < pool.Count; index++)
+			{
+				roll -= Mathf.Max(0.01f, pool[index].Weight);
+				if (roll > 0f) continue;
+				var selected = pool[index];
+				pool.RemoveAt(index);
+				return selected;
+			}
+			var fallback = pool[^1];
+			pool.RemoveAt(pool.Count - 1);
+			return fallback;
 		}
 
 		protected override void OnInit()
