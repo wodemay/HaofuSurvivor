@@ -17,6 +17,9 @@ namespace HaoFuSurvivor
 		private readonly HashSet<int> mHitTargetIds = new();
 		private bool mIsActive;
 
+		protected CombatFaction OwnerFaction => mOwnerFaction;
+		protected float Damage => mDamage;
+
 		public IArchitecture GetArchitecture() => GameArchitecture.Interface;
 
 		private void Awake()
@@ -40,6 +43,34 @@ namespace HaoFuSurvivor
 			mIsActive = true;
 		}
 
+		public virtual void ConfigureParameters(ProjectileAttackParameterConfig parameters)
+		{
+		}
+
+		public ProjectileSaveData GetSaveData(int attackId)
+		{
+			return new ProjectileSaveData
+			{
+				AttackId = attackId,
+				PositionX = transform.position.x,
+				PositionY = transform.position.y,
+				DirectionX = mDirection.x,
+				DirectionY = mDirection.y,
+				OwnerFaction = (int)mOwnerFaction,
+				Damage = mDamage,
+				MoveSpeed = mMoveSpeed,
+				RemainingLifetime = mRemainingLifetime,
+				RemainingPierce = mRemainingPierce
+			};
+		}
+
+		public void Restore(ProjectileSaveData data)
+		{
+			if (data == null) return;
+			Launch(new Vector2(data.PositionX, data.PositionY), new Vector2(data.DirectionX, data.DirectionY),
+				(CombatFaction)data.OwnerFaction, data.Damage, data.MoveSpeed, data.RemainingLifetime, data.RemainingPierce);
+		}
+
 		public void AdvanceFixed(float deltaTime)
 		{
 			if (!mIsActive) return;
@@ -58,11 +89,16 @@ namespace HaoFuSurvivor
 			if (!mIsActive || !this.SendQuery(new GetRunTimeStateQuery()).IsRunning) return;
 			var target = other.GetComponentInParent<CombatEntity>();
 			if (target == null || target.Faction == mOwnerFaction || !mHitTargetIds.Add(target.GetInstanceID())) return;
-			this.SendCommand(new ApplyCombatDamageCommand(target, mDamage));
+			ResolveHit(target);
 			if (mRemainingPierce-- <= 0) ProjectileFactory.Instance.Release(this);
 		}
 
-		public void ResetState()
+		protected virtual void ResolveHit(CombatEntity target)
+		{
+			this.SendCommand(new ApplyCombatDamageCommand(target, mDamage));
+		}
+
+		public virtual void ResetState()
 		{
 			mIsActive = false;
 			mRigidbody.velocity = Vector2.zero;

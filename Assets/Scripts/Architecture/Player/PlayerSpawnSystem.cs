@@ -23,7 +23,9 @@ namespace HaoFuSurvivor
 				return false;
 			}
 
-			var playerObject = Object.Instantiate(rootConfig.PlayerPrefab, Vector3.zero, Quaternion.identity);
+			var playerLayerRoot = WorldRootLocator.Get(WorldRootSlot.Player);
+			if (playerLayerRoot == null) return false;
+			var playerObject = Object.Instantiate(rootConfig.PlayerPrefab, Vector3.zero, Quaternion.identity, playerLayerRoot);
 			var characterRoot = playerObject.transform.Find(CharacterRootName);
 			var healthBarAnchor = playerObject.transform.Find(HealthBarAnchorName);
 			if (characterRoot == null || healthBarAnchor == null)

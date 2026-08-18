@@ -3,10 +3,10 @@ namespace HaoFuSurvivor
 	public class ExperienceModel : QFramework.AbstractModel
 	{
 		public int Level { get; internal set; }
-		public int CurrentExperience { get; internal set; }
-		public int RequiredExperience { get; internal set; }
+		public float CurrentExperience { get; internal set; }
+		public float RequiredExperience { get; internal set; }
 
-		public void Reset(int requiredExperience)
+		public void Reset(float requiredExperience)
 		{
 			Level = 1;
 			CurrentExperience = 0;

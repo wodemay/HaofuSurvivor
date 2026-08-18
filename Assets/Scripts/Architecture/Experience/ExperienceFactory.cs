@@ -5,7 +5,6 @@ namespace HaoFuSurvivor
 {
 	public class ExperienceFactory : MonoBehaviour
 	{
-		private const string ContainerName = "ExperienceDropContainer";
 		private static ExperienceFactory sInstance;
 		private readonly Dictionary<int, Queue<ExperienceDropController>> mPools = new();
 		private readonly HashSet<ExperienceDropController> mActive = new();
@@ -62,16 +61,14 @@ namespace HaoFuSurvivor
 				mPools.Add(config.Id, pool);
 			}
 			controller.gameObject.SetActive(false);
-			controller.transform.SetParent(GetContainer(), false);
+			var container = GetContainer();
+			if (container != null) controller.transform.SetParent(container, false);
 			pool.Enqueue(controller);
 		}
 
 		private static Transform GetContainer()
 		{
-			var container = GameObject.Find(ContainerName);
-			if (container != null) return container.transform;
-			Debug.LogError("Experience drops require a scene ExperienceDropContainer.");
-			return null;
+			return WorldRootLocator.Get(WorldRootSlot.Pickup);
 		}
 
 		private void PruneDestroyedEntries()

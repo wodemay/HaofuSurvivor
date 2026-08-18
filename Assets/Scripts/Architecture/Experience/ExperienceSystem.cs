@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Globalization;
 using QFramework;
 using UnityEngine;
 
@@ -7,8 +8,10 @@ namespace HaoFuSurvivor
 	public readonly struct ExperienceState
 	{
 		public readonly int Level;
-		public readonly int CurrentExperience;
-		public readonly int RequiredExperience;
+		public readonly float CurrentExperience;
+		public readonly float RequiredExperience;
+		public string CurrentExperienceText => CurrentExperience.ToString("F1", CultureInfo.InvariantCulture);
+		public string RequiredExperienceText => RequiredExperience.ToString("F1", CultureInfo.InvariantCulture);
 
 		public ExperienceState(ExperienceModel model)
 		{
@@ -32,11 +35,41 @@ namespace HaoFuSurvivor
 
 		public void Reset()
 		{
-			foreach (var drop in mDrops) ExperienceFactory.Instance.Release(drop.Config, drop.Controller);
-			mDrops.Clear();
-			this.GetSystem<GameLoopSystem>().UnregisterUpdateable(this);
+			ClearDrops();
 			var config = this.GetUtility<ExperienceProgressionCatalog>().Config;
 			this.GetModel<ExperienceModel>().Reset(config == null ? 1 : config.GetRequiredExperience(1));
+		}
+
+		public IEnumerable<ExperienceDropSaveData> GetSaveData()
+		{
+			foreach (var drop in mDrops)
+			{
+				if (drop.Config == null || drop.Controller == null) continue;
+				yield return new ExperienceDropSaveData
+				{
+					ConfigId = drop.Config.Id,
+					Experience = drop.Controller.Experience,
+					PositionX = drop.Controller.transform.position.x,
+					PositionY = drop.Controller.transform.position.y,
+					IsCaptured = drop.IsCaptured,
+					AbsorbSpeed = drop.AbsorbSpeed
+				};
+			}
+		}
+
+		public void RestoreDrops(IEnumerable<ExperienceDropSaveData> entries)
+		{
+			ClearDrops();
+			if (entries == null) return;
+			foreach (var entry in entries)
+			{
+				var config = entry == null ? null : FindConfig(entry.ConfigId);
+				var controller = config == null ? null : ExperienceFactory.Instance.Create(config, new Vector2(entry.PositionX, entry.PositionY));
+				if (controller == null) continue;
+				controller.Configure(entry.Experience);
+				mDrops.Add(new ActiveExperienceDrop(config, controller) { IsCaptured = entry.IsCaptured, AbsorbSpeed = Mathf.Max(0f, entry.AbsorbSpeed) });
+			}
+			if (mDrops.Count > 0 && this.GetSystem<RunTimerSystem>().IsRunning()) this.GetSystem<GameLoopSystem>().RegisterUpdateable(this);
 		}
 
 		public void OnRunUpdate(float deltaTime)
@@ -92,10 +125,25 @@ namespace HaoFuSurvivor
 			AddExperience(amount);
 		}
 
-		private void AddExperience(int amount)
+		private void ClearDrops()
+		{
+			foreach (var drop in mDrops) ExperienceFactory.Instance.Release(drop.Config, drop.Controller);
+			mDrops.Clear();
+			this.GetSystem<GameLoopSystem>().UnregisterUpdateable(this);
+		}
+
+		private static ExperienceDropConfig FindConfig(int configId)
+		{
+			foreach (var config in Resources.LoadAll<ExperienceDropConfig>("Configs/Progression/Experience"))
+				if (config != null && config.Id == configId) return config;
+			return null;
+		}
+
+		private void AddExperience(float amount)
 		{
 			var model = this.GetModel<ExperienceModel>();
-			model.CurrentExperience += Mathf.Max(0, amount);
+			var finalAmount = Mathf.Max(0f, amount) * this.GetSystem<StatSystem>().GetExperienceMultiplier();
+			model.CurrentExperience += finalAmount;
 			var progression = this.GetUtility<ExperienceProgressionCatalog>().Config;
 			while (model.CurrentExperience >= model.RequiredExperience)
 			{
@@ -104,7 +152,7 @@ namespace HaoFuSurvivor
 				model.RequiredExperience = progression == null ? 1 : progression.GetRequiredExperience(model.Level);
 				this.SendEvent(new PlayerLevelUpEvent(model.Level));
 			}
-			this.SendEvent(new ExperienceCollectedEvent(amount, model.CurrentExperience, model.RequiredExperience));
+			this.SendEvent(new ExperienceCollectedEvent(finalAmount, model.CurrentExperience, model.RequiredExperience));
 		}
 
 		protected override void OnInit()

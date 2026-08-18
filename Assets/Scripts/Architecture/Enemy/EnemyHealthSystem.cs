@@ -20,6 +20,16 @@ namespace HaoFuSurvivor
 			if (enemy != null) mCurrentHealth.Remove(enemy);
 		}
 
+		public float GetCurrentHealth(CombatEntity enemy)
+		{
+			return enemy != null && mCurrentHealth.TryGetValue(enemy, out var health) ? health : 0f;
+		}
+
+		public void RestoreCurrentHealth(CombatEntity enemy, float health)
+		{
+			if (enemy != null) mCurrentHealth[enemy] = Mathf.Max(0.01f, health);
+		}
+
 		public void ApplyDamage(CombatEntity enemy, float damage)
 		{
 			if (enemy == null || damage <= 0f || !mCurrentHealth.TryGetValue(enemy, out var currentHealth)) return;

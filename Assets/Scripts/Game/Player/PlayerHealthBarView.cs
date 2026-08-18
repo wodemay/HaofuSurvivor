@@ -21,10 +21,19 @@ namespace HaoFuSurvivor
 
 			this.RegisterEvent<PlayerDamagedEvent>(OnPlayerDamaged)
 				.UnRegisterWhenGameObjectDestroyed(gameObject);
+			this.RegisterEvent<PlayerHealedEvent>(OnPlayerHealed)
+				.UnRegisterWhenGameObjectDestroyed(gameObject);
+			this.RegisterEvent<PlayerHealthRestoredEvent>(_ => Refresh())
+				.UnRegisterWhenGameObjectDestroyed(gameObject);
 			Refresh();
 		}
 
 		private void OnPlayerDamaged(PlayerDamagedEvent damageEvent)
+		{
+			Refresh();
+		}
+
+		private void OnPlayerHealed(PlayerHealedEvent healedEvent)
 		{
 			Refresh();
 		}

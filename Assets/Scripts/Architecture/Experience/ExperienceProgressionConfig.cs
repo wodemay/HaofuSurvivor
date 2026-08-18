@@ -6,13 +6,13 @@ namespace HaoFuSurvivor
 	[CreateAssetMenu(menuName = "ProjectSurvivor/Experience Progression Config")]
 	public class ExperienceProgressionConfig : ScriptableObject
 	{
-		public List<int> RequiredExperienceByLevel = new();
+		public List<float> RequiredExperienceByLevel = new();
 
-		public int GetRequiredExperience(int level)
+		public float GetRequiredExperience(int level)
 		{
-			if (RequiredExperienceByLevel.Count == 0) return 1;
+			if (RequiredExperienceByLevel.Count == 0) return 1f;
 			var index = Mathf.Clamp(level - 1, 0, RequiredExperienceByLevel.Count - 1);
-			return Mathf.Max(1, RequiredExperienceByLevel[index]);
+			return Mathf.Max(1f, RequiredExperienceByLevel[index]);
 		}
 	}
 

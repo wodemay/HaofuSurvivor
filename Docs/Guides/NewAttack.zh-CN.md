@@ -20,6 +20,8 @@ Attack 不写角色、敌人、用途或目标阵营；同一配置可由不同�
 
 需要投射物时复用 `ProjectileFactory` 与 `ProjectileSystem`，不要自行创建逐实例 Update。
 
+范围残留攻击可由独立 Executor 派发 Command 给领域 System；领域 System 通过 `GameLoopSystem` Tick 处理持续时间与伤害，表现 Prefab 只负责渲染。
+
 ## 验证
 
 核对 Catalog 引用、Executor 注册、拥有者卸载/对象池回收时的注销、自动攻击 Tick 注册与 `dotnet build Assembly-CSharp.csproj --no-restore --disable-build-servers`。不改 UI、Prefab 或场景层级。

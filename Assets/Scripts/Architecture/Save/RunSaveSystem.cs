@@ -49,6 +49,8 @@ namespace HaoFuSurvivor
 			var timer = this.GetModel<RunTimerModel>();
 			var data = new RunSaveData
 			{
+				SavedPhase = (int)run.Phase,
+				RandomStateJson = JsonUtility.ToJson(Random.state),
 				CharacterId = player.CharacterId,
 				ElapsedSeconds = timer.ElapsedSeconds,
 				CurrentStageIndex = timer.CurrentStageIndex,
@@ -60,11 +62,31 @@ namespace HaoFuSurvivor
 				RequiredExperience = experience.RequiredExperience,
 				DodgeId = this.GetModel<PlayerLoadoutModel>().DodgeId,
 				DodgeLevel = this.GetModel<DodgeModel>().Runtime?.Level ?? 0,
-				HasSkillSnapshot = true
+				HasSkillSnapshot = true,
+				DamageInvulnerabilityRemaining = player.DamageInvulnerabilityRemaining,
+				DodgeInvulnerabilityRemaining = player.DodgeInvulnerabilityRemaining,
+				DodgeCooldownRemaining = this.GetModel<DodgeModel>().Runtime?.CooldownRemaining ?? 0f,
+				DodgeDurationRemaining = this.GetModel<DodgeModel>().Runtime?.DurationRemaining ?? 0f,
+				DodgeDirectionX = this.GetModel<DodgeModel>().Runtime?.Direction.x ?? 0f,
+				DodgeDirectionY = this.GetModel<DodgeModel>().Runtime?.Direction.y ?? 0f,
+				DodgeIsActive = this.GetModel<DodgeModel>().Runtime?.IsActive ?? false,
+				EnemySpawnElapsed = this.GetSystem<EnemySystem>().GetSpawnElapsed(),
+				CharacterPerkRuntime = this.GetSystem<CharacterExclusivePerkSystem>().GetRuntimeSaveData()
 			};
+			data.StatUpgrades.AddRange(this.GetModel<PlayerStatUpgradeModel>().GetSaveData());
+			data.CharacterPerks.AddRange(this.GetModel<CharacterExclusivePerkModel>().GetSaveData());
+			data.PendingLevelSelections.AddRange(this.GetModel<LevelUpModel>().GetPendingLevels());
+			foreach (var option in this.GetModel<LevelUpModel>().CurrentOptions) data.CurrentLevelOptions.Add(option.GetSaveData());
+			data.Enemies.AddRange(this.GetSystem<EnemySystem>().GetSaveData());
+			data.ExperienceDrops.AddRange(this.GetSystem<ExperienceSystem>().GetSaveData());
+			data.Projectiles.AddRange(this.GetSystem<ProjectileSystem>().GetSaveData());
+			data.GroundFlames.AddRange(this.GetSystem<ExplosiveAreaSystem>().GetGroundFlameSaveData());
+			data.TimedEffects.AddRange(this.GetSystem<ExplosiveAreaSystem>().GetTimedEffectSaveData());
+			data.Barrages.AddRange(this.GetSystem<BarrageProjectileSystem>().GetSaveData());
+			data.AttackCooldowns.AddRange(this.GetSystem<AttackSystem>().GetPlayerCooldownSaveData(player.RuntimeRoot));
 
 			foreach (var skill in this.GetModel<PlayerLoadoutModel>().Skills)
-				data.Skills.Add(new SkillSaveData { SkillId = skill.SkillId, Level = skill.Level });
+				data.Skills.Add(new SkillSaveData { RuntimeId = skill.RuntimeId, SkillId = skill.SkillId, Level = skill.Level });
 			foreach (var weapon in this.GetModel<PlayerLoadoutModel>().Weapons)
 			{
 				var weaponData = new WeaponSaveData
@@ -94,12 +116,16 @@ namespace HaoFuSurvivor
 			var timer = this.GetModel<RunTimerModel>();
 			var experience = this.GetModel<ExperienceModel>();
 			player.CurrentHealth = Mathf.Max(0f, data.CurrentHealth);
+			player.DamageInvulnerabilityRemaining = Mathf.Max(0f, data.DamageInvulnerabilityRemaining);
+			player.DodgeInvulnerabilityRemaining = Mathf.Max(0f, data.DodgeInvulnerabilityRemaining);
 			player.Position = new Vector2(data.PositionX, data.PositionY);
 			if (player.RuntimeRoot != null) player.RuntimeRoot.transform.position = player.Position;
 			this.GetSystem<RunTimerSystem>().Restore(data.ElapsedSeconds, data.CurrentStageIndex);
 			experience.Level = Mathf.Max(1, data.Level);
-			experience.CurrentExperience = Mathf.Max(0, data.CurrentExperience);
-			experience.RequiredExperience = Mathf.Max(1, data.RequiredExperience);
+			experience.CurrentExperience = Mathf.Max(0f, data.CurrentExperience);
+			experience.RequiredExperience = Mathf.Max(1f, data.RequiredExperience);
+			this.GetSystem<PlayerStatUpgradeSystem>().Restore(data.StatUpgrades);
+			this.GetSystem<CharacterExclusivePerkSystem>().Restore(data.CharacterPerks, data.CharacterPerkRuntime);
 
 			var loadout = this.GetSystem<PlayerLoadoutSystem>();
 			loadout.Reset();
@@ -107,22 +133,60 @@ namespace HaoFuSurvivor
 			loadout.SetDodge(data.DodgeId);
 			var dodge = this.GetModel<DodgeModel>().Runtime;
 			if (dodge != null) dodge.Level = Mathf.Max(1, data.DodgeLevel);
+			this.GetSystem<DodgeSystem>().RestoreRuntime(data.DodgeCooldownRemaining, data.DodgeDurationRemaining,
+				new Vector2(data.DodgeDirectionX, data.DodgeDirectionY), data.DodgeIsActive);
 			var restoredWeaponCount = 0;
 			foreach (var weapon in data.Weapons ?? new List<WeaponSaveData>())
 			{
-				var runtime = loadout.EquipWeapon(player.RuntimeRoot, weapon.WeaponId)
-					? this.GetModel<PlayerLoadoutModel>().Weapons[this.GetModel<PlayerLoadoutModel>().Weapons.Count - 1]
-					: null;
-				if (runtime == null || !loadout.RestoreWeapon(runtime, weapon))
+				var runtime = loadout.RestoreWeapon(player.RuntimeRoot, weapon);
+				if (runtime == null)
 				{
-					if (runtime != null) loadout.RemoveWeapon(runtime.RuntimeId);
 					Debug.LogWarning($"Saved weapon {weapon.WeaponId} was skipped during restore.");
 					continue;
 				}
 				restoredWeaponCount++;
 			}
 			RestoreSkills(loadout, data, player.RuntimeRoot);
+			loadout.RestoreRetiredWeaponsFromCombinations();
+			RestoreLevelUp(data);
+			this.GetSystem<EnemySystem>().Restore(data.Enemies, data.EnemySpawnElapsed);
+			this.GetSystem<ExperienceSystem>().RestoreDrops(data.ExperienceDrops);
+			this.GetSystem<ProjectileSystem>().Restore(data.Projectiles);
+			this.GetSystem<ExplosiveAreaSystem>().RestoreGroundFlames(data.GroundFlames);
+			this.GetSystem<ExplosiveAreaSystem>().RestoreTimedEffects(data.TimedEffects);
+			this.GetSystem<BarrageProjectileSystem>().Restore(data.Barrages, player.RuntimeRoot);
+			this.GetSystem<AttackSystem>().RestorePlayerCooldowns(player.RuntimeRoot, data.AttackCooldowns);
+			RestoreRandomState(data.RandomStateJson);
+			this.SendEvent(new PlayerHealthRestoredEvent());
+			RestorePhase(data);
 			return data.Weapons == null || data.Weapons.Count == 0 || restoredWeaponCount > 0;
+		}
+
+		private void RestoreLevelUp(RunSaveData data)
+		{
+			var options = new List<LevelUpOption>();
+			foreach (var option in data.CurrentLevelOptions ?? new List<LevelUpOptionSaveData>())
+				if (option != null && !string.IsNullOrEmpty(option.CandidateKey)) options.Add(LevelUpOption.FromSaveData(option));
+			this.GetModel<LevelUpModel>().Restore(data.PendingLevelSelections, options);
+		}
+
+		private void RestorePhase(RunSaveData data)
+		{
+			var phase = (RunPhase)data.SavedPhase;
+			if (phase == RunPhase.LevelUpSelection && this.GetModel<LevelUpModel>().PendingSelectionCount > 0)
+			{
+				this.GetSystem<RunSystem>().BeginLevelUpSelection();
+				this.SendEvent(new LevelUpSelectionRequestedEvent());
+				return;
+			}
+			if (phase == RunPhase.Paused) this.GetSystem<RunSystem>().Pause();
+		}
+
+		private static void RestoreRandomState(string json)
+		{
+			if (string.IsNullOrEmpty(json)) return;
+			try { Random.state = JsonUtility.FromJson<Random.State>(json); }
+			catch { }
 		}
 
 		private void RestoreSkills(PlayerLoadoutSystem loadout, RunSaveData data, GameObject owner)
@@ -141,13 +205,15 @@ namespace HaoFuSurvivor
 
 		private void RestoreSkill(PlayerLoadoutSystem loadout, GameObject owner, SkillSaveData data)
 		{
-			if (data == null || data.SkillId == 0 || !loadout.EquipSkill(owner, data.SkillId))
+			if (data == null || data.SkillId == 0 || !loadout.EquipSkill(owner, data.SkillId, data.RuntimeId))
 			{
 				if (data != null && data.SkillId != 0) Debug.LogWarning($"Saved skill {data.SkillId} was skipped during restore.");
 				return;
 			}
-			foreach (var skill in this.GetModel<PlayerLoadoutModel>().Skills)
-				if (skill.SkillId == data.SkillId) skill.Level = Mathf.Max(1, data.Level);
+			var skill = data.RuntimeId < 0
+				? this.GetModel<PlayerLoadoutModel>().GetSkill(data.RuntimeId)
+				: this.GetModel<PlayerLoadoutModel>().GetSkillById(data.SkillId);
+			if (skill != null) loadout.RestoreSkill(skill, data.Level);
 		}
 
 		protected override void OnInit()

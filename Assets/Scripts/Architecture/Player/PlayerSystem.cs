@@ -12,10 +12,10 @@ namespace HaoFuSurvivor
 			var playerModel = this.GetModel<PlayerModel>();
 			var statModel = this.GetModel<PlayerStatModel>();
 
-			statModel.MaxHealth = Mathf.Max(1f, character.MaxHealth);
-			statModel.MoveSpeed = Mathf.Max(0f, character.MoveSpeed);
-			statModel.AttackPower = Mathf.Max(0f, character.AttackPower);
-			statModel.ExperienceAbsorbRadius = Mathf.Max(0f, character.BaseExperienceAbsorbRadius);
+			statModel.BaseMaxHealth = statModel.MaxHealth = Mathf.Max(1f, character.MaxHealth);
+			statModel.BaseMoveSpeed = statModel.MoveSpeed = Mathf.Max(0f, character.MoveSpeed);
+			statModel.BaseAttackPower = statModel.AttackPower = Mathf.Max(0f, character.AttackPower);
+			statModel.BaseExperienceAbsorbRadius = statModel.ExperienceAbsorbRadius = Mathf.Max(0f, character.BaseExperienceAbsorbRadius);
 			statModel.ExperienceAbsorbAcceleration = Mathf.Max(0.01f, character.BaseExperienceAbsorbAcceleration);
 			statModel.ExperienceAbsorbMaxSpeed = Mathf.Max(0.01f, character.BaseExperienceAbsorbMaxSpeed);
 			playerModel.CharacterId = character.Id;
@@ -27,6 +27,7 @@ namespace HaoFuSurvivor
 			playerModel.DodgeInvulnerabilityRemaining = 0f;
 			playerModel.IsDead = false;
 			playerModel.IsRegistered = true;
+			this.GetSystem<PlayerStatUpgradeSystem>().Reset();
 		}
 
 		public void Unregister(GameObject runtimeRoot)
@@ -73,6 +74,18 @@ namespace HaoFuSurvivor
 			playerModel.IsDead = true;
 			this.SendEvent(new PlayerDiedEvent());
 			this.GetSystem<RunSystem>().EndWithDefeat();
+		}
+
+		public float RestoreHealth(float amount, bool applyRecoveryEfficiency = true)
+		{
+			var playerModel = this.GetModel<PlayerModel>();
+			if (!playerModel.IsRegistered || playerModel.IsDead || amount <= 0f) return 0f;
+			var multiplier = applyRecoveryEfficiency ? this.GetSystem<StatSystem>().GetRecoveryEfficiencyMultiplier() : 1f;
+			var recovered = Mathf.Min(this.GetSystem<StatSystem>().GetMaxHealth() - playerModel.CurrentHealth, amount * multiplier);
+			if (recovered <= 0f) return 0f;
+			playerModel.CurrentHealth += recovered;
+			this.SendEvent(new PlayerHealedEvent(recovered, playerModel.CurrentHealth));
+			return recovered;
 		}
 
 		public void OnRunUpdate(float deltaTime)

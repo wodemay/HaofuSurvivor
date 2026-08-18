@@ -28,6 +28,48 @@ namespace HaoFuSurvivor
 			EnemyFactory.Instance.Release(enemy);
 			this.GetModel<EnemyModel>().AliveCount = mEnemies.Count;
 		}
+
+		public IEnumerable<EnemySaveData> GetSaveData()
+		{
+			foreach (var enemy in mEnemies)
+			{
+				if (enemy == null) continue;
+				var config = EnemyFactory.Instance.GetConfig(enemy);
+				var entity = enemy.GetComponent<CombatEntity>();
+				if (config == null || entity == null) continue;
+				var data = new EnemySaveData
+				{
+					ConfigId = config.Id,
+					PositionX = enemy.position.x,
+					PositionY = enemy.position.y,
+					CurrentHealth = this.GetSystem<EnemyHealthSystem>().GetCurrentHealth(entity),
+					MoveSpeed = mMoveSpeeds.TryGetValue(enemy, out var moveSpeed) ? moveSpeed : config.MoveSpeed
+				};
+				data.AttackCooldowns.AddRange(this.GetSystem<AttackSystem>().GetCooldownSaveData(enemy.gameObject));
+				yield return data;
+			}
+		}
+
+		public void Restore(IEnumerable<EnemySaveData> entries, float spawnElapsed)
+		{
+			Reset();
+			var catalog = this.GetUtility<EnemyCatalog>();
+			if (entries != null)
+				foreach (var entry in entries)
+				{
+					var config = entry == null ? null : catalog.Get(entry.ConfigId);
+					var enemy = config == null ? null : EnemyFactory.Instance.Create(config, new Vector2(entry.PositionX, entry.PositionY));
+					if (enemy == null) continue;
+					mEnemies.Add(enemy);
+					mMoveSpeeds[enemy] = Mathf.Max(0f, entry.MoveSpeed);
+					this.GetSystem<EnemyHealthSystem>().RestoreCurrentHealth(enemy.GetComponent<CombatEntity>(), entry.CurrentHealth);
+					this.GetSystem<AttackSystem>().RestoreCooldowns(enemy.gameObject, entry.AttackCooldowns);
+				}
+			mSpawnElapsed = Mathf.Max(0f, spawnElapsed);
+			this.GetModel<EnemyModel>().AliveCount = mEnemies.Count;
+		}
+
+		public float GetSpawnElapsed() => mSpawnElapsed;
 		public void OnRunFixedUpdate(float deltaTime)
 		{
 			var player = this.GetModel<PlayerModel>();

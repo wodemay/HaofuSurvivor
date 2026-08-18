@@ -78,7 +78,8 @@ namespace HaoFuSurvivor
 			return runtime != null && config != null && config.CanUpgrade && runtime.Level < config.MaxLevel;
 		}
 
-		public float GetCooldown(DodgeConfig config, int level) => Mathf.Max(0f, config.Cooldown + (GetUpgrade(config, level)?.CooldownAdd ?? 0f));
+		public float GetCooldown(DodgeConfig config, int level) => Mathf.Max(0.01f,
+			(config.Cooldown + (GetUpgrade(config, level)?.CooldownAdd ?? 0f)) * this.GetSystem<StatSystem>().GetCooldownMultiplier());
 		public float GetDuration(DodgeConfig config, int level) => Mathf.Max(0.01f, config.Duration + (GetUpgrade(config, level)?.DurationAdd ?? 0f));
 		public float GetDistance(DodgeConfig config, int level) => Mathf.Max(0f, config.Distance + (GetUpgrade(config, level)?.DistanceAdd ?? 0f));
 		public float GetInvulnerabilityDuration(DodgeConfig config, int level) => Mathf.Max(0f, config.InvulnerabilityDuration + (GetUpgrade(config, level)?.InvulnerabilityDurationAdd ?? 0f));
@@ -88,6 +89,16 @@ namespace HaoFuSurvivor
 			this.GetModel<DodgeModel>().Reset();
 			this.GetModel<PlayerModel>().DodgeInvulnerabilityRemaining = 0f;
 			this.GetSystem<GameLoopSystem>().UnregisterFixedUpdateable(this);
+		}
+
+		public void RestoreRuntime(float cooldownRemaining, float durationRemaining, Vector2 direction, bool isActive)
+		{
+			var runtime = this.GetModel<DodgeModel>().Runtime;
+			if (runtime == null) return;
+			runtime.CooldownRemaining = Mathf.Max(0f, cooldownRemaining);
+			runtime.DurationRemaining = Mathf.Max(0f, durationRemaining);
+			runtime.Direction = direction.sqrMagnitude > 0.001f ? direction.normalized : Vector2.right;
+			runtime.IsActive = isActive && runtime.DurationRemaining > 0f;
 		}
 
 		private DodgeLevelUpgrade GetUpgrade(DodgeConfig config, int level)

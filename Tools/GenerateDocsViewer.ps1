@@ -1,10 +1,11 @@
 param([string]$ProjectRoot = (Split-Path -Parent $PSScriptRoot))
 $docsRoot = Join-Path $ProjectRoot 'Docs'
+$temporaryRoot = Join-Path $docsRoot 'Temporary'
 $output = Join-Path $docsRoot 'docs-data.js'
 $contentRoot = Join-Path $docsRoot 'docs-content'
 New-Item -ItemType Directory -Path $contentRoot -Force | Out-Null
 $script:docIndex = 0
-$items = Get-ChildItem -LiteralPath $docsRoot -Recurse -File -Filter *.md | Sort-Object FullName | ForEach-Object {
+$items = Get-ChildItem -LiteralPath $docsRoot -Recurse -File -Filter *.md | Where-Object { $_.FullName -notlike "$temporaryRoot\*" } | Sort-Object FullName | ForEach-Object {
     $relative = $_.FullName.Substring($docsRoot.Length + 1).Replace('\','/')
     $markdown = [IO.File]::ReadAllText($_.FullName, [Text.Encoding]::UTF8)
     $titleMatch = [regex]::Match($markdown, '(?m)^#\s+(.+)$')

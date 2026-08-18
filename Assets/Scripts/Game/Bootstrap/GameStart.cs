@@ -21,7 +21,7 @@ namespace HaoFuSurvivor
 
 		private void Update()
 		{
-			GameArchitecture.Interface.SendCommand(new TickGameLoopCommand(Time.unscaledDeltaTime));
+			GameArchitecture.Interface.SendCommand(new TickGameLoopCommand(Time.deltaTime));
 		}
 
 		private void FixedUpdate()

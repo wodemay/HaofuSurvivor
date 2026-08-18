@@ -5,7 +5,7 @@ using QFramework;
 
 namespace HaoFuSurvivor
 {
-	// Generate Id:070e8a61-cea4-43c6-bf1e-4dba4b9de6a3
+	// Generate Id:bfcac6d0-8ff5-4f21-bbfe-8413554773b2
 	public partial class UILevelUpPanel
 	{
 		public const string Name = "UILevelUpPanel";

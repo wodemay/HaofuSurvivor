@@ -4,11 +4,11 @@ namespace HaoFuSurvivor
 {
 	public class ExperienceDropController : MonoBehaviour
 	{
-		public int Experience { get; private set; }
+		public float Experience { get; private set; }
 
-		public void Configure(int experience)
+		public void Configure(float experience)
 		{
-			Experience = Mathf.Max(1, experience);
+			Experience = Mathf.Max(0.01f, experience);
 		}
 
 		public void MoveTowards(Vector2 targetPosition, float maxDistanceDelta)

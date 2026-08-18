@@ -8,7 +8,7 @@ namespace HaoFuSurvivor
 	{
 		private Button mSelectButton;
 
-		public void Initialize(LevelUpWeaponOption option, Action<LevelUpWeaponOption> onSelected)
+		public void Initialize(LevelUpOption option, Action<LevelUpOption> onSelected)
 		{
 			var icon = transform.Find("Image_Icon")?.GetComponent<Image>();
 			if (icon != null) icon.sprite = option.Icon;

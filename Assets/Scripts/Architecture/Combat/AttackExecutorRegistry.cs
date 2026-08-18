@@ -11,20 +11,29 @@ namespace HaoFuSurvivor
 		public readonly CombatEntity Target;
 		public readonly AttackConfig Config;
 		public readonly WeaponRuntimeData WeaponRuntime;
+		public readonly SkillRuntimeData SkillRuntime;
 
 		public AttackExecutionContext(GameObject owner, CombatFaction ownerFaction, CombatEntity target, AttackConfig config,
-			WeaponRuntimeData weaponRuntime)
+			WeaponRuntimeData weaponRuntime, SkillRuntimeData skillRuntime = null)
 		{
 			Owner = owner;
 			OwnerFaction = ownerFaction;
 			Target = target;
 			Config = config;
 			WeaponRuntime = weaponRuntime;
+			SkillRuntime = skillRuntime;
 		}
 
 		public float GetModifierValue(string key, float defaultValue)
 		{
 			return WeaponRuntime == null ? defaultValue : WeaponRuntime.GetModifierValue(Config.Id, key, defaultValue);
+		}
+
+		public float GetDamageMultiplier()
+		{
+			return OwnerFaction == CombatFaction.Player
+				? GameArchitecture.Interface.GetSystem<StatSystem>().GetAttackDamageMultiplier()
+				: GameArchitecture.Interface.GetModel<RunTimerModel>().EnemyDamageMultiplier;
 		}
 	}
 
@@ -49,6 +58,7 @@ namespace HaoFuSurvivor
 		{
 			Register(new CollisionAttackExecutor());
 			Register(new ProjectileAttackExecutor());
+			Register(new ExplosiveProjectileAttackExecutor());
 			Register(new BarrageProjectileAttackExecutor());
 		}
 
@@ -77,10 +87,7 @@ namespace HaoFuSurvivor
 
 		public void Execute(AttackExecutionContext context)
 		{
-			var multiplier = context.OwnerFaction == CombatFaction.Enemy
-				? GameArchitecture.Interface.GetModel<RunTimerModel>().EnemyDamageMultiplier
-				: 1f;
-			GameArchitecture.Interface.GetSystem<DamageSystem>().ApplyDamage(context.Target, context.Config.Damage * multiplier);
+			GameArchitecture.Interface.GetSystem<DamageSystem>().ApplyDamage(context.Target, context.Config.Damage * context.GetDamageMultiplier());
 		}
 	}
 
@@ -110,11 +117,8 @@ namespace HaoFuSurvivor
 			var direction = (Vector2)(context.Target.transform.position - context.Owner.transform.position);
 			if (direction.sqrMagnitude <= Mathf.Epsilon) return;
 
-			var multiplier = context.OwnerFaction == CombatFaction.Enemy
-				? GameArchitecture.Interface.GetModel<RunTimerModel>().EnemyDamageMultiplier
-				: 1f;
-			var projectileCount = Mathf.Max(1, Mathf.RoundToInt(context.GetModifierValue(WeaponUpgradeModifierKeys.ProjectileCountAdd, 0f) + 1f));
-			var damage = Mathf.Max(0f, context.Config.Damage + context.GetModifierValue(WeaponUpgradeModifierKeys.ProjectileDamageAdd, 0f));
+			var projectileCount = ProjectileAttackUtility.GetWeaponProjectileCount(context);
+			var damage = Mathf.Max(0f, context.Config.Damage + context.GetModifierValue(WeaponUpgradeModifierKeys.ProjectileDamageAdd, 0f)) * context.GetDamageMultiplier();
 			var speed = Mathf.Max(0f, parameters.MoveSpeed * context.GetModifierValue(WeaponUpgradeModifierKeys.ProjectileSpeedMultiplier, 1f));
 			var pierce = Mathf.Max(0, Mathf.FloorToInt(context.GetModifierValue(WeaponUpgradeModifierKeys.ProjectilePierceAdd, 0f)));
 			for (var index = 0; index < projectileCount; index++)
@@ -122,8 +126,56 @@ namespace HaoFuSurvivor
 				var angle = (index - (projectileCount - 1) * 0.5f) * 10f;
 				var projectileDirection = Quaternion.Euler(0f, 0f, angle) * direction.normalized;
 				ProjectileFactory.Instance.Spawn(parameters, context.Owner.transform.position, projectileDirection,
-					context.OwnerFaction, damage * multiplier, speed, pierce);
+					context.OwnerFaction, damage, speed, pierce);
 			}
+		}
+	}
+
+	public class ExplosiveProjectileAttackExecutor : IAttackExecutor, IAutomaticAttackExecutor
+	{
+		public string Id => "explosive-projectile";
+		public bool RequiresTarget => true;
+
+		public void ConfigureOwner(GameObject owner, AttackConfig config, CombatFaction ownerFaction, int weaponRuntimeId = 0)
+		{
+			if (config.ExecutorParameterConfig is not ExplosiveProjectileAttackParameterConfig) return;
+			GameArchitecture.Interface.GetSystem<AttackSystem>().RegisterAutomatic(owner, config, ownerFaction, weaponRuntimeId);
+		}
+
+		public CombatEntity FindTarget(AttackExecutionContext context)
+		{
+			if (context.Config.ExecutorParameterConfig is not ExplosiveProjectileAttackParameterConfig parameters || context.Owner == null) return null;
+			return GameArchitecture.Interface.SendQuery(
+				new FindClosestCombatTargetQuery(context.Owner.transform.position, context.OwnerFaction, parameters.AttackRange));
+		}
+
+		public void Execute(AttackExecutionContext context)
+		{
+			if (context.Config.ExecutorParameterConfig is not ExplosiveProjectileAttackParameterConfig parameters ||
+				parameters.ProjectilePrefab == null || context.Owner == null || context.Target == null) return;
+			var direction = (Vector2)(context.Target.transform.position - context.Owner.transform.position);
+			if (direction.sqrMagnitude <= Mathf.Epsilon) return;
+			var speed = Mathf.Max(0f, parameters.MoveSpeed * context.GetModifierValue(WeaponUpgradeModifierKeys.ProjectileSpeedMultiplier, 1f));
+			var damage = Mathf.Max(0f, context.Config.Damage + context.GetModifierValue(WeaponUpgradeModifierKeys.ProjectileDamageAdd, 0f)) * context.GetDamageMultiplier();
+			var projectileCount = ProjectileAttackUtility.GetWeaponProjectileCount(context);
+			for (var index = 0; index < projectileCount; index++)
+			{
+				var angle = (index - (projectileCount - 1) * 0.5f) * 10f;
+				var projectileDirection = Quaternion.Euler(0f, 0f, angle) * direction.normalized;
+				ProjectileFactory.Instance.Spawn(parameters, context.Owner.transform.position, projectileDirection,
+					context.OwnerFaction, damage, speed, 0);
+			}
+		}
+	}
+
+	public static class ProjectileAttackUtility
+	{
+		public static int GetWeaponProjectileCount(AttackExecutionContext context)
+		{
+			var perkCount = context.OwnerFaction == CombatFaction.Player && context.WeaponRuntime != null
+				? GameArchitecture.Interface.GetSystem<CharacterExclusivePerkSystem>().GetWeaponProjectileCountAdd()
+				: 0;
+			return Mathf.Max(1, Mathf.RoundToInt(context.GetModifierValue(WeaponUpgradeModifierKeys.ProjectileCountAdd, 0f) + 1f) + perkCount);
 		}
 	}
 
@@ -141,11 +193,9 @@ namespace HaoFuSurvivor
 		public void Execute(AttackExecutionContext context)
 		{
 			if (context.Config.ExecutorParameterConfig is not BarrageProjectileAttackParameterConfig parameters || context.Owner == null) return;
-			var multiplier = context.OwnerFaction == CombatFaction.Enemy
-				? GameArchitecture.Interface.GetModel<RunTimerModel>().EnemyDamageMultiplier
-				: 1f;
+			var isUltimate = context.SkillRuntime != null && context.SkillRuntime.Level > 1;
 			GameArchitecture.Interface.GetSystem<BarrageProjectileSystem>().Schedule(
-				context.Owner, context.OwnerFaction, parameters, context.Config.Damage * multiplier);
+				context.Owner, context.OwnerFaction, parameters, context.Config.Damage * context.GetDamageMultiplier(), isUltimate);
 		}
 	}
 

@@ -9,9 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9e6bc2f08807a3a40929f6624db823f9, type: 3}
-  m_Name: WeaponEvolution_Projectile
+  m_Script: {fileID: 11500000, guid: 31f998e1d2c44d59b08db2e3eeebcaef, type: 3}
+  m_Name: Attack_FireBall
   m_EditorClassIdentifier: 
-  SourceWeaponId: 1
-  RequiredLevel: 5
-  TargetWeaponId: 2
+  Id: 1005
+  ExecutorId: projectile
+  ExecutorParameterConfig: {fileID: 11400000, guid: b98eeb9e40354d0e89bf6655a2e853d1, type: 2}
+  Damage: 16
+  Cooldown: 0.85

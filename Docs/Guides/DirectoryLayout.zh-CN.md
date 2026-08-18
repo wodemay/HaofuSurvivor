@@ -6,7 +6,7 @@
 
 `Assets/Scripts/Architecture/` 按 QFramework 业务模块划分：Character、Player、Enemy、Combat、Skill、Dodge、Experience、LevelUp、Run、Save、Input，以及跨模块的 Commands 和 Events。
 
-`Assets/Scripts/Game/` 仅放 Unity 桥接：`Bootstrap/` 是启动入口，`Camera/` 是表现跟随，`Combat/` 是 CombatEntity、碰撞和投射物桥接，`Player/` 是角色内容兼容标记与血条视图。`UI/` 和 `Editor/` 保持独立。
+`Assets/Scripts/Game/` 仅放 Unity 桥接：`Bootstrap/` 是启动入口，`Camera/` 是表现跟随，`Combat/` 是 CombatEntity、碰撞和投射物桥接，`Player/` 是角色内容兼容标记与血条视图，`Presentation/` 是世界渲染层级等纯表现规则。`UI/` 和 `Editor/` 保持独立。
 
 ## Config
 

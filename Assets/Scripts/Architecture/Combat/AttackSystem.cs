@@ -75,12 +75,19 @@ namespace HaoFuSurvivor
 			if (executor == null) return;
 			if ((target == null && executor.RequiresTarget) || (target != null && runtime.OwnerFaction == target.Faction) || runtime.CooldownRemaining > 0f) return;
 
-			var weaponRuntime = runtime.WeaponRuntimeId == 0 ? null : this.GetModel<PlayerLoadoutModel>().GetWeapon(runtime.WeaponRuntimeId);
+			var weaponRuntime = GetWeaponRuntime(runtime);
 			var cooldownMultiplier = weaponRuntime == null
 				? 1f
 				: weaponRuntime.GetModifierValue(runtime.Config.Id, WeaponUpgradeModifierKeys.AttackCooldownMultiplier, 1f);
+			if (runtime.OwnerFaction == CombatFaction.Player)
+			{
+				cooldownMultiplier *= this.GetSystem<StatSystem>().GetCooldownMultiplier();
+				if (weaponRuntime != null) cooldownMultiplier *= this.GetSystem<CharacterExclusivePerkSystem>().GetWeaponCooldownMultiplier();
+			}
 			runtime.CooldownRemaining = Mathf.Max(0.01f, runtime.Config.Cooldown * Mathf.Max(0.01f, cooldownMultiplier));
-			executor.Execute(new AttackExecutionContext(runtime.Owner, runtime.OwnerFaction, target, runtime.Config, weaponRuntime));
+			var skillRuntime = GetSkillRuntime(runtime);
+			executor.Execute(new AttackExecutionContext(runtime.Owner, runtime.OwnerFaction, target, runtime.Config, weaponRuntime, skillRuntime));
+			if (skillRuntime != null) this.SendEvent(new SkillUsedEvent(skillRuntime.SkillId));
 		}
 
 		public void OnRunUpdate(float deltaTime)
@@ -92,7 +99,7 @@ namespace HaoFuSurvivor
 				if (runtime.CooldownRemaining > 0f) continue;
 				var attackExecutor = this.GetUtility<AttackExecutorRegistry>().Get(runtime.Config.ExecutorId);
 				if (attackExecutor is not IAutomaticAttackExecutor executor) continue;
-				var target = executor.FindTarget(new AttackExecutionContext(runtime.Owner, runtime.OwnerFaction, null, runtime.Config, GetWeaponRuntime(runtime)));
+				var target = executor.FindTarget(new AttackExecutionContext(runtime.Owner, runtime.OwnerFaction, null, runtime.Config, GetWeaponRuntime(runtime), GetSkillRuntime(runtime)));
 				if (target != null || !attackExecutor.RequiresTarget) TryExecute(pair.Key, target);
 			}
 		}
@@ -100,6 +107,55 @@ namespace HaoFuSurvivor
 		private WeaponRuntimeData GetWeaponRuntime(AttackRuntime runtime)
 		{
 			return runtime.WeaponRuntimeId == 0 ? null : this.GetModel<PlayerLoadoutModel>().GetWeapon(runtime.WeaponRuntimeId);
+		}
+
+		public IEnumerable<AttackCooldownSaveData> GetPlayerCooldownSaveData(GameObject owner)
+		{
+			foreach (var runtime in mRuntimes.Values)
+				if (runtime.Owner == owner && runtime.OwnerFaction == CombatFaction.Player)
+					yield return new AttackCooldownSaveData
+					{
+						RuntimeId = runtime.WeaponRuntimeId,
+						AttackId = runtime.Config.Id,
+						CooldownRemaining = runtime.CooldownRemaining
+					};
+		}
+
+		public IEnumerable<AttackCooldownSaveData> GetCooldownSaveData(GameObject owner)
+		{
+			foreach (var runtime in mRuntimes.Values)
+				if (runtime.Owner == owner)
+					yield return new AttackCooldownSaveData { AttackId = runtime.Config.Id, CooldownRemaining = runtime.CooldownRemaining };
+		}
+
+		public void RestorePlayerCooldowns(GameObject owner, IEnumerable<AttackCooldownSaveData> entries)
+		{
+			if (owner == null || entries == null) return;
+			foreach (var entry in entries)
+			{
+				if (entry == null) continue;
+				foreach (var runtime in mRuntimes.Values)
+					if (runtime.Owner == owner && runtime.OwnerFaction == CombatFaction.Player &&
+						runtime.WeaponRuntimeId == entry.RuntimeId && runtime.Config.Id == entry.AttackId)
+						runtime.CooldownRemaining = Mathf.Max(0f, entry.CooldownRemaining);
+			}
+		}
+
+		public void RestoreCooldowns(GameObject owner, IEnumerable<AttackCooldownSaveData> entries)
+		{
+			if (owner == null || entries == null) return;
+			foreach (var entry in entries)
+			{
+				if (entry == null) continue;
+				foreach (var runtime in mRuntimes.Values)
+					if (runtime.Owner == owner && runtime.Config.Id == entry.AttackId)
+						runtime.CooldownRemaining = Mathf.Max(0f, entry.CooldownRemaining);
+			}
+		}
+
+		private SkillRuntimeData GetSkillRuntime(AttackRuntime runtime)
+		{
+			return runtime.WeaponRuntimeId == 0 ? null : this.GetModel<PlayerLoadoutModel>().GetSkill(runtime.WeaponRuntimeId);
 		}
 
 		protected override void OnInit()

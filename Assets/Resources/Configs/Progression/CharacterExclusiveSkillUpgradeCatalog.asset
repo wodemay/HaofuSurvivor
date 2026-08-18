@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e4b1f0ad4c7440cb8af4c5c04711a101, type: 3}
+  m_Name: CharacterExclusiveSkillUpgradeCatalog
+  m_EditorClassIdentifier: 
+  Upgrades:
+  - CharacterId: 1
+    SkillId: 1
+    ExclusiveWeaponId: 1
+    CompletedWeaponIds:
+    - 2
+    ExclusiveDodgeId: 1
+    CompletedDodgeIds: []
+    DisplayName: "\u7ec8\u672b\u73af\u6d41"
+    Description: "\u73af\u5f62\u5f39\u5e55\u8f6c\u4e3a\u4e94\u79d2\u7684\u6781\u901f\u5f39\u5e55\u7206\u53d1\u3002"
+    Icon: {fileID: 0}
