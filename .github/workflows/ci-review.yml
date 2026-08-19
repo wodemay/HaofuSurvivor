@@ -41,7 +41,7 @@ jobs:
         run: |
           test -f ProjectSettings/ProjectVersion.txt
           test -f ProjectSettings/EditorBuildSettings.asset
-          test -f Assets/Scripts/Game/GameStart.cs
+          test -f Assets/Scripts/Game/Bootstrap/GameStart.cs
           test -f Assets/Editor/ProjectBuild.cs
 
   unity-compile:
