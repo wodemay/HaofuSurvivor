@@ -75,6 +75,8 @@ Write all project documentation in the project-root `Docs/` directory, never und
 
 ### Change Log
 
+- 2026-08-19 | 提交并推送 Unity 授权兼容修复 `5aa65db`（`fix(ci): support Unity license activation secrets`）到 `feat/progression-save-system`，PR #17 自动更新。工作流同时支持 `UNITY_LICENSE` 或 `UNITY_EMAIL`/`UNITY_PASSWORD`/`UNITY_SERIAL`；等待 GitHub Actions 使用新提交重新验证。用户未暂存的敌人、渲染设置和 ProjectSettings 修改仍未纳入提交。
+
 - 2026-08-19 | 修正 GitHub Actions 的 Unity 授权传递：`ci-review.yml` 与 `unity-windows-build.yml` 现在同时传入 `UNITY_LICENSE`、`UNITY_EMAIL`、`UNITY_PASSWORD`、`UNITY_SERIAL`，兼容完整 `.ulf` 授权文件或账号/序列号激活。`Docs/Guides/GitHubActions.zh-CN.md` 已补充两种配置方式及优先级。原因是 PR #17 的静态检查通过，但 Unity job 报 `No valid license activation strategy`。待用户确认 Secrets 内容后重新运行 Actions；未修改用户未暂存的敌人、渲染设置和 ProjectSettings 文件。
 
 - 2026-08-18 | Fixed legacy saved level-up candidate text: existing active-run snapshots had already persisted the prior literal `\\uXXXX` perk name/description, so correcting the ScriptableObject alone did not repair Continue Game. `LevelUpOption.FromSaveData()` now decodes legacy Unicode escape sequences while restoring candidate display text, preserving the saved candidate choice and runtime target rather than discarding the snapshot. Focused review confirmed the conversion runs only for strings containing `\\u`; scoped `git diff --check` and `dotnet build Assembly-CSharp.csproj --no-restore --disable-build-servers /p:UseSharedCompilation=false` passed with 0 errors and the two existing MCPForUnity warning groups. No UI, prefab, scene, commit, push, or PR change was made.
