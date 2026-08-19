@@ -79,6 +79,8 @@ Write all project documentation in the project-root `Docs/` directory, never und
 
 - 2026-08-19 | 合并冲突修复提交 `f023a7b` 已推送到 `feat/progression-save-system`，PR #17 已更新。`git diff --check` 通过，`dotnet build Assembly-CSharp.csproj --no-restore --disable-build-servers /p:UseSharedCompilation=false` 通过（0 errors，保留 2 组既有 MCPForUnity 程序集警告）。用户五个未提交 Enemy/渲染设置文件已恢复在工作区，未提交。
 
+- 2026-08-19 | PR #17 冲突修复后的 Actions 已完成：两次 Static review 通过，两次 Unity compile validation 失败，PR API 状态为 `MERGEABLE`/`UNSTABLE`。失败仍是 GameCI Unity 授权策略，不是合并冲突或项目编译错误；待 GitHub Secrets 配置有效后重新运行即可。
+
 - 2026-08-19 | CI/Windows 打包实现及授权兼容修复已包含在 PR #17：`.github/workflows/ci-review.yml`、`.github/workflows/unity-windows-build.yml`、`Assets/Editor/ProjectBuild.cs`、GitHub Actions 指南和 Docs viewer 均已同步。工作流支持完整 `UNITY_LICENSE` 或 `UNITY_EMAIL`/`UNITY_PASSWORD`/`UNITY_SERIAL`；最近一次 Unity job 失败原因为仓库 Secrets 为空或无效，静态检查通过。
 
 - 2026-08-19 | 用户本地 Enemy 碰撞与渲染设置修改继续保留在 stash，未进入 PR #17 或本次冲突合并：`Assets/Art/Prefabs/EnemyRoot.prefab`、`Scripts/Architecture/Enemy/EnemyFactory.cs`、`Scripts/Architecture/Enemy/EnemySystem.cs`、`Assets/Settings/UniversalRP.asset`、`ProjectSettings/ProjectSettings.asset`。合并完成后需恢复 stash 并继续由用户验证。
