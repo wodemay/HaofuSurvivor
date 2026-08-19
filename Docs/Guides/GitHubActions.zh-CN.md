@@ -11,15 +11,19 @@
 
 ## 配置授权
 
-在仓库 `Settings → Secrets and variables → Actions` 中选择一种授权方式。
+在仓库 `Settings → Secrets and variables → Actions` 中配置与许可证类型匹配的授权方式。
 
-方式一：新增 `UNITY_LICENSE`，值为完整 Unity `.ulf` 授权文件内容。不要填写文件路径、序列号或账号密码。
+Personal 许可证需要同时配置以下三个 Secret：
 
 ```text
 UNITY_LICENSE
+UNITY_EMAIL
+UNITY_PASSWORD
 ```
 
-方式二：新增以下三个 Secret，由 GameCI 在运行时激活 Unity：
+`UNITY_LICENSE` 必须是完整 Unity `.ulf` 文件原文，不要填写文件路径、序列号、激活码或 Base64。`UNITY_EMAIL` 和 `UNITY_PASSWORD` 必须是对应 Unity 账号的登录凭据。
+
+Plus/Pro 等专业许可证使用以下三个 Secret：
 
 ```text
 UNITY_EMAIL
@@ -27,7 +31,7 @@ UNITY_PASSWORD
 UNITY_SERIAL
 ```
 
-不要把 Unity 账号密码、序列号或授权文件写入仓库。两种方式可以同时配置；GameCI 会优先使用有效的 `UNITY_LICENSE`，否则使用账号、密码和序列号。
+不要把 Unity 账号密码、序列号或授权文件提交到 Git 仓库；它们只能放在 GitHub Actions Secrets 中。
 
 未配置任一完整授权方案时，静态检查仍可运行，但 Unity 编译和自动打包会失败并提示 `No valid license activation strategy`。
 
