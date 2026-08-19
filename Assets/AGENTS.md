@@ -75,6 +75,24 @@ Write all project documentation in the project-root `Docs/` directory, never und
 
 ### Change Log
 
+- 2026-08-19 | 管理员补齐仓库 Secrets `UNITY_EMAIL` 与 `UNITY_PASSWORD` 后，PR #17 的两次 Unity compile validation 均通过，`UNITY_LICENSE`、Personal License 激活和 Unity 项目编译验证正常；Static review 同样通过，PR 状态为 `MERGEABLE`，等待管理员审核合并。
+
+- 2026-08-19 | 通过本机代理成功更新仓库 Secret `UNITY_LICENSE`，PR #17 的两次 Unity compile validation 已重新运行；GameCI 能读取许可证内容，但因 `UNITY_EMAIL` 与 `UNITY_PASSWORD` 为空仍报 `No valid license activation strategy`。静态 review 通过，项目代码无需修改；待管理员补充两个账号 Secret 后重新运行检查。
+
+- 2026-08-19 | 解决 PR #17 与 `origin/main` 的冲突：保留 main 的 UTF-8 上下文规范与已合并的 progression 内容，重新生成全部 Docs viewer 分片，恢复 CI/Windows 打包的授权配置记录。冲突仅涉及 `Assets/AGENTS.md` 与生成的 `Docs/docs-content/doc-008.js` 至 `doc-021.js`；用户暂存前的 Enemy、渲染设置和 ProjectSettings 修改已通过 stash 保留，未纳入本次合并。待完成静态检查、C# 编译、合并提交和推送。
+
+- 2026-08-19 | 合并冲突修复提交 `f023a7b` 已推送到 `feat/progression-save-system`，PR #17 已更新。`git diff --check` 通过，`dotnet build Assembly-CSharp.csproj --no-restore --disable-build-servers /p:UseSharedCompilation=false` 通过（0 errors，保留 2 组既有 MCPForUnity 程序集警告）。用户五个未提交 Enemy/渲染设置文件已恢复在工作区，未提交。
+
+- 2026-08-19 | PR #17 冲突修复后的 Actions 已完成：两次 Static review 通过，两次 Unity compile validation 失败，PR API 状态为 `MERGEABLE`/`UNSTABLE`。失败仍是 GameCI Unity 授权策略，不是合并冲突或项目编译错误；待 GitHub Secrets 配置有效后重新运行即可。
+
+- 2026-08-19 | 诊断最新授权失败：仓库 Secret 列表中存在 `UNITY_LICENSE`，但 GameCI 容器仍报 `No valid license activation strategy`，且 `UNITY_EMAIL`、`UNITY_PASSWORD`、`UNITY_SERIAL` 未配置。结论是 `UNITY_LICENSE` 非完整有效 `.ulf` 文件内容或已被截断；工作流本身已正确传递该 Secret，待管理员重新导出并填写完整授权文件后重跑 Actions。
+
+- 2026-08-19 | 根据 GameCI v4 官方激活规则进一步确认：Personal 许可证必须同时配置完整 `UNITY_LICENSE`、`UNITY_EMAIL`、`UNITY_PASSWORD`；`UNITY_SERIAL` 仅用于 Plus/Pro 等专业许可证。此前只配置 `UNITY_LICENSE` 会触发 `No valid license activation strategy`。已修正 `Docs/Guides/GitHubActions.zh-CN.md`，待管理员补充账号 Secret 后重跑 PR #17。
+
+- 2026-08-19 | CI/Windows 打包实现及授权兼容修复已包含在 PR #17：`.github/workflows/ci-review.yml`、`.github/workflows/unity-windows-build.yml`、`Assets/Editor/ProjectBuild.cs`、GitHub Actions 指南和 Docs viewer 均已同步。工作流支持完整 `UNITY_LICENSE` 或 `UNITY_EMAIL`/`UNITY_PASSWORD`/`UNITY_SERIAL`；最近一次 Unity job 失败原因为仓库 Secrets 为空或无效，静态检查通过。
+
+- 2026-08-19 | 用户本地 Enemy 碰撞与渲染设置修改继续保留在 stash，未进入 PR #17 或本次冲突合并：`Assets/Art/Prefabs/EnemyRoot.prefab`、`Scripts/Architecture/Enemy/EnemyFactory.cs`、`Scripts/Architecture/Enemy/EnemySystem.cs`、`Assets/Settings/UniversalRP.asset`、`ProjectSettings/ProjectSettings.asset`。合并完成后需恢复 stash 并继续由用户验证。
+
 - 2026-08-18 | Fixed legacy saved level-up candidate text: existing active-run snapshots had already persisted the prior literal `\\uXXXX` perk name/description, so correcting the ScriptableObject alone did not repair Continue Game. `LevelUpOption.FromSaveData()` now decodes legacy Unicode escape sequences while restoring candidate display text, preserving the saved candidate choice and runtime target rather than discarding the snapshot. Focused review confirmed the conversion runs only for strings containing `\\u`; scoped `git diff --check` and `dotnet build Assembly-CSharp.csproj --no-restore --disable-build-servers /p:UseSharedCompilation=false` passed with 0 errors and the two existing MCPForUnity warning groups. No UI, prefab, scene, commit, push, or PR change was made.
 
 - 2026-08-18 | Fixed garbled Character Perk text in `Resources/Configs/Progression/CharacterExclusivePerkCatalog.asset`. The three display-name/description fields had been stored as unquoted literal `\\uXXXX` sequences, unlike the project’s normal UTF-8 text assets, causing Unity to display the escape text rather than Chinese. Replaced them with direct UTF-8 Chinese: `绝境意志`, `战术翻滚`, and `环流蓄能`. Focused asset review confirmed all six fields render as Chinese and no `\\uXXXX` remains in this catalog; scoped `git diff --check` passed. No UI, prefab, scene, code, commit, push, or PR change was made.

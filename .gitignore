@@ -7,6 +7,14 @@
 [Ll]ogs/
 [Uu]serSettings/
 
+# Generated ResKit and local build output
+/AssetBundles/
+/Assets/StreamingAssets/
+/Assets/StreamingAssets.meta
+/Assets/QFrameworkData/QAssets.cs
+/Assets/QFrameworkData/QAssets.cs.meta
+/EXE/
+
 # IDE-generated files
 .vs/
 .vsconfig
