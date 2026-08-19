@@ -75,6 +75,8 @@ Write all project documentation in the project-root `Docs/` directory, never und
 
 ### Change Log
 
+- 2026-08-19 | PR #17 新一轮 Actions 已执行：Static review 通过，Unity compile validation 仍失败。日志显示 `UNITY_LICENSE`、`UNITY_EMAIL`、`UNITY_PASSWORD`、`UNITY_SERIAL` 在 GameCI 容器内均为空或未形成有效策略，最终报 `No valid license activation strategy could be determined`。工作流代码已支持两种授权方式，剩余操作需要管理员在 GitHub Secrets 中填写完整 `.ulf` 内容，或填写账号、密码和序列号；不得将凭据写入仓库。当前项目代码与本地 C# 编译不受影响。
+
 - 2026-08-19 | 提交并推送 Unity 授权兼容修复 `5aa65db`（`fix(ci): support Unity license activation secrets`）到 `feat/progression-save-system`，PR #17 自动更新。工作流同时支持 `UNITY_LICENSE` 或 `UNITY_EMAIL`/`UNITY_PASSWORD`/`UNITY_SERIAL`；等待 GitHub Actions 使用新提交重新验证。用户未暂存的敌人、渲染设置和 ProjectSettings 修改仍未纳入提交。
 
 - 2026-08-19 | 修正 GitHub Actions 的 Unity 授权传递：`ci-review.yml` 与 `unity-windows-build.yml` 现在同时传入 `UNITY_LICENSE`、`UNITY_EMAIL`、`UNITY_PASSWORD`、`UNITY_SERIAL`，兼容完整 `.ulf` 授权文件或账号/序列号激活。`Docs/Guides/GitHubActions.zh-CN.md` 已补充两种配置方式及优先级。原因是 PR #17 的静态检查通过，但 Unity job 报 `No valid license activation strategy`。待用户确认 Secrets 内容后重新运行 Actions；未修改用户未暂存的敌人、渲染设置和 ProjectSettings 文件。
