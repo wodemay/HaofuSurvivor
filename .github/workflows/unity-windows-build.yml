@@ -26,7 +26,7 @@ jobs:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
         with:
           projectPath: .
-          unityVersion: 2022.3.62f3c1
+          unityVersion: 2022.3.62f3
           targetPlatform: StandaloneWindows64
           buildMethod: HaoFuSurvivor.Editor.ProjectBuild.BuildWindows
           buildPath: build/StandaloneWindows64/HaofuSurvivor.exe
