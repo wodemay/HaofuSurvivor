@@ -75,6 +75,8 @@ Write all project documentation in the project-root `Docs/` directory, never und
 
 ### Change Log
 
+- 2026-08-19 | 管理员补齐仓库 Secrets `UNITY_EMAIL` 与 `UNITY_PASSWORD` 后，PR #17 的两次 Unity compile validation 均通过，`UNITY_LICENSE`、Personal License 激活和 Unity 项目编译验证正常；Static review 同样通过，PR 状态为 `MERGEABLE`，等待管理员审核合并。
+
 - 2026-08-19 | 通过本机代理成功更新仓库 Secret `UNITY_LICENSE`，PR #17 的两次 Unity compile validation 已重新运行；GameCI 能读取许可证内容，但因 `UNITY_EMAIL` 与 `UNITY_PASSWORD` 为空仍报 `No valid license activation strategy`。静态 review 通过，项目代码无需修改；待管理员补充两个账号 Secret 后重新运行检查。
 
 - 2026-08-19 | 解决 PR #17 与 `origin/main` 的冲突：保留 main 的 UTF-8 上下文规范与已合并的 progression 内容，重新生成全部 Docs viewer 分片，恢复 CI/Windows 打包的授权配置记录。冲突仅涉及 `Assets/AGENTS.md` 与生成的 `Docs/docs-content/doc-008.js` 至 `doc-021.js`；用户暂存前的 Enemy、渲染设置和 ProjectSettings 修改已通过 stash 保留，未纳入本次合并。待完成静态检查、C# 编译、合并提交和推送。
