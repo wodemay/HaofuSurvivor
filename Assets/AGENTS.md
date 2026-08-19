@@ -75,6 +75,8 @@ Write all project documentation in the project-root `Docs/` directory, never und
 
 ### Change Log
 
+- 2026-08-19 | 扩展 `.github/workflows/unity-windows-build.yml`：保留 `main` Artifact 打包，新增 `v*` Tag 触发、Windows 构建 ZIP 和 GitHub Release 创建；工作流声明 `contents: write`，使用内置 `GITHUB_TOKEN`，不新增账号 Secret。同步更新 `Docs/Guides/GitHubActions.zh-CN.md` 与 Docs viewer。静态检查通过；未执行真实 Tag 打包，待 PR 合并后手动推送版本 Tag 验证。
+
 - 2026-08-19 | 管理员补齐仓库 Secrets `UNITY_EMAIL` 与 `UNITY_PASSWORD` 后，PR #17 的两次 Unity compile validation 均通过，`UNITY_LICENSE`、Personal License 激活和 Unity 项目编译验证正常；Static review 同样通过，PR 状态为 `MERGEABLE`，等待管理员审核合并。
 
 - 2026-08-19 | 通过本机代理成功更新仓库 Secret `UNITY_LICENSE`，PR #17 的两次 Unity compile validation 已重新运行；GameCI 能读取许可证内容，但因 `UNITY_EMAIL` 与 `UNITY_PASSWORD` 为空仍报 `No valid license activation strategy`。静态 review 通过，项目代码无需修改；待管理员补充两个账号 Secret 后重新运行检查。
