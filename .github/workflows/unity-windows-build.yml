@@ -34,13 +34,13 @@ jobs:
           unityVersion: 2022.3.62f3
           targetPlatform: StandaloneWindows64
           buildMethod: HaoFuSurvivor.Editor.ProjectBuild.BuildWindows
-          buildPath: build/StandaloneWindows64/HaofuSurvivor.exe
+          buildPath: Build/StandaloneWindows64/HaofuSurvivor.exe
 
       - name: Upload Windows package
         uses: actions/upload-artifact@v4
         with:
           name: HaofuSurvivor-Windows-${{ github.sha }}
-          path: build/StandaloneWindows64
+          path: Build/StandaloneWindows64
           if-no-files-found: error
           retention-days: 14
 
@@ -48,7 +48,7 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/v')
         shell: bash
         run: |
-          cd build/StandaloneWindows64
+          cd Build/StandaloneWindows64
           zip -r "../HaofuSurvivor-Windows-${GITHUB_REF_NAME}.zip" .
 
       - name: Create GitHub Release
@@ -57,6 +57,6 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release create "${GITHUB_REF_NAME}" \
-            "build/HaofuSurvivor-Windows-${GITHUB_REF_NAME}.zip" \
+            "Build/HaofuSurvivor-Windows-${GITHUB_REF_NAME}.zip" \
             --title "HaofuSurvivor ${GITHUB_REF_NAME}" \
             --generate-notes
