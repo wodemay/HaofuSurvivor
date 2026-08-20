@@ -7,6 +7,11 @@ namespace HaoFuSurvivor
 	{
 		private readonly List<Transform> mEnemies = new();
         private readonly Dictionary<Transform, float> mMoveSpeeds = new();
+		private readonly Dictionary<Transform, float> mBodyRadii = new();
+		private readonly List<Transform> mMoveEnemies = new();
+		private readonly List<Vector2> mNextPositions = new();
+		private const float DefaultBodyRadius = 0.5f;
+		private const int SeparationIterations = 2;
 		private float mSpawnElapsed;
 		public void Reset()
 		{
@@ -17,13 +22,14 @@ namespace HaoFuSurvivor
 				EnemyFactory.Instance.Release(enemy);
 			}
 			EnemyFactory.Instance.ReleaseAllActive();
-			mEnemies.Clear(); mMoveSpeeds.Clear(); mSpawnElapsed = 0f; this.GetModel<EnemyModel>().AliveCount = 0;
+			mEnemies.Clear(); mMoveSpeeds.Clear(); mBodyRadii.Clear(); mMoveEnemies.Clear(); mNextPositions.Clear(); mSpawnElapsed = 0f; this.GetModel<EnemyModel>().AliveCount = 0;
 		}
 
 		public void Release(Transform enemy)
 		{
 			if (enemy == null || !mEnemies.Remove(enemy)) return;
 			mMoveSpeeds.Remove(enemy);
+			mBodyRadii.Remove(enemy);
 			this.GetSystem<EnemyHealthSystem>().Unregister(enemy.GetComponent<CombatEntity>());
 			EnemyFactory.Instance.Release(enemy);
 			this.GetModel<EnemyModel>().AliveCount = mEnemies.Count;
@@ -62,6 +68,7 @@ namespace HaoFuSurvivor
 					if (enemy == null) continue;
 					mEnemies.Add(enemy);
 					mMoveSpeeds[enemy] = Mathf.Max(0f, entry.MoveSpeed);
+					mBodyRadii[enemy] = GetBodyRadius(enemy);
 					this.GetSystem<EnemyHealthSystem>().RestoreCurrentHealth(enemy.GetComponent<CombatEntity>(), entry.CurrentHealth);
 					this.GetSystem<AttackSystem>().RestoreCooldowns(enemy.gameObject, entry.AttackCooldowns);
 				}
@@ -98,6 +105,7 @@ namespace HaoFuSurvivor
 						if (enemy == null) continue;
 						mEnemies.Add(enemy);
 						mMoveSpeeds[enemy] = enemyConfig.MoveSpeed;
+						mBodyRadii[enemy] = GetBodyRadius(enemy);
 					}
 				}
 			}
@@ -105,15 +113,69 @@ namespace HaoFuSurvivor
 		private void Move(Vector2 playerPosition, float deltaTime)
 		{
 			var multiplier = this.GetModel<RunTimerModel>().EnemyMoveSpeedMultiplier;
+			mMoveEnemies.Clear();
+			mNextPositions.Clear();
 			for (var i = mEnemies.Count - 1; i >= 0; i--)
 			{
-				var enemy = mEnemies[i]; if (enemy == null) { mEnemies.RemoveAt(i); mMoveSpeeds.Remove(enemy); continue; }
-				var nextPosition = Vector2.MoveTowards(enemy.position, playerPosition, mMoveSpeeds[enemy] * multiplier * deltaTime);
+				var enemy = mEnemies[i];
+				if (enemy == null)
+				{
+					mEnemies.RemoveAt(i);
+					mMoveSpeeds.Remove(enemy);
+					mBodyRadii.Remove(enemy);
+					continue;
+				}
+
+				mMoveEnemies.Add(enemy);
+				var moveSpeed = mMoveSpeeds.TryGetValue(enemy, out var speed) ? speed : 0f;
+				mNextPositions.Add(Vector2.MoveTowards(enemy.position, playerPosition, moveSpeed * multiplier * deltaTime));
+			}
+
+			for (var iteration = 0; iteration < SeparationIterations; iteration++)
+			{
+				for (var i = 0; i < mMoveEnemies.Count; i++)
+				{
+					for (var j = i + 1; j < mMoveEnemies.Count; j++)
+					{
+						var first = mMoveEnemies[i];
+						var second = mMoveEnemies[j];
+						var firstRadius = mBodyRadii.TryGetValue(first, out var firstValue) ? firstValue : DefaultBodyRadius;
+						var secondRadius = mBodyRadii.TryGetValue(second, out var secondValue) ? secondValue : DefaultBodyRadius;
+						var offset = mNextPositions[j] - mNextPositions[i];
+						var distance = offset.magnitude;
+						var minimumDistance = firstRadius + secondRadius;
+						if (distance >= minimumDistance) continue;
+
+						var direction = distance > 0.0001f ? offset / distance : GetOverlapDirection(i, j);
+						var correction = (minimumDistance - distance) * 0.5f;
+						mNextPositions[i] -= direction * correction;
+						mNextPositions[j] += direction * correction;
+					}
+				}
+			}
+
+			for (var i = 0; i < mMoveEnemies.Count; i++)
+			{
+				var enemy = mMoveEnemies[i];
 				var rigidbody = enemy.GetComponent<Rigidbody2D>();
-				if (rigidbody != null) rigidbody.MovePosition(nextPosition);
-				else enemy.position = nextPosition;
+				if (rigidbody != null) rigidbody.MovePosition(mNextPositions[i]);
+				else enemy.position = mNextPositions[i];
 			}
 			this.GetModel<EnemyModel>().AliveCount = mEnemies.Count;
+		}
+
+		private static float GetBodyRadius(Transform enemy)
+		{
+			var bodyCollider = enemy == null ? null : enemy.Find("BodyCollider")?.GetComponent<Collider2D>();
+			if (bodyCollider == null) return DefaultBodyRadius;
+			var bounds = bodyCollider.bounds;
+			return Mathf.Max(0.05f, Mathf.Max(bounds.extents.x, bounds.extents.y));
+		}
+
+		private static Vector2 GetOverlapDirection(int firstIndex, int secondIndex)
+		{
+			var angle = (firstIndex * 97 + secondIndex * 53) * Mathf.Deg2Rad;
+			return new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
 		}
 		private static Vector3 GetSpawnPosition(float padding)
 		{
