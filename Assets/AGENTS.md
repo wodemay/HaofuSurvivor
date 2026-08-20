@@ -366,3 +366,4 @@ Write all project documentation in the project-root `Docs/` directory, never und
 - 2026-08-20 | 修正地面贴图显示比例：`Ground.png` 实际为 282×282 像素，原 `spritePixelsToUnits: 32` 使单个 Tile 覆盖约 8.8×8.8 世界单位；已将 `Ground.png.meta` 的 Pixels Per Unit 调整为 282，使每个地面 Tile 对应一个 1×1 网格单元。未修改 Tilemap 生成逻辑。
 - 2026-08-20 | 提交前验证当前版本：程序集编译通过，0 errors，保留既有 MCP 程序集警告；Unity Windows 批处理打包因 ProjectSurvivor 已被另一个 Unity 实例打开而中止，未生成 Build 输出，未强制关闭用户编辑器。当前提交范围包含地图系统、地面资源、场景与现有运行时改动；`Docs/Temporary/` 与本地 `Mac/` 成品继续排除。
 - 2026-08-20 | 创建提交 `e248d3f`（`feat(map): add infinite tilemap world`），包含当前地图与地面比例修复等已暂存改动。推送 `origin/feat/progression-save-system` 时 GitHub HTTPS 经直连及 `127.0.0.1:17891` 代理均返回 TLS unexpected EOF，远程分支与 PR 尚未更新；本地 `Docs/Temporary/`、`Mac/` 仍未跟踪。
+- 2026-08-20 | 按 GitHub Release 工作流创建本地标签 `v0.1.1`，目标为当前版本；工作流会在标签推送后通过 `unity-windows-build.yml` 构建 Windows 包并创建 Release。标签与分支推送再次因 GitHub TLS unexpected EOF 失败，需网络恢复后重试。
