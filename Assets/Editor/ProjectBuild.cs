@@ -12,6 +12,7 @@ namespace HaoFuSurvivor.Editor
 	public static class ProjectBuild
 	{
 		private const string DefaultBuildPath = "Build/StandaloneWindows64/HaofuSurvivor.exe";
+		private const string DefaultMacBuildPath = "Build/StandaloneOSX/HaofuSurvivor.app";
 
 		public static void ValidateProject()
 		{
@@ -26,10 +27,20 @@ namespace HaoFuSurvivor.Editor
 
 		public static void BuildWindows()
 		{
+			BuildStandalone(BuildTarget.StandaloneWindows64, DefaultBuildPath, "Windows");
+		}
+
+		public static void BuildMac()
+		{
+			BuildStandalone(BuildTarget.StandaloneOSX, DefaultMacBuildPath, "Mac");
+		}
+
+		private static void BuildStandalone(BuildTarget target, string defaultBuildPath, string platformName)
+		{
 			var scenes = GetEnabledScenes();
 			if (scenes.Length == 0) throw new BuildFailedException("No enabled scenes found in EditorBuildSettings.");
-			BuildScript.BuildAssetBundles(BuildTarget.StandaloneWindows64);
-			var buildPath = ResolveBuildPath();
+			BuildScript.BuildAssetBundles(target);
+			var buildPath = ResolveBuildPath(defaultBuildPath);
 			var directory = Path.GetDirectoryName(buildPath);
 			if (!string.IsNullOrEmpty(directory)) Directory.CreateDirectory(directory);
 
@@ -37,13 +48,13 @@ namespace HaoFuSurvivor.Editor
 			{
 				scenes = scenes,
 				locationPathName = buildPath,
-				target = BuildTarget.StandaloneWindows64,
+				target = target,
 				options = BuildOptions.None
 			});
 
 			if (report.summary.result != BuildResult.Succeeded)
-				throw new BuildFailedException($"Windows build failed: {report.summary.result}");
-			Debug.Log($"Windows build completed: {buildPath}");
+				throw new BuildFailedException($"{platformName} build failed: {report.summary.result}");
+			Debug.Log($"{platformName} build completed: {buildPath}");
 		}
 
 		private static string[] GetEnabledScenes()
@@ -54,7 +65,7 @@ namespace HaoFuSurvivor.Editor
 				.ToArray();
 		}
 
-		private static string ResolveBuildPath()
+		private static string ResolveBuildPath(string fallbackPath)
 		{
 			var args = Environment.GetCommandLineArgs();
 			for (var index = 0; index < args.Length - 1; index++)
@@ -63,7 +74,7 @@ namespace HaoFuSurvivor.Editor
 				var path = args[index + 1];
 				if (!string.IsNullOrWhiteSpace(path)) return Path.GetFullPath(path);
 			}
-			return Path.GetFullPath(DefaultBuildPath);
+			return Path.GetFullPath(fallbackPath);
 		}
 	}
 }

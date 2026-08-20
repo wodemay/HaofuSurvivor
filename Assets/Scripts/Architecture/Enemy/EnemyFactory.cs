@@ -87,6 +87,7 @@ namespace HaoFuSurvivor
 			var rigidbody = enemyRoot.GetComponent<Rigidbody2D>();
 			if (rigidbody == null) rigidbody = enemyRoot.AddComponent<Rigidbody2D>();
 			rigidbody.bodyType = RigidbodyType2D.Kinematic;
+			rigidbody.useFullKinematicContacts = true;
 			rigidbody.gravityScale = 0f;
 
 			foreach (var attackId in config.AttackIds)

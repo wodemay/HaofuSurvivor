@@ -18,6 +18,8 @@ namespace HaoFuSurvivor
 			this.GetSystem<LevelUpSystem>().Reset();
 			this.GetSystem<PlayerStatUpgradeSystem>().Reset();
 			this.GetSystem<CharacterExclusivePerkSystem>().Reset();
+			this.GetSystem<MapSystem>().Reset();
+			this.GetSystem<MapSystem>().PrepareForRun();
 			this.GetSystem<BarrageProjectileSystem>().Reset();
 			this.GetSystem<ExplosiveAreaSystem>().Reset();
 			this.GetSystem<GameLoopSystem>().BeginRun();
@@ -139,6 +141,7 @@ namespace HaoFuSurvivor
 			this.GetSystem<BarrageProjectileSystem>().Reset();
 			this.GetSystem<ExplosiveAreaSystem>().Reset();
 			this.GetSystem<CharacterExclusivePerkSystem>().Reset();
+			this.GetSystem<MapSystem>().Reset();
 			this.GetSystem<PlayerSpawnSystem>().DespawnCurrentCharacter();
 		}
 

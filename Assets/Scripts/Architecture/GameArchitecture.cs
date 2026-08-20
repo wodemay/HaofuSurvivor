@@ -20,6 +20,7 @@ namespace HaoFuSurvivor
 			RegisterModel(new DodgeModel());
 			RegisterModel(new PlayerStatUpgradeModel());
 			RegisterModel(new CharacterExclusivePerkModel());
+			RegisterModel(new MapModel());
 
 			RegisterUtility(new CharacterCatalog());
 			RegisterUtility(new CharacterSelectionStorage());
@@ -37,6 +38,7 @@ namespace HaoFuSurvivor
 			RegisterUtility(new StatUpgradeCatalog());
 			RegisterUtility(new CharacterExclusiveSkillUpgradeCatalog());
 			RegisterUtility(new CharacterExclusivePerkCatalog());
+			RegisterUtility(new MapGridCatalog());
 
 			RegisterSystem(new RunSystem());
 			RegisterSystem(new GameLoopSystem());
@@ -65,6 +67,7 @@ namespace HaoFuSurvivor
 			RegisterSystem(new CharacterExclusivePerkSystem());
 			RegisterSystem(new PlayerRegenerationSystem());
 			RegisterSystem(new CharacterExclusiveSkillUpgradeSystem());
+			RegisterSystem(new MapSystem());
 		}
 	}
 }

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using QFramework;
 
@@ -14,6 +15,7 @@ namespace HaoFuSurvivor
 		protected override void OnInit(IUIData uiData = null)
 		{
 			mData = uiData as UIGameOverPanelData ?? new UIGameOverPanelData();
+			SetKeyboardNavigation(false);
 			Button_Restart.onClick.AddListener(Restart);
 			Button_Return.onClick.AddListener(ReturnToMainMenu);
 		}
@@ -34,6 +36,14 @@ namespace HaoFuSurvivor
 		{
 			Button_Restart.onClick.RemoveListener(Restart);
 			Button_Return.onClick.RemoveListener(ReturnToMainMenu);
+			SetKeyboardNavigation(true);
+		}
+
+		private static void SetKeyboardNavigation(bool enabled)
+		{
+			if (EventSystem.current == null) return;
+			EventSystem.current.sendNavigationEvents = enabled;
+			if (!enabled) EventSystem.current.SetSelectedGameObject(null);
 		}
 
 		private void Restart()
