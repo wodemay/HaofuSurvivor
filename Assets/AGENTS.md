@@ -75,6 +75,8 @@ Write all project documentation in the project-root `Docs/` directory, never und
 
 ### Change Log
 
+- 2026-08-20 | 修复 GitHub Release 压缩权限问题：v0.1.1 的 Unity Windows 构建与 AssetBundle Artifact 已成功上传，但 Docker 以 root 创建的 `Build` 目录不允许 Runner 用户在其中创建 ZIP。`.github/workflows/unity-windows-build.yml` 现将 ZIP 输出到工作区根目录，并从该路径创建 Release 附件；待合并后使用新 Tag 验证。
+
 - 2026-08-20 | 修复 Release 工作流的 Linux 路径大小写错误：Unity 构建入口输出 `Build/StandaloneWindows64`，工作流原先使用小写 `build` 导致构建成功后 Artifact 上传失败。统一修正构建、Artifact、压缩和 Release 附件路径为 `Build`；待重新推送版本 Tag 验证。
 
 - 2026-08-19 | 扩展 `.github/workflows/unity-windows-build.yml`：保留 `main` Artifact 打包，新增 `v*` Tag 触发、Windows 构建 ZIP 和 GitHub Release 创建；工作流声明 `contents: write`，使用内置 `GITHUB_TOKEN`，不新增账号 Secret。同步更新 `Docs/Guides/GitHubActions.zh-CN.md` 与 Docs viewer。静态检查通过；未执行真实 Tag 打包，待 PR 合并后手动推送版本 Tag 验证。
