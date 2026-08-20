@@ -49,7 +49,7 @@ jobs:
         shell: bash
         run: |
           cd Build/StandaloneWindows64
-          zip -r "../HaofuSurvivor-Windows-${GITHUB_REF_NAME}.zip" .
+          zip -r "$GITHUB_WORKSPACE/HaofuSurvivor-Windows-${GITHUB_REF_NAME}.zip" .
 
       - name: Create GitHub Release
         if: startsWith(github.ref, 'refs/tags/v')
@@ -57,6 +57,6 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release create "${GITHUB_REF_NAME}" \
-            "Build/HaofuSurvivor-Windows-${GITHUB_REF_NAME}.zip" \
+            "HaofuSurvivor-Windows-${GITHUB_REF_NAME}.zip" \
             --title "HaofuSurvivor ${GITHUB_REF_NAME}" \
             --generate-notes
