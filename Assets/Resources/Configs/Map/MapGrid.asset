@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b48b16b03c35bb5499574dff51942cfe, type: 3}
   m_Name: MapGrid
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier:
   ChunkPrefab: {fileID: 2969848609979780518, guid: bd6210d4f108353418fa5c9ffa1bcfeb, type: 3}
   GroundTile: {fileID: 11400000, guid: fd62a0e4c3e65e7418df0710d074498a, type: 2}
   ChunkSize: 32
