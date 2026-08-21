@@ -10,6 +10,8 @@ namespace HaoFuSurvivor
 		private readonly Dictionary<Transform, float> mBodyRadii = new();
 		private readonly List<Transform> mMoveEnemies = new();
 		private readonly List<Vector2> mNextPositions = new();
+		private readonly RaycastHit2D[] mMapHits = new RaycastHit2D[16];
+		private readonly Collider2D[] mOverlapHits = new Collider2D[16];
 		private const float DefaultBodyRadius = 0.5f;
 		private const int SeparationIterations = 2;
 		private float mSpawnElapsed;
@@ -158,10 +160,75 @@ namespace HaoFuSurvivor
 			{
 				var enemy = mMoveEnemies[i];
 				var rigidbody = enemy.GetComponent<Rigidbody2D>();
-				if (rigidbody != null) rigidbody.MovePosition(mNextPositions[i]);
+				if (rigidbody != null)
+				{
+					var radius = mBodyRadii.TryGetValue(enemy, out var bodyRadius) ? bodyRadius : DefaultBodyRadius;
+					rigidbody.MovePosition(ResolveMapCollision(rigidbody, radius, mNextPositions[i]));
+				}
 				else enemy.position = mNextPositions[i];
 			}
 			this.GetModel<EnemyModel>().AliveCount = mEnemies.Count;
+		}
+
+		private Vector2 ResolveMapCollision(Rigidbody2D rigidbody, float radius, Vector2 target)
+		{
+			var recoveredPosition = RecoverMapOverlap(rigidbody, radius);
+			if (recoveredPosition != rigidbody.position) return recoveredPosition;
+			var position = rigidbody.position;
+			var remaining = target - position;
+			var filter = new ContactFilter2D();
+			filter.NoFilter();
+			filter.useTriggers = false;
+			for (var iteration = 0; iteration < 2; iteration++)
+			{
+				var distance = remaining.magnitude;
+				if (distance <= 0.0001f) return position;
+				var direction = remaining / distance;
+				var count = rigidbody.Cast(direction, filter, mMapHits, distance);
+				var nearestDistance = float.MaxValue;
+				var nearestNormal = Vector2.zero;
+				for (var i = 0; i < count; i++)
+				{
+					var collider = mMapHits[i].collider;
+					if (collider == null || collider.GetComponentInParent<UnityEngine.Tilemaps.TilemapCollider2D>() == null) continue;
+					if (Vector2.Dot(remaining, mMapHits[i].normal) >= 0f) continue;
+					if (mMapHits[i].distance >= nearestDistance) continue;
+					nearestDistance = mMapHits[i].distance;
+					nearestNormal = mMapHits[i].normal;
+				}
+				if (nearestDistance == float.MaxValue) return position + remaining;
+				position += direction * Mathf.Max(0f, nearestDistance - 0.001f);
+				remaining = target - position;
+				var tangent = remaining - nearestNormal * Vector2.Dot(remaining, nearestNormal);
+				if (tangent.sqrMagnitude <= 0.0001f)
+				{
+					var left = new Vector2(-nearestNormal.y, nearestNormal.x);
+					var right = -left;
+					tangent = Vector2.Dot(left, remaining) >= Vector2.Dot(right, remaining) ? left : right;
+					tangent *= Mathf.Min(remaining.magnitude, distance);
+				}
+				remaining = tangent;
+			}
+			return position + remaining;
+		}
+
+		private Vector2 RecoverMapOverlap(Rigidbody2D rigidbody, float radius)
+		{
+			var count = Physics2D.OverlapCircleNonAlloc(rigidbody.position, radius, mOverlapHits);
+			var bodyCollider = rigidbody.GetComponentsInChildren<Collider2D>(true);
+			Collider2D physicalBody = null;
+			foreach (var collider in bodyCollider)
+				if (collider != null && !collider.isTrigger) { physicalBody = collider; break; }
+			if (physicalBody == null) return rigidbody.position;
+			for (var i = 0; i < count; i++)
+			{
+				var obstacle = mOverlapHits[i];
+				if (obstacle == null || obstacle.GetComponentInParent<UnityEngine.Tilemaps.TilemapCollider2D>() == null) continue;
+				var distance = Physics2D.Distance(physicalBody, obstacle);
+				if (!distance.isOverlapped) continue;
+				return rigidbody.position - distance.normal * (-distance.distance + 0.002f);
+			}
+			return rigidbody.position;
 		}
 
 		private static float GetBodyRadius(Transform enemy)

@@ -1,11 +1,13 @@
 using QFramework;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 namespace HaoFuSurvivor
 {
 	public class PlayerSystem : AbstractSystem, IRunUpdateable, IRunFixedUpdateable
 	{
 		private Rigidbody2D mRigidbody;
+		private readonly RaycastHit2D[] mMapHits = new RaycastHit2D[16];
 
 		public void Register(GameObject runtimeRoot, Vector2 initialPosition, CharacterConfig character)
 		{
@@ -50,7 +52,14 @@ namespace HaoFuSurvivor
 			if (this.GetModel<DodgeModel>().Runtime?.IsActive == true) return;
 
 			var direction = this.GetModel<InputModel>().Movement;
-			playerModel.Position += direction * this.GetSystem<StatSystem>().GetMoveSpeed() * deltaTime;
+			MoveBy(direction * this.GetSystem<StatSystem>().GetMoveSpeed() * deltaTime);
+		}
+
+		public void MoveBy(Vector2 delta)
+		{
+			var playerModel = this.GetModel<PlayerModel>();
+			if (!playerModel.IsRegistered || playerModel.IsDead) return;
+			playerModel.Position = ResolveMapCollision(playerModel.Position + delta);
 		}
 
 		private void SyncRuntimePosition()
@@ -74,6 +83,34 @@ namespace HaoFuSurvivor
 			playerModel.IsDead = true;
 			this.SendEvent(new PlayerDiedEvent());
 			this.GetSystem<RunSystem>().EndWithDefeat();
+		}
+
+		private Vector2 ResolveMapCollision(Vector2 target)
+		{
+			if (mRigidbody == null) return target;
+			var origin = mRigidbody.position;
+			var offset = target - origin;
+			var distance = offset.magnitude;
+			if (distance <= 0.0001f) return target;
+			var filter = new ContactFilter2D();
+			filter.NoFilter();
+			filter.useTriggers = false;
+			var count = mRigidbody.Cast(offset / distance, filter, mMapHits, distance);
+			var nearestDistance = float.MaxValue;
+			var nearestNormal = Vector2.zero;
+			for (var i = 0; i < count; i++)
+			{
+				var collider = mMapHits[i].collider;
+				if (collider == null || collider.GetComponentInParent<TilemapCollider2D>() == null) continue;
+				if (Vector2.Dot(offset, mMapHits[i].normal) >= 0f) continue;
+				if (mMapHits[i].distance >= nearestDistance) continue;
+				nearestDistance = mMapHits[i].distance;
+				nearestNormal = mMapHits[i].normal;
+			}
+			if (nearestDistance == float.MaxValue) return target;
+			var contactPosition = origin + offset / distance * Mathf.Max(0f, nearestDistance - 0.001f);
+			var remaining = target - contactPosition;
+			return contactPosition + (remaining - nearestNormal * Vector2.Dot(remaining, nearestNormal));
 		}
 
 		public float RestoreHealth(float amount, bool applyRecoveryEfficiency = true)

@@ -52,8 +52,7 @@ namespace HaoFuSurvivor
 				this.GetModel<PlayerModel>().DodgeInvulnerabilityRemaining = 0f;
 				return;
 			}
-			var player = this.GetModel<PlayerModel>();
-			player.Position += runtime.Direction * GetDistance(config, runtime.Level) / GetDuration(config, runtime.Level) * deltaTime;
+			this.GetSystem<PlayerSystem>().MoveBy(runtime.Direction * GetDistance(config, runtime.Level) / GetDuration(config, runtime.Level) * deltaTime);
 			runtime.DurationRemaining -= deltaTime;
 			if (runtime.DurationRemaining > 0f) return;
 			runtime.DurationRemaining = 0f;

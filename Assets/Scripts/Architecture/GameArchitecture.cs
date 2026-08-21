@@ -21,6 +21,7 @@ namespace HaoFuSurvivor
 			RegisterModel(new PlayerStatUpgradeModel());
 			RegisterModel(new CharacterExclusivePerkModel());
 			RegisterModel(new MapModel());
+			RegisterModel(new WorldMapModel());
 
 			RegisterUtility(new CharacterCatalog());
 			RegisterUtility(new CharacterSelectionStorage());
