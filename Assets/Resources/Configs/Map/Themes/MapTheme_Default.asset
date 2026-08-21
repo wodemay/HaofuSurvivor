@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5350e706fe5341e6abb7a5dd9ed332f7, type: 3}
   m_Name: MapTheme_Default
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier:
   Id: 1
   GroundTile: {fileID: 11400000, guid: fd62a0e4c3e65e7418df0710d074498a, type: 2}
   DecorationTiles: []

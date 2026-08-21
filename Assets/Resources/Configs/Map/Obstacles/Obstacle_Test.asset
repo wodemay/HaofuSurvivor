@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 962de69cf53f410dbdf43c7bbf4fc286, type: 3}
   m_Name: Obstacle_Test
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier:
   Id: 1
   VisualTile: {fileID: 11400000, guid: d38b5dc304bc65e449f9812cd1d6b296, type: 2}
   OccupiedCells:
