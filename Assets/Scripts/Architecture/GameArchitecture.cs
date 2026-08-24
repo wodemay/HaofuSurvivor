@@ -69,6 +69,7 @@ namespace HaoFuSurvivor
 			RegisterSystem(new PlayerRegenerationSystem());
 			RegisterSystem(new CharacterExclusiveSkillUpgradeSystem());
 			RegisterSystem(new MapSystem());
+			RegisterSystem(new MapNavMeshSystem());
 		}
 	}
 }

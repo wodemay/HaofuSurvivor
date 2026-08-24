@@ -1,6 +1,5 @@
 using QFramework;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 using System.Collections.Generic;
 
 namespace HaoFuSurvivor
@@ -88,7 +87,7 @@ namespace HaoFuSurvivor
 		private void OnTriggerEnter2D(Collider2D other)
 		{
 			if (!mIsActive || !this.SendQuery(new GetRunTimeStateQuery()).IsRunning) return;
-			if (other.GetComponentInParent<TilemapCollider2D>() != null)
+			if (MapColliderUtility.IsProjectileBlocker(other))
 			{
 				ResolveObstacleHit();
 				return;

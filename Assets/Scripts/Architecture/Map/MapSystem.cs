@@ -9,18 +9,25 @@ namespace HaoFuSurvivor
 		private readonly Dictionary<Vector2Int, MapChunkView> mLoadedChunks = new();
 		private readonly Dictionary<Vector2Int, MapChunkData> mGeneratedChunks = new();
 		private readonly Queue<Vector2Int> mPendingLoads = new();
+		private readonly List<Vector2Int> mLoadOrderBuffer = new();
 		private readonly HashSet<Vector2Int> mQueuedLoads = new();
 		private readonly List<Vector2Int> mUnloadBuffer = new();
+		private bool[] mWalkabilityVisited = System.Array.Empty<bool>();
+		private int[] mWalkabilityQueue = System.Array.Empty<int>();
 		private MapGridConfig mConfig;
 		private bool mHasCenter;
+
+		public bool HasPendingChunkOperations => mPendingLoads.Count > 0;
 
 		public void Reset()
 		{
 			this.GetSystem<GameLoopSystem>().UnregisterUpdateable(this);
+			this.GetSystem<MapNavMeshSystem>().PrepareForMapMutation();
 			MapChunkFactory.Instance.ReleaseAll();
 			mLoadedChunks.Clear();
 			mGeneratedChunks.Clear();
 			mPendingLoads.Clear();
+			mLoadOrderBuffer.Clear();
 			mQueuedLoads.Clear();
 			mUnloadBuffer.Clear();
 			mHasCenter = false;
@@ -28,6 +35,7 @@ namespace HaoFuSurvivor
 			model.HasCurrentChunk = false;
 			model.LoadedChunkCount = 0;
 			this.GetModel<WorldMapModel>().Clear();
+			this.GetSystem<MapNavMeshSystem>().MarkDirty();
 		}
 
 		public bool TryRestoreWorld(int worldSeed, int themeId, int generatorVersion)
@@ -35,11 +43,13 @@ namespace HaoFuSurvivor
 			if (mConfig == null) mConfig = this.GetUtility<MapGridCatalog>().Config;
 			if (mConfig == null || themeId != mConfig.ThemeId || generatorVersion != mConfig.GeneratorVersion) return false;
 
+			this.GetSystem<MapNavMeshSystem>().PrepareForMapMutation();
 			this.GetModel<WorldMapModel>().Restore(worldSeed, themeId, generatorVersion);
 			MapChunkFactory.Instance.ReleaseAll();
 			mLoadedChunks.Clear();
 			mGeneratedChunks.Clear();
 			mPendingLoads.Clear();
+			mLoadOrderBuffer.Clear();
 			mQueuedLoads.Clear();
 			mUnloadBuffer.Clear();
 			mHasCenter = false;
@@ -61,7 +71,7 @@ namespace HaoFuSurvivor
 			model.HasCurrentChunk = true;
 			QueueRequiredChunks(center);
 			EnsureGenerationWindow(center);
-			LoadPendingChunks(center, int.MaxValue);
+			LoadPendingChunks(center, int.MaxValue, true);
 			mHasCenter = true;
 			model.LoadedChunkCount = mLoadedChunks.Count;
 		}
@@ -80,19 +90,29 @@ namespace HaoFuSurvivor
 			if (centerChanged) QueueRequiredChunks(center);
 			mHasCenter = true;
 			UnloadFarChunks(center);
-			LoadPendingChunks(center, Mathf.Max(1, mConfig.MaxChunkOperationsPerTick));
+			LoadPendingChunks(center, Mathf.Max(1, mConfig.MaxChunkOperationsPerTick), false);
 			model.LoadedChunkCount = mLoadedChunks.Count;
 		}
 
 		private void QueueRequiredChunks(Vector2Int center)
 		{
 			var radius = Mathf.Max(0, mConfig.LoadRadius);
+			mLoadOrderBuffer.Clear();
 			for (var y = -radius; y <= radius; y++)
 			for (var x = -radius; x <= radius; x++)
 			{
 				var coordinate = center + new Vector2Int(x, y);
-				if (!mLoadedChunks.ContainsKey(coordinate) && mQueuedLoads.Add(coordinate)) mPendingLoads.Enqueue(coordinate);
+				if (!mLoadedChunks.ContainsKey(coordinate) && !mQueuedLoads.Contains(coordinate)) mLoadOrderBuffer.Add(coordinate);
 			}
+			mLoadOrderBuffer.Sort((left, right) =>
+			{
+				var leftDistance = (left - center).sqrMagnitude;
+				var rightDistance = (right - center).sqrMagnitude;
+				if (leftDistance != rightDistance) return leftDistance.CompareTo(rightDistance);
+				return left.y != right.y ? left.y.CompareTo(right.y) : left.x.CompareTo(right.x);
+			});
+			foreach (var coordinate in mLoadOrderBuffer)
+				if (mQueuedLoads.Add(coordinate)) mPendingLoads.Enqueue(coordinate);
 		}
 
 		private void UnloadFarChunks(Vector2Int center)
@@ -101,6 +121,7 @@ namespace HaoFuSurvivor
 			mUnloadBuffer.Clear();
 			foreach (var entry in mLoadedChunks)
 				if (!IsWithin(entry.Key, center, radius)) mUnloadBuffer.Add(entry.Key);
+			if (mUnloadBuffer.Count > 0) this.GetSystem<MapNavMeshSystem>().PrepareForMapMutation();
 
 			foreach (var coordinate in mUnloadBuffer)
 			{
@@ -108,19 +129,27 @@ namespace HaoFuSurvivor
 				mLoadedChunks.Remove(coordinate);
 				MapChunkFactory.Instance.Release(view);
 			}
+			if (mUnloadBuffer.Count > 0) this.GetSystem<MapNavMeshSystem>().MarkDirty();
 		}
 
-		private void LoadPendingChunks(Vector2Int center, int operationLimit)
+		private void LoadPendingChunks(Vector2Int center, int operationLimit, bool initialOnly)
 		{
+			var changed = false;
+			if (mPendingLoads.Count > 0) this.GetSystem<MapNavMeshSystem>().PrepareForMapMutation();
 			for (var operation = 0; operation < operationLimit && mPendingLoads.Count > 0; operation++)
 			{
-				var coordinate = mPendingLoads.Dequeue();
+				var coordinate = mPendingLoads.Peek();
+				if (initialOnly && (coordinate - center).sqrMagnitude > mConfig.InitialLoadRadius * mConfig.InitialLoadRadius) break;
+				mPendingLoads.Dequeue();
 				mQueuedLoads.Remove(coordinate);
 				if (!IsWithin(coordinate, center, mConfig.LoadRadius) || mLoadedChunks.ContainsKey(coordinate)) continue;
 
 				var view = MapChunkFactory.Instance.Spawn(mConfig, coordinate, GenerateChunkData(coordinate), WorldRootLocator.Get(WorldRootSlot.MapBackground));
-				if (view != null) mLoadedChunks.Add(coordinate, view);
+				if (view == null) continue;
+				mLoadedChunks.Add(coordinate, view);
+				changed = true;
 			}
+			if (changed) this.GetSystem<MapNavMeshSystem>().MarkDirty();
 		}
 
 		private MapChunkData GenerateChunkData(Vector2Int coordinate)
@@ -152,8 +181,9 @@ namespace HaoFuSurvivor
 				}
 			}
 
-			var blocked = new bool[windowSize * windowSize];
-			foreach (var entry in working) MarkExistingObstacles(entry.Value, blocked, origin, windowSize);
+			var occupied = new bool[windowSize * windowSize];
+			var movementBlocked = new bool[windowSize * windowSize];
+			foreach (var entry in working) MarkExistingObstacles(entry.Value, occupied, movementBlocked, origin, windowSize);
 			var candidates = new List<ObstacleCandidate>();
 			foreach (var coordinate in missing) candidates.AddRange(BuildCandidates(coordinate, chunkSize));
 			candidates.Sort((left, right) =>
@@ -166,11 +196,11 @@ namespace HaoFuSurvivor
 
 			foreach (var candidate in candidates)
 			{
-				if (!CanPlace(blocked, candidate, origin, windowSize, chunkSize)) continue;
-				MarkCandidate(blocked, candidate, origin, windowSize, chunkSize, true);
-				if (!IsWalkableWindow(blocked, origin, windowSize))
+				if (!CanPlace(occupied, candidate, origin, windowSize, chunkSize)) continue;
+				MarkCandidate(occupied, movementBlocked, candidate, origin, windowSize, chunkSize, true);
+				if (!IsWalkableWindow(movementBlocked, windowSize))
 				{
-					MarkCandidate(blocked, candidate, origin, windowSize, chunkSize, false);
+					MarkCandidate(occupied, movementBlocked, candidate, origin, windowSize, chunkSize, false);
 					continue;
 				}
 
@@ -180,7 +210,12 @@ namespace HaoFuSurvivor
 				{
 					var localX = candidate.Anchor.x + cell.x;
 					var localY = candidate.Anchor.y + cell.y;
-					data.CellFlags[localY * data.ChunkSize + localX] |= MapCellFlags.BlocksMovement | MapCellFlags.BlocksProjectile;
+					var flags = MapCellFlags.None;
+					if (candidate.Template.BlocksMovement) flags |= MapCellFlags.BlocksMovement;
+					if (candidate.Template.BlocksProjectile) flags |= MapCellFlags.BlocksProjectile;
+					var cellIndex = localY * data.ChunkSize + localX;
+					data.CellFlags[cellIndex] |= flags;
+					if (candidate.Template.BlocksMovement) data.CellFlags[cellIndex] &= ~MapCellFlags.Walkable;
 				}
 			}
 
@@ -255,7 +290,7 @@ namespace HaoFuSurvivor
 			return true;
 		}
 
-		private void MarkExistingObstacles(MapChunkData data, bool[] blocked, Vector2Int origin, int windowSize)
+		private void MarkExistingObstacles(MapChunkData data, bool[] occupied, bool[] movementBlocked, Vector2Int origin, int windowSize)
 		{
 			if (mConfig.Theme == null) return;
 			foreach (var placement in data.Obstacles)
@@ -263,66 +298,75 @@ namespace HaoFuSurvivor
 				var template = mConfig.Theme.ObstacleTemplates.Find(item => item != null && item.Id == placement.TemplateId);
 				if (template == null) continue;
 				foreach (var cell in template.GetTransformedCells(placement.QuarterTurns, placement.IsMirrored))
-					SetBlocked(blocked, origin, windowSize, new Vector2Int(placement.WorldCellX + cell.x, placement.WorldCellY + cell.y), true);
+				{
+					var world = new Vector2Int(placement.WorldCellX + cell.x, placement.WorldCellY + cell.y);
+					SetBlocked(occupied, origin, windowSize, world, true);
+					if (template.BlocksMovement) SetBlocked(movementBlocked, origin, windowSize, world, true);
+				}
 			}
 		}
 
-		private static void MarkCandidate(bool[] blocked, ObstacleCandidate candidate, Vector2Int origin, int windowSize, int chunkSize, bool value)
+		public bool TryGetCellFlags(Vector2Int worldCell, out MapCellFlags flags)
 		{
-			foreach (var cell in candidate.Cells)
-				SetBlocked(blocked, origin, windowSize, new Vector2Int(candidate.Coordinate.x * chunkSize + candidate.Anchor.x + cell.x, candidate.Coordinate.y * chunkSize + candidate.Anchor.y + cell.y), value);
-		}
-
-		private static bool IsWalkableWindow(bool[] blocked, Vector2Int origin, int windowSize)
-		{
-			var visited = new bool[blocked.Length];
-			var queue = new Queue<int>();
-			for (var x = 0; x < windowSize; x++)
-			{
-				TryEnqueue(x, 0, blocked, visited, queue, windowSize);
-				TryEnqueue(x, windowSize - 1, blocked, visited, queue, windowSize);
-			}
-			for (var y = 1; y < windowSize - 1; y++)
-			{
-				TryEnqueue(0, y, blocked, visited, queue, windowSize);
-				TryEnqueue(windowSize - 1, y, blocked, visited, queue, windowSize);
-			}
-			while (queue.Count > 0)
-			{
-				var index = queue.Dequeue();
-				var x = index % windowSize;
-				var y = index / windowSize;
-				TryEnqueue(x - 1, y, blocked, visited, queue, windowSize);
-				TryEnqueue(x + 1, y, blocked, visited, queue, windowSize);
-				TryEnqueue(x, y - 1, blocked, visited, queue, windowSize);
-				TryEnqueue(x, y + 1, blocked, visited, queue, windowSize);
-			}
-			for (var index = 0; index < blocked.Length; index++)
-				if (!blocked[index] && !visited[index]) return false;
-			return IsSpawnReachable(blocked, visited, origin, windowSize);
-		}
-
-		private static bool IsSpawnReachable(bool[] blocked, bool[] visited, Vector2Int origin, int windowSize)
-		{
-			for (var y = -1; y <= 1; y++)
-			for (var x = -1; x <= 1; x++)
-			{
-				var localX = x - origin.x;
-				var localY = y - origin.y;
-				if (localX < 0 || localY < 0 || localX >= windowSize || localY >= windowSize) continue;
-				var index = localY * windowSize + localX;
-				if (blocked[index] || !visited[index]) return false;
-			}
+			flags = MapCellFlags.None;
+			if (mConfig == null) mConfig = this.GetUtility<MapGridCatalog>().Config;
+			if (mConfig == null) return false;
+			var chunkSize = Mathf.Max(1, mConfig.ChunkSize);
+			var chunk = new Vector2Int(FloorDivide(worldCell.x, chunkSize), FloorDivide(worldCell.y, chunkSize));
+			var data = GenerateChunkData(chunk);
+			var localX = PositiveModulo(worldCell.x, chunkSize);
+			var localY = PositiveModulo(worldCell.y, chunkSize);
+			var index = localY * chunkSize + localX;
+			if (index < 0 || index >= data.CellFlags.Count) return false;
+			flags = data.CellFlags[index];
 			return true;
 		}
 
-		private static void TryEnqueue(int x, int y, bool[] blocked, bool[] visited, Queue<int> queue, int size)
+		private static void MarkCandidate(bool[] occupied, bool[] movementBlocked, ObstacleCandidate candidate, Vector2Int origin, int windowSize, int chunkSize, bool value)
+		{
+			foreach (var cell in candidate.Cells)
+			{
+				var world = new Vector2Int(candidate.Coordinate.x * chunkSize + candidate.Anchor.x + cell.x, candidate.Coordinate.y * chunkSize + candidate.Anchor.y + cell.y);
+				SetBlocked(occupied, origin, windowSize, world, value);
+				if (candidate.Template.BlocksMovement) SetBlocked(movementBlocked, origin, windowSize, world, value);
+			}
+		}
+
+		private bool IsWalkableWindow(bool[] blocked, int windowSize)
+		{
+			if (mWalkabilityVisited.Length < blocked.Length)
+			{
+				mWalkabilityVisited = new bool[blocked.Length];
+				mWalkabilityQueue = new int[blocked.Length];
+			}
+			System.Array.Clear(mWalkabilityVisited, 0, blocked.Length);
+			var head = 0;
+			var tail = 0;
+			for (var index = 0; index < blocked.Length; index++)
+				if (!blocked[index]) { mWalkabilityVisited[index] = true; mWalkabilityQueue[tail++] = index; break; }
+			if (tail == 0) return false;
+			while (head < tail)
+			{
+				var index = mWalkabilityQueue[head++];
+				var x = index % windowSize;
+				var y = index / windowSize;
+				TryEnqueue(x - 1, y, blocked, mWalkabilityVisited, mWalkabilityQueue, ref tail, windowSize);
+				TryEnqueue(x + 1, y, blocked, mWalkabilityVisited, mWalkabilityQueue, ref tail, windowSize);
+				TryEnqueue(x, y - 1, blocked, mWalkabilityVisited, mWalkabilityQueue, ref tail, windowSize);
+				TryEnqueue(x, y + 1, blocked, mWalkabilityVisited, mWalkabilityQueue, ref tail, windowSize);
+			}
+			for (var index = 0; index < blocked.Length; index++)
+				if (!blocked[index] && !mWalkabilityVisited[index]) return false;
+			return true;
+		}
+
+		private static void TryEnqueue(int x, int y, bool[] blocked, bool[] visited, int[] queue, ref int tail, int size)
 		{
 			if (x < 0 || y < 0 || x >= size || y >= size) return;
 			var index = y * size + x;
 			if (blocked[index] || visited[index]) return;
 			visited[index] = true;
-			queue.Enqueue(index);
+			queue[tail++] = index;
 		}
 
 		private static bool IsBlocked(bool[] blocked, Vector2Int origin, int size, Vector2Int world)
@@ -395,6 +439,18 @@ namespace HaoFuSurvivor
 		{
 			var size = Mathf.Max(1, chunkSize);
 			return new Vector2Int(Mathf.FloorToInt(position.x / size), Mathf.FloorToInt(position.y / size));
+		}
+
+		private static int FloorDivide(int value, int divisor)
+		{
+			return Mathf.FloorToInt((float)value / Mathf.Max(1, divisor));
+		}
+
+		private static int PositiveModulo(int value, int divisor)
+		{
+			var size = Mathf.Max(1, divisor);
+			var result = value % size;
+			return result < 0 ? result + size : result;
 		}
 
 		protected override void OnInit()

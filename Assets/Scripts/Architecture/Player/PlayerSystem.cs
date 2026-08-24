@@ -1,6 +1,5 @@
 using QFramework;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 
 namespace HaoFuSurvivor
 {
@@ -101,7 +100,7 @@ namespace HaoFuSurvivor
 			for (var i = 0; i < count; i++)
 			{
 				var collider = mMapHits[i].collider;
-				if (collider == null || collider.GetComponentInParent<TilemapCollider2D>() == null) continue;
+				if (!MapColliderUtility.IsMoveBlocker(collider)) continue;
 				if (Vector2.Dot(offset, mMapHits[i].normal) >= 0f) continue;
 				if (mMapHits[i].distance >= nearestDistance) continue;
 				nearestDistance = mMapHits[i].distance;

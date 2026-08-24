@@ -19,4 +19,5 @@ MonoBehaviour:
   ChunkSize: 32
   LoadRadius: 2
   UnloadRadius: 3
-  MaxChunkOperationsPerTick: 4
+  InitialLoadRadius: 1
+  MaxChunkOperationsPerTick: 1

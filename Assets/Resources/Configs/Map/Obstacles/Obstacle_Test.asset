@@ -20,3 +20,5 @@ MonoBehaviour:
   MinimumSpacing: 3
   AllowQuarterTurnRotation: 0
   AllowMirror: 0
+  BlocksMovement: 1
+  BlocksProjectile: 1
