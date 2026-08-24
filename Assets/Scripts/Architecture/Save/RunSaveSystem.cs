@@ -47,8 +47,13 @@ namespace HaoFuSurvivor
 			var player = this.GetModel<PlayerModel>();
 			var experience = this.GetModel<ExperienceModel>();
 			var timer = this.GetModel<RunTimerModel>();
+			var world = this.GetModel<WorldMapModel>();
 			var data = new RunSaveData
 			{
+				HasMapSnapshot = world.HasWorld,
+				WorldSeed = world.WorldSeed,
+				MapThemeId = world.ThemeId,
+				MapGeneratorVersion = world.GeneratorVersion,
 				SavedPhase = (int)run.Phase,
 				RandomStateJson = JsonUtility.ToJson(Random.state),
 				CharacterId = player.CharacterId,
@@ -113,13 +118,14 @@ namespace HaoFuSurvivor
 		{
 			if (data == null) return false;
 			var player = this.GetModel<PlayerModel>();
+			player.Position = new Vector2(data.PositionX, data.PositionY);
+			if (player.RuntimeRoot != null) player.RuntimeRoot.transform.position = player.Position;
+			if (data.HasMapSnapshot && !this.GetSystem<MapSystem>().TryRestoreWorld(data.WorldSeed, data.MapThemeId, data.MapGeneratorVersion)) return false;
 			var timer = this.GetModel<RunTimerModel>();
 			var experience = this.GetModel<ExperienceModel>();
 			player.CurrentHealth = Mathf.Max(0f, data.CurrentHealth);
 			player.DamageInvulnerabilityRemaining = Mathf.Max(0f, data.DamageInvulnerabilityRemaining);
 			player.DodgeInvulnerabilityRemaining = Mathf.Max(0f, data.DodgeInvulnerabilityRemaining);
-			player.Position = new Vector2(data.PositionX, data.PositionY);
-			if (player.RuntimeRoot != null) player.RuntimeRoot.transform.position = player.Position;
 			this.GetSystem<RunTimerSystem>().Restore(data.ElapsedSeconds, data.CurrentStageIndex);
 			experience.Level = Mathf.Max(1, data.Level);
 			experience.CurrentExperience = Mathf.Max(0f, data.CurrentExperience);

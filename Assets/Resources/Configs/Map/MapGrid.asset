@@ -14,7 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier:
   ChunkPrefab: {fileID: 2969848609979780518, guid: bd6210d4f108353418fa5c9ffa1bcfeb, type: 3}
   GroundTile: {fileID: 11400000, guid: fd62a0e4c3e65e7418df0710d074498a, type: 2}
+  Theme: {fileID: 11400000, guid: 76fd4cad177546c5944160ce42c931cd, type: 2}
+  GeneratorVersion: 1
   ChunkSize: 32
   LoadRadius: 2
   UnloadRadius: 3
-  MaxChunkOperationsPerTick: 4
+  InitialLoadRadius: 1
+  MaxChunkOperationsPerTick: 1

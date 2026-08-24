@@ -44,3 +44,6 @@ TagManager:
   - name: MapBackground
     uniqueID: 24522477
     locked: 0
+  - name: MapDecoration
+    uniqueID: 788305305
+    locked: 0

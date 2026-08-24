@@ -81,7 +81,17 @@ namespace HaoFuSurvivor
 			var rigidbody = playerObject.GetComponent<Rigidbody2D>();
 			if (rigidbody == null) rigidbody = playerObject.AddComponent<Rigidbody2D>();
 			rigidbody.bodyType = RigidbodyType2D.Kinematic;
+			rigidbody.useFullKinematicContacts = true;
 			rigidbody.gravityScale = 0f;
+			if (HasPhysicalCollider(playerObject)) return;
+			Debug.LogError("PlayerRoot requires a non-trigger Collider2D for map collision.");
+		}
+
+		private static bool HasPhysicalCollider(GameObject playerObject)
+		{
+			foreach (var collider in playerObject.GetComponentsInChildren<Collider2D>(true))
+				if (collider != null && !collider.isTrigger) return true;
+			return false;
 		}
 
 		private static void BindCamera(Transform playerTransform)

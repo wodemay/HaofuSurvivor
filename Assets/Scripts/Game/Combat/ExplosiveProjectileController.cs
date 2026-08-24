@@ -14,6 +14,17 @@ namespace HaoFuSurvivor
 
 		protected override void ResolveHit(CombatEntity target)
 		{
+			SpawnImpact();
+		}
+
+		protected override void ResolveObstacleHit()
+		{
+			SpawnImpact();
+			ProjectileFactory.Instance.Release(this);
+		}
+
+		private void SpawnImpact()
+		{
 			if (mParameters == null) return;
 			this.SendCommand(new SpawnExplosiveProjectileImpactCommand(mParameters, transform.position, OwnerFaction, Damage));
 		}

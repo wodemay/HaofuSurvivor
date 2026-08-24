@@ -87,6 +87,11 @@ namespace HaoFuSurvivor
 		private void OnTriggerEnter2D(Collider2D other)
 		{
 			if (!mIsActive || !this.SendQuery(new GetRunTimeStateQuery()).IsRunning) return;
+			if (MapColliderUtility.IsProjectileBlocker(other))
+			{
+				ResolveObstacleHit();
+				return;
+			}
 			var target = other.GetComponentInParent<CombatEntity>();
 			if (target == null || target.Faction == mOwnerFaction || !mHitTargetIds.Add(target.GetInstanceID())) return;
 			ResolveHit(target);
@@ -96,6 +101,11 @@ namespace HaoFuSurvivor
 		protected virtual void ResolveHit(CombatEntity target)
 		{
 			this.SendCommand(new ApplyCombatDamageCommand(target, mDamage));
+		}
+
+		protected virtual void ResolveObstacleHit()
+		{
+			ProjectileFactory.Instance.Release(this);
 		}
 
 		public virtual void ResetState()

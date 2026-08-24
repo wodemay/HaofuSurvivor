@@ -7,6 +7,10 @@ namespace HaoFuSurvivor
 	public class RunSaveData
 	{
 		public int CharacterId;
+		public bool HasMapSnapshot;
+		public int WorldSeed;
+		public int MapThemeId;
+		public int MapGeneratorVersion;
 		public float ElapsedSeconds;
 		public int CurrentStageIndex;
 		public float CurrentHealth;

@@ -21,7 +21,7 @@ namespace HaoFuSurvivor
 			}
 		}
 
-		public MapChunkView Spawn(MapGridConfig config, Vector2Int coordinate, Transform container)
+		public MapChunkView Spawn(MapGridConfig config, Vector2Int coordinate, MapChunkData data, Transform container)
 		{
 			if (config == null || config.ChunkPrefab == null || container == null) return null;
 			PruneDestroyedEntries();
@@ -37,7 +37,7 @@ namespace HaoFuSurvivor
 				if (pooled == null) continue;
 				pooled.transform.SetParent(container, false);
 				pooled.gameObject.SetActive(true);
-				pooled.Configure(coordinate, config);
+				pooled.Configure(coordinate, config, data);
 				return pooled;
 			}
 
@@ -45,7 +45,7 @@ namespace HaoFuSurvivor
 			var view = instance.GetComponent<MapChunkView>();
 			if (view == null) view = instance.AddComponent<MapChunkView>();
 			mPrefabs[view] = config.ChunkPrefab;
-			view.Configure(coordinate, config);
+			view.Configure(coordinate, config, data);
 			return view;
 		}
 
