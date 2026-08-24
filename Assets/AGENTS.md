@@ -83,6 +83,8 @@ Write all project documentation in the project-root `Docs/` directory, never und
 
 ### Change Log
 
+- 2026-08-24 | 地图流式加载优化已提交为 `56de610` 并推送到 PR #23（https://github.com/wodemay/HaofuSurvivor/pull/23）。静态审查与 Unity 编译验证通过；标签 `v0.1.2` 触发 Windows 构建成功，GitHub Release 已发布：https://github.com/wodemay/HaofuSurvivor/releases/tag/v0.1.2 。成品下载：https://github.com/wodemay/HaofuSurvivor/releases/download/v0.1.2/HaofuSurvivor-Windows-v0.1.2.zip 。后续用户所说“打个包”默认执行 GitHub Releases 成品构建。
+
 - 2026-08-24 | 修复开场地图空白：`MapGridConfig.InitialLoadRadius` 默认 1，`MapSystem.PrepareForRun()` 现在一次完成玩家区块及周围 3x3 区块的加载，外围区块仍按每帧上限渐进加载；移除无效的 `InitialChunkOperationsPerTick` 配置。这样玩家进入对局时附近地面与树木已就绪，导航仍等外围加载队列结束后再构建。编译与序列化检查待完成。
 
 - 2026-08-24 | 继续降低地图卡顿：`MapNavMeshSystem` 的导航源从 `RenderMeshes` 改为 `PhysicsColliders`，直接使用 TilemapCollider2D；`MapObstacleTemplateConfig` 缓存旋转/镜像后的占用单元，避免候选生成和区块绘制重复分配列表。首次并行编译出现 Roslyn 自身崩溃，使用禁用共享编译与串行构建重试通过 0 错误；既有 MCP 程序集版本警告保留，`git diff --check` 通过。
