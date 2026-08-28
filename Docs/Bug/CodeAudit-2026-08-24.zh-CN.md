@@ -1,0 +1,96 @@
+# 旁观者代码审计
+
+审计范围：`Assets/Scripts` 项目代码、`Resources/Configs` 运行时配置、`MainScene` 与运行时 Prefab。未以现有文档作为正确性依据。审计只记录可由源码或资源直接证明的问题；本次未修改业务代码。
+
+## P0/P1：应优先修复
+
+### BUG-01：时间线为空或未加载时，敌人固定帧直接崩溃；首阶段非 0 时还会提前刷怪
+
+- 位置：`Assets/Scripts/Architecture/Enemy/EnemySystem.cs:91`
+- 证据：直接访问 `RunTimelineCatalog.Config.Stages[Mathf.Max(0, stageIndex)]`，没有检查 `Config`、`Stages` 或 `stageIndex` 是否有效。
+- 影响：配置缺失/空列表会在固定帧产生 `NullReferenceException` 或 `ArgumentOutOfRangeException`。当 `CurrentStageIndex == -1` 且首阶段时间大于 0 时，代码仍强行使用第 0 阶段，导致时间线尚未到达就开始刷怪。
+- 建议：没有已到达阶段时直接跳过刷怪；对时间线做启动期校验，并按 `TimeSeconds` 排序/拒绝乱序配置。
+
+### BUG-02：导航网格把障碍区域当作可通行区域
+
+- 位置：`Assets/Scripts/Game/Map/MapChunkView.cs:57-62`、`Assets/Scripts/Architecture/Map/MapNavMeshSystem.cs:162-164,207-209`
+- 证据：移动阻挡 Tilemap 被标记为 NavMesh area `1`，但寻路和采样均使用 `NavMesh.AllAreas`。
+- 影响：敌人路径可以穿过树/障碍；随后只能依赖 Rigidbody2D 碰撞修正，表现为贴墙、绕路失败、局部卡住，导航系统没有真正承担避障职责。
+- 建议：为可行走区域定义明确的 area mask，寻路、采样、出生点检测统一排除阻挡 area。
+
+### BUG-03：玩家碰撞体校验只记录错误，不阻止生成
+
+- 位置：`Assets/Scripts/Architecture/Player/PlayerSpawnSystem.cs:38,75-88`
+- 证据：`EnsurePlayerComponents` 在找不到非触发 Collider2D 时只 `Debug.LogError`，调用方仍继续注册玩家并开始运行。
+- 影响：任意遗漏物理碰撞体的 PlayerRoot 都能进入游戏，玩家会穿过地图障碍；错误只出现在 Console，运行状态仍被视为成功。
+- 建议：校验失败立即销毁实例并返回失败，让启动命令无法进入 Active。
+
+### BUG-04：EnemyRoot 配置缺失时静默降级为不可战斗占位物
+
+- 位置：`Assets/Scripts/Architecture/Enemy/EnemyFactory.cs:59-73`
+- 证据：`EnemyRootConfig` 或 Prefab 缺失时创建裸 `GameObject`，但不添加 `CombatEntity`、`Rigidbody2D`、敌人生命注册，也不写入 `mEnemyIds/mConfigs`。
+- 影响：敌人仍被 `EnemySystem` 加入活动列表，却无法被攻击、无法造成碰撞攻击、不会进入正常保存数据，重置时还走另一套销毁路径。配置错误被伪装成“敌人正常出现”。
+- 建议：运行时配置缺失时失败并停止生成；移除该静默 fallback，或让 fallback 完整实现同一运行时契约。
+
+### BUG-05：存档恢复失败后不会清理坏存档，Continue 会永久重复失败
+
+- 位置：`Assets/Scripts/Architecture/Run/RunSystem.cs:126-133`
+- 证据：`RunSaveSystem.Restore` 返回 `false` 后释放运行时并回到 `None`，但没有调用 `RunSaveSystem.Clear()`。
+- 影响：版本不兼容、资源删除或存档内容损坏时，主菜单每次 Continue 都重复加载同一坏文件；用户无法脱离失败循环。
+- 建议：恢复失败时删除该存档，或先移动到带时间戳的 quarantine 文件并向用户报告。
+
+### BUG-06：无视觉 Tile 的障碍不会生成碰撞阻挡
+
+- 位置：`Assets/Scripts/Game/Map/MapChunkView.cs:78-82`
+- 证据：`template.VisualTile == null` 时整条 placement 被 `continue`，后续移动/投射物 blocker Tilemap 也不会写入。
+- 影响：配置为“不可见但阻挡”的逻辑障碍会在数据层存在，在运行时却完全可穿过；碰撞行为依赖是否有美术资源。
+- 建议：视觉 Tile 与逻辑阻挡分离；即使没有 `VisualTile`，仍应向对应 blocker Tilemap 写入专用碰撞 Tile。
+
+## P2：确定性逻辑与数据完整性问题
+
+### BUG-07：未知角色 ID 被静默替换为第一个角色
+
+- 位置：`Assets/Scripts/Architecture/Character/CharacterCatalog.cs:20-29`
+- 证据：`Get(id)` 找不到 ID 时返回 `mCharacters[0]`。
+- 影响：失效/篡改存档不会被拒绝，而是加载成另一个角色；角色属性、技能组、结算数据会出现不一致，问题难以追踪。
+- 建议：运行时 ID 不存在时返回 `null` 并让 Continue 失败；只有新游戏的默认选择流程可以显式指定 fallback。
+
+### BUG-08：特效/投射物存档通过参数资产反推 Attack ID，多个攻击共用参数时会串档
+
+- 位置：`ProjectileSystem.GetSaveData`、`ExplosiveAreaSystem.GetGroundFlameSaveData/GetTimedEffectSaveData`、`BarrageProjectileSystem.GetSaveData`
+- 证据：这些系统都用 `ExecutorParameterConfig == runtime.Parameters` 找回 Attack，而不是在运行时保存原始 Attack ID。
+- 影响：两个 Attack 共用同一参数资产时，保存会选中列表中的第一个 Attack；恢复后可能获得错误攻击定义、伤害/冷却/表现参数。
+- 建议：运行时对象保存创建它的 Attack ID；参数资产只用于执行，不承担身份标识。
+
+### BUG-09：导航表面收集整个场景，动态 Actor 可能被烘进 NavMesh
+
+- 位置：`Assets/Scripts/Architecture/Map/MapNavMeshSystem.cs:197-204`
+- 证据：运行时 `NavMeshSurface.collectObjects = CollectObjects.All`，几何来源为 PhysicsColliders；玩家、敌人、投射物也带 Collider2D。
+- 影响：导航网格可能把动态对象当作静态几何，生成随 Actor 数量和生成时机变化的路径障碍；异步更新期间还会出现旧网格与当前实体不一致。
+- 建议：限定收集根节点/层级，只收集地面与地图阻挡 Tilemap；动态对象绝不能进入烘焙源。
+
+### BUG-10：配置缺失保护不一致，部分目录会在运行时直接空引用
+
+- 位置：`EnemyConfigCatalog.cs:12`、`CharacterSelectionSystem.cs:18`
+- 证据：`EnemyCatalog.Get` 直接访问 `Config.Enemies`；角色选择初始化直接访问 `catalog.All[0]`。
+- 影响：缺少 EnemyCatalog 或 CharacterConfig 资源时，错误不是可诊断的“配置不可用”，而是启动/恢复阶段异常终止。
+- 建议：所有 Catalog 统一返回空结果并输出一次结构化错误；启动阶段集中执行资源完整性校验。
+
+### BUG-11：恢复的属性升级不限制槽位数量
+
+- 位置：`Assets/Scripts/Architecture/Progression/PlayerStatUpgradeModel.cs:48-54`
+- 证据：`Restore` 直接写入所有存档条目，没有应用 `MaxSlots = 6`，也不拒绝重复/非法 ID。
+- 影响：异常或旧版本存档可恢复超过六个属性槽，后续升级候选池和 `CanUpgrade` 结果偏离正常规则。
+- 建议：恢复时按目录验证、去重并截断到六个有效槽位。
+
+## 设计级缺陷
+
+1. `RunTimelineConfig`、各类 Catalog、ObstacleTemplate 没有统一的启动期验证；当前系统大量依赖“资源一定存在且字段合法”的隐式前提。
+2. 运行时对象池通过静态 Factory 持久化，而场景容器会销毁；虽然部分池做了清理，但身份、配置和场景生命周期仍分散在多个系统，后续新增对象类型容易复制出遗漏注销问题。
+3. 业务系统对 Unity `Random` 与自有 `System.Random` 混用，存档只保存 `UnityEngine.Random.state`。当前地图生成可复现，但以后任何把 Unity 随机引入地图/刷怪顺序的改动都会破坏继续游戏的确定性。
+4. 许多数据对象用整数 ID 关联，但没有重复 ID、缺失引用、Executor 不存在、Prefab 类型不匹配的统一检查；错误通常在首次运行或恢复时才暴露。
+
+## 验证记录
+
+- `dotnet build Assembly-CSharp.csproj --no-restore --disable-build-servers /m:1 /p:UseSharedCompilation=false /p:BuildInParallel=false /nr:false`：0 errors，保留 2 组既有程序集版本警告。
+- 本次未进行 Unity Play Mode、真实存档损坏恢复、NavMesh 运行时烘焙和地图障碍穿行验证；上述四类问题需要在 Editor/Play Mode 中补充确认。

@@ -6,6 +6,7 @@ namespace HaoFuSurvivor
 	{
 		protected override void Init()
 		{
+			RegisterUtility(new GameStoragePath());
 			RegisterModel(new RunModel());
 			RegisterModel(new RunTimerModel());
 			RegisterModel(new RunSettlementModel());
@@ -22,6 +23,8 @@ namespace HaoFuSurvivor
 			RegisterModel(new CharacterExclusivePerkModel());
 			RegisterModel(new MapModel());
 			RegisterModel(new WorldMapModel());
+			RegisterModel(new ProfileModel());
+			RegisterModel(new RunEconomyModel());
 
 			RegisterUtility(new CharacterCatalog());
 			RegisterUtility(new CharacterSelectionStorage());
@@ -35,12 +38,19 @@ namespace HaoFuSurvivor
 			RegisterUtility(new WeaponCombinationCatalog());
 			RegisterUtility(new ExperienceProgressionCatalog());
 			RegisterUtility(new RunSaveStorage());
+			RegisterUtility(new SaveFileStorage());
 			RegisterUtility(new DodgeCatalog());
 			RegisterUtility(new StatUpgradeCatalog());
 			RegisterUtility(new CharacterExclusiveSkillUpgradeCatalog());
 			RegisterUtility(new CharacterExclusivePerkCatalog());
 			RegisterUtility(new MapGridCatalog());
+			RegisterUtility(new BreakableObjectCatalog());
+			RegisterUtility(new MapEventCatalog());
+			RegisterUtility(new ProfileStorage());
+			RegisterUtility(new CoinEconomyCatalog());
+			RegisterUtility(new DropTableCatalog());
 
+			RegisterSystem(new GameLogSystem());
 			RegisterSystem(new RunSystem());
 			RegisterSystem(new GameLoopSystem());
 			RegisterSystem(new RunTimerSystem());
@@ -69,7 +79,14 @@ namespace HaoFuSurvivor
 			RegisterSystem(new PlayerRegenerationSystem());
 			RegisterSystem(new CharacterExclusiveSkillUpgradeSystem());
 			RegisterSystem(new MapSystem());
+			RegisterSystem(new BreakableObjectSystem());
+			RegisterSystem(new MapEventSystem());
 			RegisterSystem(new MapNavMeshSystem());
+			RegisterSystem(new WorldGuideSystem());
+			RegisterSystem(new UIPopPanelSystem());
+			RegisterSystem(new ProfileSystem());
+			RegisterSystem(new RunEconomySystem());
+			RegisterSystem(new PickupSystem());
 		}
 	}
 }

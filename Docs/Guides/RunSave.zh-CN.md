@@ -2,21 +2,37 @@
 
 本文只说明局内快照；局外 Profile 不属于当前模块。
 
-## 存储方式
+## 文件位置
 
-`RunSaveStorage` 使用 PlayerPrefs 键 `HaoFuSurvivor.ActiveRun` 保存一个 JSON。存档只保存数值和 ID，不保存 Unity 对象、对象池实例、敌人、经验球或投射物。
+Windows 运行时只允许在游戏根目录下生成 ASCII 路径。`GameStoragePath.TryGetPath` 会拒绝包含中文或其他非 ASCII 字符的安装根目录，并停用业务存档与游戏日志写入；请将游戏安装到例如 `D:\Games\ProjectSurvivor` 的纯英文路径。
 
-## 快照字段
+`RunSaveStorage` 将 JSON 写入游戏根目录：
 
-- 角色 ID、对局时间与时间阶段。
-- 玩家生命和二维位置。
-- 等级、当前经验、下一等级阈值。
-- 每个 WeaponRuntime 的 Weapon ID、等级、Attack 内容和属性修正。
-- 每个 SkillRuntime 的 Skill ID 与等级。
-- Dodge ID 与等级。
+```text
+SaveData/active-run.json
+SaveData/selected-character.json
+Logs/game.log
+Settings/qframework-settings.json
+```
 
-## 时机与恢复
+根目录由 `Save/GameStoragePath.cs` 按 Windows、macOS Player 和 Unity Editor 分别解析。
 
-`RunSaveSystem` 是按需注册的 `IRunUpdateable`，每 30 秒逻辑时间自动保存；暂停、返回主菜单、切后台和退出应用也立即保存。胜利或失败结算会清除未完成对局存档。
+Windows 版本的项目业务数据完全不使用 PlayerPrefs，也不写入系统用户目录。旧版本注册表数据不会再被读取；需要保留旧存档时，应在迁移前手动导出到 `SaveData/active-run.json`。`SaveData/` 已加入 Git 忽略规则，不会把本机存档提交到仓库。
 
-主菜单通过 `HasSavedRunQuery` 决定是否显示继续入口。`ContinueSavedRunCommand` 重建 PlayerRoot、恢复快照，并按已恢复的时间重新驱动敌人生成。恢复会重新绑定 Loadout Owner，再重新注册已保存的 Skill 和 Weapon Attack；单个无效 Skill、Weapon 或 Dodge 会跳过；所有 Weapon 无效则恢复失败并回滚运行时。旧快照没有技能字段时，会回退装配角色技能组中的初始技能。
+QFramework 的 AudioKit、LocaleKit 和 ResKit 设置也写入 `Settings/qframework-settings.json`，不再使用 PlayerPrefs；音频开关、音量、语言选择和 AssetBundle 读取开关都能跨重启保留。
+
+`GameStoragePath` 只接受 ASCII 英文相对路径，并拒绝绝对路径、`.`、`..` 和控制字符；当前生成的目录与文件名均为英文。程序不会自动修改应用安装根目录，因此请将 Windows 游戏安装在不含中文的路径中。
+
+QFramework ResKit 的热更新资源缓存、Unity 原生日志和崩溃报告仍由第三方/Unity 使用平台默认目录，这是当前明确保留的例外。
+
+## 快照内容
+
+快照保存可重建对局所需的 ID、数值和运行时数据：角色与地图世界种子、主题和生成器版本、阶段时间、玩家位置与生命、等级经验、通用属性等级、Weapon/Skill/Dodge 运行时等级与 Attack 修正、角色专属升级等级与临时效果、已退役 Weapon 来源，以及当前敌人、经验球、投射物、地面火焰和弹幕状态。基础地图区块不逐格序列化，而是由 Seed、主题和生成器版本确定性重建。Unity 对象、Prefab、对象池实例和表现组件不直接序列化。
+
+## 保存与恢复
+
+`RunSaveSystem` 作为 `IRunUpdateable` 按逻辑时间周期保存，并在暂停、返回菜单、切后台和退出应用时触发即时保存。胜利或失败结算会清理未完成对局存档。
+
+主菜单通过 `HasSavedRunQuery` 控制“继续游戏”。`ContinueSavedRunCommand` 先按 Seed、主题和生成器版本重建 PlayerRoot 与基础地图，再恢复 Loadout、属性、角色专属效果、位置、生命和时间；敌人、经验球、投射物、地面火焰和弹幕等池对象按快照数据重新生成。无效的可选能力会跳过，必要 Weapon 恢复失败则中止继续流程。
+
+当前仍未实现存档版本号、校验和、损坏文件备份与修复提示；这些属于后续存档健壮性任务。

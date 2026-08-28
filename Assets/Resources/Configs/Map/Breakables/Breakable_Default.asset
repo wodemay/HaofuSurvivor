@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d2e8d21b6cf4d42a3f2b1e8d0a7c9f1, type: 3}
+  m_Name: Breakable_Default
+  m_EditorClassIdentifier:
+  Id: 1
+  Prefab: {fileID: 7323399301526505322, guid: aa98fa97021c3ae43b0a787f73c75584, type: 3}
+  HitPoints: 3
+  Weight: 1
+  SpawnCountPerChunk: 2
+  MinimumSpacing: 3
+  DropTableId: 1

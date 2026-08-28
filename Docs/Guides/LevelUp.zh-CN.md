@@ -6,13 +6,13 @@
 
 ## 当前候选
 
-候选包含可升级 Weapon、满足条件的 Weapon 进化，以及可升级 Dodge。普通升级文本为 `LevelX->LevelX+1`；进化为 `LevelX->Evolve`。
+每次升级固定生成三个候选并保持到确认；候选不足时允许同类候选重复出现，但同一 Weapon 的同一级不会生成多个不同路线。候选包含可升级 Weapon、满足条件的 Weapon 进化、通用属性、Dodge 和角色专属升级。普通升级文本为 `LevelX->LevelX+1`；进化为 `LevelX->Evolve`。
 
 ## 确认规则
 
 UI 发送确认 Command 后，`PlayerLoadoutSystem` 升级或进化 Weapon，或 `DodgeSystem` 升级闪避。所有修改只写入运行时数据，绝不修改 ScriptableObject。没有待选项时恢复 Active。
 
-新 Weapon、通用属性、Weapon 组合和专属 Skill 已接入候选生成；刷新、跳过、锁定和稀有度仍未实现。
+新 Weapon、通用属性、Weapon 组合和专属 Skill 已接入候选生成；刷新按钮不参与当前流程，跳过、锁定和稀有度仍未实现。
 
 ## 专属 Skill 候选
 

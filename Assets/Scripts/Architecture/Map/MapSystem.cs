@@ -12,6 +12,7 @@ namespace HaoFuSurvivor
 		private readonly List<Vector2Int> mLoadOrderBuffer = new();
 		private readonly HashSet<Vector2Int> mQueuedLoads = new();
 		private readonly List<Vector2Int> mUnloadBuffer = new();
+		private readonly HashSet<string> mDestroyedBreakables = new();
 		private bool[] mWalkabilityVisited = System.Array.Empty<bool>();
 		private int[] mWalkabilityQueue = System.Array.Empty<int>();
 		private MapGridConfig mConfig;
@@ -23,6 +24,7 @@ namespace HaoFuSurvivor
 		{
 			this.GetSystem<GameLoopSystem>().UnregisterUpdateable(this);
 			this.GetSystem<MapNavMeshSystem>().PrepareForMapMutation();
+			this.GetSystem<BreakableObjectSystem>().Reset();
 			MapChunkFactory.Instance.ReleaseAll();
 			mLoadedChunks.Clear();
 			mGeneratedChunks.Clear();
@@ -30,6 +32,7 @@ namespace HaoFuSurvivor
 			mLoadOrderBuffer.Clear();
 			mQueuedLoads.Clear();
 			mUnloadBuffer.Clear();
+			mDestroyedBreakables.Clear();
 			mHasCenter = false;
 			var model = this.GetModel<MapModel>();
 			model.HasCurrentChunk = false;
@@ -44,6 +47,7 @@ namespace HaoFuSurvivor
 			if (mConfig == null || themeId != mConfig.ThemeId || generatorVersion != mConfig.GeneratorVersion) return false;
 
 			this.GetSystem<MapNavMeshSystem>().PrepareForMapMutation();
+			this.GetSystem<BreakableObjectSystem>().Reset();
 			this.GetModel<WorldMapModel>().Restore(worldSeed, themeId, generatorVersion);
 			MapChunkFactory.Instance.ReleaseAll();
 			mLoadedChunks.Clear();
@@ -126,6 +130,7 @@ namespace HaoFuSurvivor
 			foreach (var coordinate in mUnloadBuffer)
 			{
 				var view = mLoadedChunks[coordinate];
+				this.GetSystem<BreakableObjectSystem>().UnloadChunk(mGeneratedChunks[coordinate]);
 				mLoadedChunks.Remove(coordinate);
 				MapChunkFactory.Instance.Release(view);
 			}
@@ -147,6 +152,7 @@ namespace HaoFuSurvivor
 				var view = MapChunkFactory.Instance.Spawn(mConfig, coordinate, GenerateChunkData(coordinate), WorldRootLocator.Get(WorldRootSlot.MapBackground));
 				if (view == null) continue;
 				mLoadedChunks.Add(coordinate, view);
+				this.GetSystem<BreakableObjectSystem>().LoadChunk(mGeneratedChunks[coordinate]);
 				changed = true;
 			}
 			if (changed) this.GetSystem<MapNavMeshSystem>().MarkDirty();
@@ -217,6 +223,30 @@ namespace HaoFuSurvivor
 					data.CellFlags[cellIndex] |= flags;
 					if (candidate.Template.BlocksMovement) data.CellFlags[cellIndex] &= ~MapCellFlags.Walkable;
 				}
+			}
+
+			var breakableCandidates = new List<BreakableCandidate>();
+			foreach (var coordinate in missing) breakableCandidates.AddRange(BuildBreakableCandidates(coordinate, chunkSize));
+			breakableCandidates.Sort((left, right) =>
+			{
+				var result = left.OrderKey.CompareTo(right.OrderKey);
+				if (result != 0) return result;
+				result = left.Coordinate.y.CompareTo(right.Coordinate.y);
+				return result != 0 ? result : left.Coordinate.x.CompareTo(right.Coordinate.x);
+			});
+			foreach (var candidate in breakableCandidates)
+			{
+				if (!CanPlaceBreakable(occupied, candidate, origin, windowSize, chunkSize)) continue;
+				MarkBreakable(occupied, candidate, origin, windowSize, chunkSize, true);
+				var data = working[candidate.Coordinate];
+				data.Breakables.Add(new MapBreakableEntityData
+				{
+					StableId = $"b:{candidate.Coordinate.x}:{candidate.Coordinate.y}:{data.Breakables.Count}",
+					ConfigId = candidate.Config.Id,
+					WorldCellX = candidate.Coordinate.x * chunkSize + candidate.Anchor.x,
+					WorldCellY = candidate.Coordinate.y * chunkSize + candidate.Anchor.y,
+					IsDestroyed = mDestroyedBreakables.Contains($"b:{candidate.Coordinate.x}:{candidate.Coordinate.y}:{data.Breakables.Count}")
+				});
 			}
 
 			foreach (var entry in working)
@@ -306,6 +336,56 @@ namespace HaoFuSurvivor
 			}
 		}
 
+		private List<BreakableCandidate> BuildBreakableCandidates(Vector2Int coordinate, int chunkSize)
+		{
+			var candidates = new List<BreakableCandidate>();
+			var configs = mConfig.Theme == null ? null : mConfig.Theme.BreakableObjects;
+			if (configs == null || configs.Count == 0) return candidates;
+			var random = new System.Random(CombineSeed(this.GetModel<WorldMapModel>().WorldSeed ^ 7919, coordinate, mConfig.GeneratorVersion));
+			var targetCount = 0;
+			foreach (var config in configs) if (config != null) targetCount += Mathf.Max(0, config.SpawnCountPerChunk);
+			for (var attempt = 0; attempt < targetCount * 16 && candidates.Count < targetCount; attempt++)
+			{
+				var config = PickBreakable(configs, random);
+				if (config == null || config.Prefab == null) continue;
+				var anchor = new Vector2Int(random.Next(0, chunkSize), random.Next(0, chunkSize));
+				candidates.Add(new BreakableCandidate(coordinate, config, anchor, attempt));
+			}
+			return candidates;
+		}
+
+		private static BreakableObjectConfig PickBreakable(List<BreakableObjectConfig> configs, System.Random random)
+		{
+			var total = 0f;
+			foreach (var config in configs) if (config != null) total += Mathf.Max(0f, config.Weight);
+			if (total <= 0f) return null;
+			var value = (float)random.NextDouble() * total;
+			foreach (var config in configs)
+			{
+				if (config == null) continue;
+				value -= Mathf.Max(0f, config.Weight);
+				if (value <= 0f) return config;
+			}
+			return configs.Find(config => config != null);
+		}
+
+		private static bool CanPlaceBreakable(bool[] occupied, BreakableCandidate candidate, Vector2Int origin, int windowSize, int chunkSize)
+		{
+			var world = new Vector2Int(candidate.Coordinate.x * chunkSize + candidate.Anchor.x, candidate.Coordinate.y * chunkSize + candidate.Anchor.y);
+			if (Mathf.Abs(world.x) <= 1 && Mathf.Abs(world.y) <= 1) return false;
+			var spacing = Mathf.Max(0, candidate.Config.MinimumSpacing);
+			for (var y = -spacing; y <= spacing; y++)
+			for (var x = -spacing; x <= spacing; x++)
+				if (IsBlocked(occupied, origin, windowSize, world + new Vector2Int(x, y))) return false;
+			return true;
+		}
+
+		private static void MarkBreakable(bool[] occupied, BreakableCandidate candidate, Vector2Int origin, int windowSize, int chunkSize, bool value)
+		{
+			var world = new Vector2Int(candidate.Coordinate.x * chunkSize + candidate.Anchor.x, candidate.Coordinate.y * chunkSize + candidate.Anchor.y);
+			SetBlocked(occupied, origin, windowSize, world, value);
+		}
+
 		public bool TryGetCellFlags(Vector2Int worldCell, out MapCellFlags flags)
 		{
 			flags = MapCellFlags.None;
@@ -320,6 +400,39 @@ namespace HaoFuSurvivor
 			if (index < 0 || index >= data.CellFlags.Count) return false;
 			flags = data.CellFlags[index];
 			return true;
+		}
+
+		public void MarkBreakableDestroyed(string stableId)
+		{
+			if (string.IsNullOrEmpty(stableId)) return;
+			mDestroyedBreakables.Add(stableId);
+			foreach (var data in mGeneratedChunks.Values)
+				foreach (var entry in data.Breakables)
+					if (entry != null && entry.StableId == stableId)
+					{
+						entry.IsDestroyed = true;
+						return;
+					}
+		}
+
+		public IEnumerable<BreakableSaveData> GetBreakableSaveData()
+		{
+			foreach (var stableId in mDestroyedBreakables)
+				yield return new BreakableSaveData { StableId = stableId, IsDestroyed = true };
+		}
+
+		public void RestoreBreakables(IEnumerable<BreakableSaveData> entries)
+		{
+			mDestroyedBreakables.Clear();
+			if (entries != null)
+				foreach (var entry in entries)
+					if (entry != null && entry.IsDestroyed && !string.IsNullOrEmpty(entry.StableId)) mDestroyedBreakables.Add(entry.StableId);
+			foreach (var data in mGeneratedChunks.Values)
+				foreach (var entry in data.Breakables)
+					if (entry != null && mDestroyedBreakables.Contains(entry.StableId)) entry.IsDestroyed = true;
+			this.GetSystem<BreakableObjectSystem>().Reset();
+			foreach (var coordinate in mLoadedChunks.Keys)
+				if (mGeneratedChunks.TryGetValue(coordinate, out var loadedData)) this.GetSystem<BreakableObjectSystem>().LoadChunk(loadedData);
 		}
 
 		private static void MarkCandidate(bool[] occupied, bool[] movementBlocked, ObstacleCandidate candidate, Vector2Int origin, int windowSize, int chunkSize, bool value)
@@ -439,6 +552,22 @@ namespace HaoFuSurvivor
 		{
 			var size = Mathf.Max(1, chunkSize);
 			return new Vector2Int(Mathf.FloorToInt(position.x / size), Mathf.FloorToInt(position.y / size));
+		}
+
+		private sealed class BreakableCandidate
+		{
+			public readonly Vector2Int Coordinate;
+			public readonly BreakableObjectConfig Config;
+			public readonly Vector2Int Anchor;
+			public readonly int OrderKey;
+
+			public BreakableCandidate(Vector2Int coordinate, BreakableObjectConfig config, Vector2Int anchor, int attempt)
+			{
+				Coordinate = coordinate;
+				Config = config;
+				Anchor = anchor;
+				OrderKey = CombineSeed(17389, coordinate, attempt);
+			}
 		}
 
 		private static int FloorDivide(int value, int divisor)

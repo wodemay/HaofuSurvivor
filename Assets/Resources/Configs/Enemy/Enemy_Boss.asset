@@ -20,3 +20,5 @@ MonoBehaviour:
   - 1001
   ExperienceDrop: {fileID: 11400000, guid: 9f69ff63e06f4ea7ab610567952d1470, type: 2}
   DropTableId: 0
+  IsBoss: 1
+  IsPersistent: 0

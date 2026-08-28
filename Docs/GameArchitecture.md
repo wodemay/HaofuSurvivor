@@ -27,8 +27,12 @@ Controller/View -> Command -> System -> Model/Utility
 | Combat | Attack definitions, executors, targeting, damage routing, projectiles |
 | Skill | skill groups and runtime Weapon containers |
 | Dodge | dodge runtime state, cooldown, movement and upgrades |
-| Experience / LevelUp | drops and absorption; level-up queue and selection |
+| Experience | drops, pooling, absorption, and level-up events |
+| LevelUp | candidate generation, three-option selection, and phase control |
+| Progression | global stat upgrades, regeneration, and character-exclusive effects |
+| Map | deterministic chunks, obstacle validation, streaming, collision, and NavMesh |
 | Save | active-run snapshot serialization and recovery |
+| Presentation | WorldRoot slots, sorting layers, and runtime render bindings |
 | UI | display and input binding; hierarchy and Bind generation remain user-owned |
 
 ## Runtime Tick Rule

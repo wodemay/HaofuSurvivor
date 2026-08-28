@@ -7,6 +7,12 @@ namespace HaoFuSurvivor
 		public void ApplyDamage(CombatEntity target, float damage)
 		{
 			if (!this.GetSystem<RunTimerSystem>().IsRunning()) return;
+			var breakable = target == null ? null : target.GetComponent<BreakableObjectView>();
+			if (breakable != null)
+			{
+				this.GetSystem<BreakableObjectSystem>().ApplyDamage(breakable, damage);
+				return;
+			}
 
 			if (target != null && target.Faction == CombatFaction.Player)
 			{

@@ -2,21 +2,20 @@
 
 ## 当前结论
 
-项目已按 QFramework 拆分职责，但仍共用 `Assembly-CSharp`。任一脚本的语法或编译错误仍会阻止所有游戏脚本进入 Play Mode；这是未使用 `.asmdef` 的编译级限制。
+项目按 QFramework 拆分职责，但仍共用 `Assembly-CSharp`；任一脚本的语法或编译错误仍会阻止所有游戏脚本进入 Play Mode，这是未使用 `.asmdef` 的编译级限制。
 
-运行级隔离已按“核心模块 / 可选能力”执行：PlayerRoot、角色内容和必需 Weapon 装配失败会阻止开局；Skill 与 Dodge 配置失败只禁用对应能力。存档恢复同样可跳过单个无效 Dodge 或 Weapon；全部 Weapon 无效才回滚恢复。
+运行级隔离按“核心模块 / 可选能力”执行：PlayerRoot、角色内容和必需 Weapon 装配失败会阻止开局；Skill、Dodge、角色专属升级和单个可选 Attack 失败只禁用对应能力。对象池、地图区块和 Tick 注册均有生命周期清理。
 
 ## 统一 Tick 的隔离效果
 
-`GameLoopSystem` 只调度已注册的 `IRunUpdateable` / `IRunFixedUpdateable`。Dodge 未装备时不会进入物理 Tick 列表；投射物和经验球为空时各自注销；AttackRuntime 清空后自动攻击注销。因此可选能力不会保留独立 Unity Update/FixedUpdate，也不会在对局结束后持续运行。
+`GameLoopSystem` 只调度已注册的 `IRunUpdateable` / `IRunFixedUpdateable`。Dodge 未装备时不会进入物理 Tick；投射物、经验球、区域效果和角色专属临时效果为空时会注销；AttackRuntime 清空后自动攻击也会注销。对局结束会清空所有 Tick 列表。
 
-这不等于吞掉异常：已注册 System 出现异常仍应修复。它解决的是无能力、无活动对象或能力被卸载时不做无效调度的问题。
+这不等于吞掉异常：已注册 System 出现异常仍应修复。它解决的是无能力、无活动对象或能力卸载时不做无效调度的问题。
 
-## 仍需关注
+## 当前已知边界
 
-- `PlayerSystem` 仍直接读取 Dodge 状态以暂停普通移动，尚未抽象为通用位移覆盖能力。
-- `SkillGroupConfig.StartingSkillIds` 目前只保存 ID，未实现 Skill 有效性校验。
-- Enemy 的无效 Attack 目前倾向跳过，和玩家必需 Weapon 的失败策略不同。
-- RunSave 使用单个 PlayerPrefs JSON，仍缺版本、校验和与迁移。
+- 仍共用 `Assembly-CSharp`，尚未做程序集级隔离。
+- SkillGroup 中的可选 Skill 有效性校验和敌人 Attack 失败反馈仍可进一步统一。
+- 存档已迁移为 `SaveData/*.json`，但仍缺版本号、校验和、损坏恢复与迁移失败提示。
 
 后续开发须先判断新增内容是核心模块还是可选能力，并在启动、恢复、Tick 注册和失败反馈上采用一致策略。

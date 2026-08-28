@@ -7,10 +7,10 @@ namespace HaoFuSurvivor
 		public readonly int SurvivalSeconds;
 		public readonly int Level;
 		public readonly float RunExperience;
-		public readonly int Coins;
+		public readonly BigCoin Coins;
 		public readonly int MetaExperience;
 
-		public RunSettlementData(int characterId, RunPhase result, int survivalSeconds, int level, float runExperience, int coins, int metaExperience)
+		public RunSettlementData(int characterId, RunPhase result, int survivalSeconds, int level, float runExperience, BigCoin coins, int metaExperience)
 		{
 			CharacterId = characterId;
 			Result = result;

@@ -12,6 +12,10 @@ namespace HaoFuSurvivor
 	{
 	}
 
+	public struct RunExitedEvent
+	{
+	}
+
 	public struct RunEndedEvent
 	{
 		public readonly RunPhase Phase;
@@ -112,11 +116,33 @@ namespace HaoFuSurvivor
 	{
 		public readonly ExperienceDropConfig ExperienceDrop;
 		public readonly UnityEngine.Vector2 DeathPosition;
+		public readonly bool IsBoss;
 
-		public EnemyDiedEvent(ExperienceDropConfig experienceDrop, UnityEngine.Vector2 deathPosition)
+		public EnemyDiedEvent(ExperienceDropConfig experienceDrop, UnityEngine.Vector2 deathPosition, bool isBoss)
 		{
 			ExperienceDrop = experienceDrop;
 			DeathPosition = deathPosition;
+			IsBoss = isBoss;
+		}
+	}
+
+	public readonly struct EnemySpawnedEvent
+	{
+		public readonly bool IsBoss;
+
+		public EnemySpawnedEvent(bool isBoss)
+		{
+			IsBoss = isBoss;
+		}
+	}
+
+	public struct RunEconomyChangedEvent
+	{
+		public readonly RunEconomyState State;
+
+		public RunEconomyChangedEvent(RunEconomyState state)
+		{
+			State = state;
 		}
 	}
 

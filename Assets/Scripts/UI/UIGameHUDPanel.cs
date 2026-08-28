@@ -20,7 +20,10 @@ namespace HaoFuSurvivor
 			Button_Pause.onClick.AddListener(TogglePause);
 			this.RegisterEvent<RunTimerUpdatedEvent>(OnRunTimerUpdated)
 				.UnRegisterWhenGameObjectDestroyed(gameObject);
+			this.RegisterEvent<RunEconomyChangedEvent>(OnRunEconomyChanged)
+				.UnRegisterWhenGameObjectDestroyed(gameObject);
 			RefreshTime();
+			RefreshRunCoin();
 		}
 		
 		protected override void OnOpen(IUIData uiData = null)
@@ -79,6 +82,17 @@ namespace HaoFuSurvivor
 		{
 			var timer = this.SendQuery(new GetRunTimerStateQuery());
 			Text_RemainingTime.text = FormatTime(timer.ElapsedSeconds);
+		}
+
+		private void OnRunEconomyChanged(RunEconomyChangedEvent economyEvent)
+		{
+			Text_RunCoin.text = $"金币数：{economyEvent.State.RunCoin.ToDisplayString()}";
+		}
+
+		private void RefreshRunCoin()
+		{
+			var economy = this.SendQuery(new GetRunEconomyStateQuery());
+			Text_RunCoin.text = $"金币数：{economy.RunCoin.ToDisplayString()}";
 		}
 
 		private static string FormatTime(int seconds)

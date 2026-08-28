@@ -2,6 +2,7 @@ using UnityEngine;
 
 namespace HaoFuSurvivor
 {
+	[DefaultExecutionOrder(-100)]
 	public class CameraFollow : MonoBehaviour
 	{
 		private Transform mTarget;
