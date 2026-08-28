@@ -23,8 +23,8 @@ namespace HaoFuSurvivor
 			RegisterModel(new CharacterExclusivePerkModel());
 			RegisterModel(new MapModel());
 			RegisterModel(new WorldMapModel());
-				RegisterModel(new ProfileModel());
-				RegisterModel(new RunEconomyModel());
+			RegisterModel(new ProfileModel());
+			RegisterModel(new RunEconomyModel());
 
 			RegisterUtility(new CharacterCatalog());
 			RegisterUtility(new CharacterSelectionStorage());
@@ -43,12 +43,12 @@ namespace HaoFuSurvivor
 			RegisterUtility(new StatUpgradeCatalog());
 			RegisterUtility(new CharacterExclusiveSkillUpgradeCatalog());
 			RegisterUtility(new CharacterExclusivePerkCatalog());
-				RegisterUtility(new MapGridCatalog());
-				RegisterUtility(new BreakableObjectCatalog());
-				RegisterUtility(new MapEventCatalog());
-				RegisterUtility(new ProfileStorage());
-				RegisterUtility(new CoinEconomyCatalog());
-				RegisterUtility(new DropTableCatalog());
+			RegisterUtility(new MapGridCatalog());
+			RegisterUtility(new BreakableObjectCatalog());
+			RegisterUtility(new MapEventCatalog());
+			RegisterUtility(new ProfileStorage());
+			RegisterUtility(new CoinEconomyCatalog());
+			RegisterUtility(new DropTableCatalog());
 
 			RegisterSystem(new GameLogSystem());
 			RegisterSystem(new RunSystem());
@@ -78,15 +78,15 @@ namespace HaoFuSurvivor
 			RegisterSystem(new CharacterExclusivePerkSystem());
 			RegisterSystem(new PlayerRegenerationSystem());
 			RegisterSystem(new CharacterExclusiveSkillUpgradeSystem());
-				RegisterSystem(new MapSystem());
-				RegisterSystem(new BreakableObjectSystem());
-				RegisterSystem(new MapEventSystem());
+			RegisterSystem(new MapSystem());
+			RegisterSystem(new BreakableObjectSystem());
+			RegisterSystem(new MapEventSystem());
 			RegisterSystem(new MapNavMeshSystem());
 			RegisterSystem(new WorldGuideSystem());
 			RegisterSystem(new UIPopPanelSystem());
-				RegisterSystem(new ProfileSystem());
-				RegisterSystem(new RunEconomySystem());
-				RegisterSystem(new PickupSystem());
+			RegisterSystem(new ProfileSystem());
+			RegisterSystem(new RunEconomySystem());
+			RegisterSystem(new PickupSystem());
 		}
 	}
 }
