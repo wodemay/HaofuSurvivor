@@ -146,6 +146,8 @@ Write all project documentation in the project-root `Docs/` directory, never und
 
 - 2026-08-28 | 合并 `origin/main` 到 PR #24 分支并解决地图、敌人、运行循环、存档和配置冲突；保留主分支的敌人恢复/地图区块卸载与导航修复，同时保留本分支的金币、可破坏物、地图事件、掉落物和 Profile 存档功能。待完成编译、差异检查和 CI 复核。
 
+- 2026-08-28 | 冲突解决后的 `rg` 标记扫描、`git diff --check` 和 `dotnet build Assembly-CSharp.csproj --no-restore --disable-build-servers /m:1 /p:UseSharedCompilation=false /p:BuildInParallel=false /nr:false` 均通过；PR #24 静态审查通过，Unity 编译检查仍在 GitHub 运行中。未跟踪的本地 `Mac/` 构建目录未纳入提交。
+
 - 2026-08-28 | 将当前进度保存、金币经济、掉落、可破坏物、地图事件、世界指示器和弹窗等已完成改动提交为 `72cc7b4` 并推送；已创建 PR #24（https://github.com/wodemay/HaofuSurvivor/pull/24）。本地 `Mac/` 构建目录未纳入提交；等待 GitHub CI 和管理员手动验证。
 
 - 2026-08-28 | 修复地图事件完成后指示箭头不消失：`WorldGuideSystem` 每次更新先将现有视图标记为待回收，再从当前事件查询结果移除仍有效的 ID；事件完成后从 `MapEventSystem` 查询中移除时，旧箭头会在下一次更新销毁。待执行编译和 Unity 控制台验证。
