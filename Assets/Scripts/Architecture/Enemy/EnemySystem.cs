@@ -74,6 +74,7 @@ namespace HaoFuSurvivor
 					mEnemies.Add(enemy);
 					mMoveSpeeds[enemy] = Mathf.Max(0f, entry.MoveSpeed);
 					mBodyRadii[enemy] = GetBodyRadius(enemy);
+					if (config.IsBoss) this.SendEvent(new EnemySpawnedEvent(true));
 					this.GetSystem<EnemyHealthSystem>().RestoreCurrentHealth(enemy.GetComponent<CombatEntity>(), entry.CurrentHealth);
 					this.GetSystem<AttackSystem>().RestoreCooldowns(enemy.gameObject, entry.AttackCooldowns);
 				}
@@ -82,6 +83,12 @@ namespace HaoFuSurvivor
 		}
 
 		public float GetSpawnElapsed() => mSpawnElapsed;
+		public bool HasActiveBoss()
+		{
+			foreach (var enemy in mEnemies)
+				if (enemy != null && EnemyFactory.Instance.GetConfig(enemy)?.IsBoss == true) return true;
+			return false;
+		}
 		public void OnRunFixedUpdate(float deltaTime)
 		{
 			var player = this.GetModel<PlayerModel>();
@@ -123,6 +130,7 @@ namespace HaoFuSurvivor
 						mEnemies.Add(enemy);
 						mMoveSpeeds[enemy] = enemyConfig.MoveSpeed;
 						mBodyRadii[enemy] = bodyRadius;
+						if (enemyConfig.IsBoss) this.SendEvent(new EnemySpawnedEvent(true));
 					}
 				}
 			}

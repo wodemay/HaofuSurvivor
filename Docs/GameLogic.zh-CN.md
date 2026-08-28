@@ -12,7 +12,27 @@
 
 `GameStart.Update()` 只发送 `TickGameLoopCommand`，`FixedUpdate()` 只发送 `TickGamePhysicsCommand`。`GameLoopSystem` 先让 `RunTimerSystem` 更新逻辑时间；仅当对局处于 Active 时，才向已注册的 `IRunUpdateable` / `IRunFixedUpdateable` 分发 Tick。
 
-当前帧 Tick 包括输入、玩家无敌帧、自动攻击、经验球和自动存档；物理 Tick 包括玩家移动、敌人生成/追击、闪避和活跃投射物。暂停或升级选择会停止这两类业务 Tick。
+当前帧 Tick 包括输入、自动攻击、经验球、区域效果、地图区块流式加载、NavMesh 脏标记处理和自动存档；物理 Tick 包括玩家移动、敌人生成/追击、闪避和活跃投射物。暂停或升级选择会停止这两类业务 Tick。`RunTimerSystem` 将单帧逻辑增量限制为 0.05 秒，避免恢复焦点时产生长帧补算。
+
+## 地图与障碍
+
+`MapSystem` 使用隐藏的世界 Seed、主题 ID、生成器版本和 32×32 区块确定性生成底图与障碍。障碍来自主题配置的模板，可设置占用形状、权重、最小间距、旋转、镜像、移动阻挡和投射物阻挡；生成时拒绝重叠，并通过 Flood Fill 保证可行走区域不被完全封闭。
+
+玩家周围的 3×3 区块按距离优先加载，初始半径同步加载，外围区块按每帧操作上限逐步加载；离开卸载半径的区块回收到 `MapChunkFactory`，其逻辑数据保留在 `WorldMapModel`。`MapNavMeshSystem` 在区块变化后异步重建 NavMesh，敌人按需计算连续 A* 路径，并继续通过 Rigidbody2D 碰撞滑动处理局部阻挡。
+
+世界动态对象按 `WorldRoot` 九层 Sorting Layer 管理：地图背景、地图装饰、地面特效、拾取物、敌人、玩家、投射物、战斗特效、世界 UI。地面火焰使用地面特效层，不覆盖敌人和玩家。
+
+## 成长与战斗扩展
+
+升级候选固定三个槽位，由 `LevelUpSystem` 生成并由 UI 确认；当前支持 Weapon、Weapon 组合进化、通用属性、Dodge 和角色专属升级。Weapon 是运行时容器，Attack 是容器内容；升级只改运行时数据。FireBall 进化为 Inferno FireBall 后会释放范围爆炸并留下 3 秒地面火焰，来源 Weapon 会退役，不再回到候选池。
+
+通用属性升级覆盖伤害、冷却、经验倍率、吸收范围、移动速度、自然回血和恢复效率，均有等级上限。角色专属升级不占 Weapon/属性槽位，可通过 Dodge 结束或 Skill 使用触发短时联动效果。
+
+## 文件存储
+
+局内快照和角色选择写入游戏根目录 `SaveData/`，运行日志写入 `Logs/game.log`；项目运行链路完全不使用 PlayerPrefs。快照恢复时先用 Seed、主题和生成器版本重建地图，再重建 PlayerRoot、运行时数值，以及敌人、经验球、投射物、地面火焰和弹幕状态。
+
+QFramework 的 AudioKit、LocaleKit、ResKit 设置统一写入游戏根目录 `Settings/qframework-settings.json`。
 
 ## 结束、重开与继续
 

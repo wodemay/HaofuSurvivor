@@ -1,6 +1,6 @@
-﻿/****************************************************************************
+/****************************************************************************
  * Copyright (c) 2015 - 2024 liangxiegame UNDER MIT License
- * 
+ *
  * http://qframework.cn
  * https://github.com/liangxiegame/QFramework
  * https://gitee.com/liangxiegame/QFramework
@@ -28,10 +28,10 @@ namespace QFramework
         {
             (Interface as LocaleKit)?.Init();
         }
-        
+
         protected override void Init()
         {
-            var languageIndex = LoadCommand("CURRENT_LANGUAGE_INDEX", 0);
+            var languageIndex = LoadCommand(0);
 
             if (languageIndex >= Config.LanguageDefines.Count)
             {
@@ -44,12 +44,10 @@ namespace QFramework
         private static readonly BindableProperty<Language> mCurrentLanguage = new BindableProperty<Language>(Language.English);
         public static IReadonlyBindableProperty<Language> CurrentLanguage => mCurrentLanguage ;
 
-        public static Action<string, int> SaveCommand = (key, languageIndex) =>
-            PlayerPrefs.SetInt(key, languageIndex);
+        public static Action<int> SaveCommand = languageIndex => RuntimeSettingsStorage.SetInt("Locale.CurrentLanguageIndex", languageIndex);
 
-        public static Func<string, int, int> LoadCommand = (key, defaultLanguageIndex) =>
-            PlayerPrefs.GetInt(key, defaultLanguageIndex);
-        
+        public static Func<int, int> LoadCommand = defaultLanguageIndex => RuntimeSettingsStorage.GetInt("Locale.CurrentLanguageIndex", defaultLanguageIndex);
+
 
         private static LanguageDefineConfig mConfig;
 
@@ -73,7 +71,7 @@ namespace QFramework
         public static void ChangeLanguage(Language language)
         {
             mCurrentLanguage.Value = language;
-            SaveCommand("CURRENT_LANGUAGE_INDEX", Config.LanguageDefines.FindIndex(l => l.Language == language));
+            SaveCommand(Config.LanguageDefines.FindIndex(l => l.Language == language));
         }
     }
 }

@@ -17,3 +17,9 @@ MonoBehaviour:
   DecorationTiles: []
   ObstacleTemplates:
   - {fileID: 11400000, guid: d7dd2b3588be1744db7ae71cb2ed030c, type: 2}
+  BreakableObjects:
+  - {fileID: 11400000, guid: 8e1c3a5d7f9b2d4e6a8c0f1b3d5e7a9c, type: 2}
+  MapEvents:
+  - {fileID: 11400000, guid: 4c8a2e7d1f5b9a3e6c0d4f8b2a7e1d95, type: 2}
+  MapEventSpawnIntervalSeconds: 60
+  MapEventMinimumPlayerDistance: 12

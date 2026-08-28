@@ -12,15 +12,17 @@ namespace HaoFuSurvivor
 
 			var player = this.GetModel<PlayerModel>();
 			var experience = this.GetModel<ExperienceModel>();
+			var coins = this.GetSystem<RunEconomySystem>().CalculateSettlementCoins(result, Mathf.FloorToInt(this.GetModel<RunTimerModel>().ElapsedSeconds));
 			settlementModel.LastSettlement = new RunSettlementData(
 				player.CharacterId,
 				result,
 				Mathf.FloorToInt(this.GetModel<RunTimerModel>().ElapsedSeconds),
 				experience.Level,
 				experience.CurrentExperience,
-				0,
+				coins,
 				0);
 			settlementModel.HasSettlement = true;
+			this.GetSystem<ProfileSystem>().AddCoins(coins);
 			this.SendEvent(new RunSettledEvent(settlementModel.LastSettlement));
 		}
 
@@ -31,6 +33,27 @@ namespace HaoFuSurvivor
 
 		protected override void OnInit()
 		{
+		}
+	}
+
+	public readonly struct RunSettlementState
+	{
+		public readonly bool HasSettlement;
+		public readonly RunSettlementData Data;
+
+		public RunSettlementState(bool hasSettlement, RunSettlementData data)
+		{
+			HasSettlement = hasSettlement;
+			Data = data;
+		}
+	}
+
+	public class GetRunSettlementStateQuery : AbstractQuery<RunSettlementState>
+	{
+		protected override RunSettlementState OnDo()
+		{
+			var model = this.GetModel<RunSettlementModel>();
+			return new RunSettlementState(model.HasSettlement, model.LastSettlement);
 		}
 	}
 }

@@ -1,22 +1,11 @@
-﻿/****************************************************************************
- * Copyright (c) 2016 - 2022 liangxiegame UNDER MIT License
- * 
- * https://qframework.cn
- * https://github.com/liangxiegame/QFramework
- * https://gitee.com/liangxiegame/QFramework
- ****************************************************************************/
-
-using UnityEngine;
-
 namespace QFramework
 {
-    public class PlayerPrefsFloatProperty : BindableProperty<float>
+    public class RuntimeFloatProperty : BindableProperty<float>
     {
-        public PlayerPrefsFloatProperty(string saveKey, float defaultValue = 0.0f)
+        public RuntimeFloatProperty(string key, float defaultValue = 0.0f)
         {
-            mValue =  PlayerPrefs.GetFloat(saveKey, defaultValue);
-
-            this.Register(value => PlayerPrefs.SetFloat(saveKey, value));
+            mValue = RuntimeSettingsStorage.GetFloat(key, defaultValue);
+            Register(value => RuntimeSettingsStorage.SetFloat(key, value));
         }
     }
 }

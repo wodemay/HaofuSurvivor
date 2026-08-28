@@ -17,10 +17,16 @@ namespace HaoFuSurvivor
 				.UnRegisterWhenGameObjectDestroyed(gameObject);
 			this.RegisterEvent<RunEndedEvent>(OnRunEnded)
 				.UnRegisterWhenGameObjectDestroyed(gameObject);
+			this.RegisterEvent<UIPopPanelRequestedEvent>(_ => OpenPopPanel())
+				.UnRegisterWhenGameObjectDestroyed(gameObject);
+			this.RegisterEvent<ProfileLoadCompletedEvent>(OnProfileLoadCompleted)
+				.UnRegisterWhenGameObjectDestroyed(gameObject);
+			GameArchitecture.Interface.GetSystem<ProfileSystem>().Initialize();
 		}
 
 		private void Update()
 		{
+			GameArchitecture.Interface.GetSystem<ProfileSystem>().FlushPendingSave();
 			GameArchitecture.Interface.SendCommand(new TickGameLoopCommand(Time.deltaTime));
 		}
 
@@ -43,9 +49,26 @@ namespace HaoFuSurvivor
 				prefabName: UILevelUpPanel.Name);
 		}
 
+		private void OpenPopPanel()
+		{
+			var panel = UIKit.OpenPanel<UIPopPanel>(
+				assetBundleName: "uipoppanel_prefab",
+				prefabName: UIPopPanel.Name);
+			if (panel == null)
+			{
+				GameArchitecture.Interface.GetSystem<UIPopPanelSystem>().AcknowledgeClosed();
+			}
+		}
+
+		private void OnProfileLoadCompleted(ProfileLoadCompletedEvent profileEvent)
+		{
+			if (!profileEvent.RequiresNotice || string.IsNullOrEmpty(profileEvent.Message)) return;
+			GameArchitecture.Interface.SendCommand(new RequestUIPopPanelCommand(
+				new UIPopPanelRequest("存档提示", profileEvent.Message, "确认", string.Empty)));
+		}
+
 		private void OnRunEnded(RunEndedEvent runEndedEvent)
 		{
-			if (runEndedEvent.Phase != RunPhase.Defeat) return;
 			UIKit.ClosePanel<UIGameHUDPanel>();
 			UIKit.ClosePanel<UILevelUpPanel>();
 			UIKit.OpenPanel<UIGameOverPanel>(

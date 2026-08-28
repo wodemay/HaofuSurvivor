@@ -5,11 +5,13 @@ using QFramework;
 
 namespace HaoFuSurvivor
 {
-	// Generate Id:c49d6f43-684d-4399-affe-41ef04df7f9c
+	// Generate Id:d634bdfb-2d80-4f2c-a7aa-921138abf77f
 	public partial class UIGameOverPanel
 	{
 		public const string Name = "UIGameOverPanel";
 		
+		[SerializeField]
+		public UnityEngine.UI.Text Text_Coins;
 		[SerializeField]
 		public UnityEngine.UI.Button Button_Restart;
 		[SerializeField]
@@ -19,6 +21,7 @@ namespace HaoFuSurvivor
 		
 		protected override void ClearUIComponents()
 		{
+			Text_Coins = null;
 			Button_Restart = null;
 			Button_Return = null;
 			

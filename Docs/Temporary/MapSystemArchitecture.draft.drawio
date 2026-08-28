@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="drawio" version="26.0.0">
+  <diagram name="完整地图架构">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1000" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="2" value="运行与存档" style="swimlane;startSize=30;horizontal=1;html=1;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1"><mxGeometry x="40" y="40" width="310" height="230" as="geometry"/></mxCell>
+        <mxCell id="3" value="RunSaveSystem&#xa;Seed / ThemeId / GeneratorVersion" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="2"><mxGeometry x="30" y="60" width="250" height="70" as="geometry"/></mxCell>
+        <mxCell id="4" value="GameLoopSystem&#xa;仅 Active 调度" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="2"><mxGeometry x="30" y="145" width="250" height="55" as="geometry"/></mxCell>
+        <mxCell id="5" value="地图确定性数据" style="swimlane;startSize=30;horizontal=1;html=1;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1"><mxGeometry x="410" y="40" width="360" height="330" as="geometry"/></mxCell>
+        <mxCell id="6" value="WorldMapModel&#xa;Seed / ThemeId / 生成版本" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="5"><mxGeometry x="40" y="55" width="280" height="55" as="geometry"/></mxCell>
+        <mxCell id="7" value="MapChunkGenerationSystem&#xa;地面 + 候选 → ChunkData" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="5"><mxGeometry x="40" y="130" width="280" height="60" as="geometry"/></mxCell>
+        <mxCell id="8" value="MapObstacleTemplateConfig&#xa;形状 / 权重 / 阻挡规则" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="5"><mxGeometry x="40" y="210" width="280" height="55" as="geometry"/></mxCell>
+        <mxCell id="9" value="防封闭校验&#xa;候选投放 / 缓冲区 / Flood Fill" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="5"><mxGeometry x="40" y="280" width="280" height="35" as="geometry"/></mxCell>
+        <mxCell id="10" value="流式表现与物理" style="swimlane;startSize=30;horizontal=1;html=1;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1"><mxGeometry x="830" y="40" width="350" height="330" as="geometry"/></mxCell>
+        <mxCell id="11" value="MapChunkStreamingSystem&#xa;预热、加载、卸载预算" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="10"><mxGeometry x="35" y="55" width="280" height="60" as="geometry"/></mxCell>
+        <mxCell id="12" value="MapChunkFactory / View&#xa;对象池与 Data → Tilemap" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="10"><mxGeometry x="35" y="135" width="280" height="60" as="geometry"/></mxCell>
+        <mxCell id="13" value="Ground / Decoration / MoveBlocker / ProjectileBlocker" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="10"><mxGeometry x="35" y="215" width="280" height="55" as="geometry"/></mxCell>
+        <mxCell id="14" value="导航与外部模块" style="swimlane;startSize=30;horizontal=1;html=1;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1"><mxGeometry x="410" y="440" width="770" height="240" as="geometry"/></mxCell>
+        <mxCell id="15" value="MapNavigationSystem&#xa;共享流场 / 阻挡膨胀" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="14"><mxGeometry x="35" y="65" width="220" height="60" as="geometry"/></mxCell>
+        <mxCell id="16" value="EnemySystem&#xa;采样方向 + 局部避让" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="14"><mxGeometry x="285" y="65" width="200" height="60" as="geometry"/></mxCell>
+        <mxCell id="17" value="ItemSystem / MapEventSystem / WorldGuideSystem&#xa;仅使用世界坐标、ChunkData 查询和事件" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;dashed=1;" vertex="1" parent="14"><mxGeometry x="515" y="65" width="220" height="60" as="geometry"/></mxCell>
+        <mxCell id="18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="3" target="6"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="4" target="11"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="20" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="6" target="7"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="21" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="8" target="7"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="22" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="7" target="11"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="23" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="11" target="12"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="24" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="12" target="13"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="25" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="13" target="15"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="26" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="15" target="16"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="27" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;dashed=1;" edge="1" parent="1" source="6" target="17"><mxGeometry relative="1" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

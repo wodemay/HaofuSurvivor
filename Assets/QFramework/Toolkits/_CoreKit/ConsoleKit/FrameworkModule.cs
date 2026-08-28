@@ -13,7 +13,6 @@ namespace QFramework
 
             if (GUILayout.Button("Clear All Data & Quit"))
             {
-                PlayerPrefs.DeleteAll();
                 Directory.Delete(Application.persistentDataPath, true);
                 Quit();
             }

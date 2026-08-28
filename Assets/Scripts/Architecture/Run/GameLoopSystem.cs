@@ -32,6 +32,8 @@ namespace HaoFuSurvivor
 			RegisterUpdateable(this.GetSystem<PlayerSystem>());
 			RegisterUpdateable(this.GetSystem<RunSaveSystem>());
 			RegisterUpdateable(this.GetSystem<MapSystem>());
+			RegisterUpdateable(this.GetSystem<MapEventSystem>());
+			RegisterUpdateable(this.GetSystem<WorldGuideSystem>());
 			RegisterUpdateable(this.GetSystem<MapNavMeshSystem>());
 			if (this.GetSystem<DodgeSystem>().IsEquipped) RegisterFixedUpdateable(this.GetSystem<DodgeSystem>());
 			RegisterFixedUpdateable(this.GetSystem<PlayerSystem>());

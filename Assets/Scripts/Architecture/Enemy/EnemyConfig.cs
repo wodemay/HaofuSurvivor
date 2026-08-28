@@ -12,6 +12,7 @@ namespace HaoFuSurvivor
 		public List<int> AttackIds = new();
 		public ExperienceDropConfig ExperienceDrop;
 		public int DropTableId;
+		public bool IsBoss;
 		public bool IsPersistent;
 	}
 }

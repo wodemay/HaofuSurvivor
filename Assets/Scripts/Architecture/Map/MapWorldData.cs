@@ -34,6 +34,16 @@ namespace HaoFuSurvivor
 	}
 
 	[Serializable]
+	public class MapBreakableEntityData
+	{
+		public string StableId;
+		public int ConfigId;
+		public int WorldCellX;
+		public int WorldCellY;
+		public bool IsDestroyed;
+	}
+
+	[Serializable]
 	public class MapChunkData
 	{
 		public Vector2Int Coordinate;
@@ -41,5 +51,6 @@ namespace HaoFuSurvivor
 		public List<MapCellFlags> CellFlags = new();
 		public List<MapObstaclePlacementData> Obstacles = new();
 		public List<MapStaticEntityAnchorData> StaticEntityAnchors = new();
+		public List<MapBreakableEntityData> Breakables = new();
 	}
 }

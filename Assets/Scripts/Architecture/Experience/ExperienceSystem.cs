@@ -72,6 +72,12 @@ namespace HaoFuSurvivor
 			if (mDrops.Count > 0 && this.GetSystem<RunTimerSystem>().IsRunning()) this.GetSystem<GameLoopSystem>().RegisterUpdateable(this);
 		}
 
+		public void CaptureAll()
+		{
+			foreach (var drop in mDrops) drop.IsCaptured = true;
+			if (mDrops.Count > 0 && this.GetSystem<RunTimerSystem>().IsRunning()) this.GetSystem<GameLoopSystem>().RegisterUpdateable(this);
+		}
+
 		public void OnRunUpdate(float deltaTime)
 		{
 			var player = this.GetModel<PlayerModel>();

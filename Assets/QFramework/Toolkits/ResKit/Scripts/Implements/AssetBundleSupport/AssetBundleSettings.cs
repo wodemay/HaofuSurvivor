@@ -38,11 +38,11 @@ namespace QFramework
         }
 
         public static List<IResDatas> SubProjectAssetBundleConfigFiles = new List<IResDatas>();
-        
+
         public static bool LoadAssetResFromStreamingAssetsPath
         {
-            get { return PlayerPrefs.GetInt("LoadResFromStreamingAssetsPath", 1) == 1; }
-            set { PlayerPrefs.SetInt("LoadResFromStreamingAssetsPath", value ? 1 : 0); }
+            get { return RuntimeSettingsStorage.GetBool("ResKit.LoadResFromStreamingAssetsPath", true); }
+            set { RuntimeSettingsStorage.SetBool("ResKit.LoadResFromStreamingAssetsPath", value); }
         }
 
 

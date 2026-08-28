@@ -16,6 +16,65 @@ Write C# with tabs, four-space visual width, braces on separate lines, and Pasca
 
 Always unregister QFramework event subscriptions with the owning GameObject lifecycle, for example `.UnRegisterWhenGameObjectDestroyed(gameObject)`.
 
+## Agent 协作与任务 DAG 守则
+
+### Concept Clarification
+
+- 任务 DAG：以子任务为节点、以结果依赖为有向边构成的无环图。节点必须在声明输入满足后可独立执行和验收；有向边表示后继节点依赖前驱节点的明确输出。
+- 可闭环叶子任务：围绕一个主要变更目标和一个独立验收结果，并能由选定 agent 在一次委托中完成全部必要决策、执行和验证的任务。
+- 轻量直接任务：目标与验收明确、无独立结果依赖且并行或上下文隔离无实际收益的任务，由当前 agent 直接完成。
+- 关键工作：任务开始前已在原始计划中定义的工作。旁路工作：为解除关键工作阻塞而临时创建的工作。
+- 调度 agent：接受任务 DAG 的 agent。执行 agent：接受可闭环叶子任务的 agent。
+
+### 任务定义与范围
+
+- 优先按项目文档、CodeGraph、实际代码获取上下文；只有上一层不足时才进入下一层。
+- 需求存在歧义或缺少验收结果时先向用户确认，不得凭未经确认的假设实现。
+- 实现只做满足当前需求且可独立审查的最小完整修改，只修改任务范围内的代码。
+- 除轻量直接任务外，先拆成必要的可闭环叶子任务 DAG；每个非轻量节点在调度前声明目标/非目标、依赖、执行 agent、workspace/访问模式、产物和验收条件，并固定输入 commit。
+- 只有输入已满足、无结果依赖、无写入冲突且共享派生产物可安全并发时才并行调度。
+- 轻量任务若出现多个需协调或隔离的工作单元，立即升级为 DAG。
+- 执行中出现新工作单元、所有权域、公共合同或验收范围不足时，在安全点停止扩大范围，报告 workspace、未提交状态、已完成验证、剩余阻断，由调度 agent 重新拆分；不得提交语义不完整的变更。
+- 调度 agent 只处理会改变 DAG 状态的完成、阻断、复审、审批、用户变更和依赖解锁事件；无状态变化时不重复播报。
+- 执行 agent 只保证任务实现、验收闭环和可审查变更；必须在开始、关键阶段、阻塞和最终验证完成时报告，其他时间不发送心跳。
+- 接受无关任务前先清除上下文。
+
+### 工作区隔离与产物复用
+
+- 并行执行或需要状态隔离时，为每个短期主题分支创建独立 worktree。
+- 实现与审查并行时，reviewer 必须基于不会继续变化的独立 workspace、固定 diff 或 commit。
+- 只有确认输入覆盖源代码、依赖、工具链、配置和目标平台，且产物支持并发访问与失效重建时，才共享缓存、构建物或索引。
+- 禁止多个执行 agent 共用可写 worktree；禁止共享无明确有效性边界、不可安全并发或不可重建的可变产物。
+
+### Codex 实现相关规则
+
+- 执行命令前预估输出量，使用过滤、限定行数和精简参数，避免无关输出占用上下文。
+- 完整读取文件时先用 `shasum -a 256 -- <path>` 记录路径和 SHA-256；只判断是否变化时重新计算并比较 SHA-256，不得重新读取正文。
+- 等待 agent 或长任务时按已声明里程碑和预期时长使用单次长等待，不得连续短轮询。
+- 长时间 `write_stdin` 或 `functions.wait` 等待使用不少于 180 秒；嵌套等待时外层至少多 30 秒。非空交互输入禁止使用长等待。
+
+### 工程实现、验证与变更安全
+
+- 通过二分法和临时诊断打点定位异常。
+- 创建抽象前先搜索并复用仓库已有模式。
+- 可自动检查的规则优先用 lint、CI 和结构测试强制执行。
+- 逐步清理重复、废弃和推测性复杂度，不做大规模重写。
+- 不实现当前不存在的需求，不为未来需求提前引入复杂度。
+- 执行 `git checkout`、`git reset`、`git clean`、覆盖文件或其他可能丢失工作区内容的操作前必须询问用户。
+- 不在功能语义之外加入检查、兜底或持久化副作用；不创建不能解决真实问题的新抽象。
+- 不得为简化代码牺牲正确性、安全性、必要校验或测试。
+
+### Commit 与 PR
+
+- 一个 agent 任务的 commit 只包含单一、完整、可独立验证和审查的目标。
+- 进入版本历史或共享分支的变更必须使用短期主题分支，并通过 PR 合入。
+- 审查结论形成后如果内容发生修改，必须重新审查受影响变更。
+- 超出可靠审查范围的工作按明确依赖拆为连续 commit 或 stacked PR，每段保持可独立审查。
+- commit 或 PR 前必须自审、最小化 diff、移除无关修改并完成相关验证。
+- PR 必须说明目标、非目标、验证结果、已知风险和后续项。
+- 任务未明确授权时，commit、push、创建或更新 PR 前先向用户确认。
+- 禁止直接在共享目标分支提交或绕过 PR 合入；禁止混入无关变更或为减少提交数量扩大审查批量。
+
 ## Testing Guidelines
 
 Place new Unity Test Framework tests under `Tests/` with `Editor/` or `PlayMode/` subfolders. Name test fixtures after the subject and tests as `Method_Condition_ExpectedResult`. Cover Commands, Queries, and Systems without scene dependencies where possible; use Play Mode tests for Unity integration.
@@ -55,7 +114,7 @@ Write all project documentation in the project-root `Docs/` directory, never und
 - Startup flow: `GameStart` initializes ResKit and `GameArchitecture`, then opens `UIMainMenuPanel`. Start enters `UICharacterSelectPanel`; a confirmed choice persists the ID and dispatches `StartSelectedCharacterRunCommand`; the run does not start before confirmation.
 - Directory layout: QFramework business code remains in `Scripts/Architecture/<Module>/`; Unity bridges are split into `Scripts/Game/Bootstrap`, `Camera`, `Combat`, `Player`, and presentation-only `Presentation`. Runtime Configs mirror their owner module: `Character`, `Enemy`, `Player`, `Combat/Attack|Weapon|Skill|Dodge`, `Progression/Experience`, and `Run`. See `Docs/Guides/DirectoryLayout.zh-CN.md` before adding a new script or Config asset.
 - Runtime clock contract: `RunTimelineConfig` at `Resources/Configs/Run/RunTimeline.asset` defines ordered time-point events. `RunTimerSystem` is the only gameplay-time source; `GameLoopSystem` advances it then dispatches only registered `IRunUpdateable` / `IRunFixedUpdateable` Systems while `RunPhase.Active`. `GameStart` is the only gameplay Update/FixedUpdate host. Paused and level-up states dispatch no gameplay ticks. `UIGameHUDPanel` displays elapsed time; future enemy, spawn, and event modules must subscribe to `RunTimelineStageReachedEvent` or query this state.
-- Character selection baseline: `CharacterConfig` ScriptableObject assets under `Resources/Configs/Character/` provide the roles with numeric IDs 1 (survivor), 2 (vanguard), and 3 (scout). `CharacterCatalog` is the QFramework Utility that loads and orders these assets; `CharacterSelectionModel` stores only the selected integer ID, and `CharacterSelectionStorage` persists it with `PlayerPrefs`.
+- Character selection baseline: `CharacterConfig` ScriptableObject assets under `Resources/Configs/Character/` provide the roles with numeric IDs 1 (survivor), 2 (vanguard), and 3 (scout). `CharacterCatalog` is the QFramework Utility that loads and orders these assets; `CharacterSelectionModel` stores only the selected integer ID, and `CharacterSelectionStorage` persists it in `SaveData/selected-character.json` without PlayerPrefs.
 - `CharacterConfig.Id` and `CharacterConfig.SkillGroupId` are directly serialized integer fields. Skill-group ID 0 means no starting skill group; current survivor uses skill group 1, while vanguard and scout remain 0.
 - All `CharacterConfig` columns use direct serialized names without `m` prefixes: `Id`, `DisplayName`, `SkillDescription`, `SkillGroupId`, `Icon`, `PlayerPrefab`, `SortOrder`, `MaxHealth`, `MoveSpeed`, and `AttackPower`.
 - Character load contract: every `CharacterConfig` has a `PlayerPrefab` reference. It is content-only; `PlayerSpawnSystem` instantiates it under PlayerRoot's `CharacterRoot`, removes any legacy `PlayerController`, and PlayerRoot owns runtime Rigidbody2D, CombatEntity and movement. Current mappings are survivor, vanguard and scout placeholder prefabs.
@@ -80,8 +139,62 @@ Write all project documentation in the project-root `Docs/` directory, never und
 - `Scenes/TestUIPanels/TestUICharacterSelectPanel.unity` contains the UI root and `UICharacterSelectPanel`, but no `GameStart`. Run it additively after a boot scene, or add the existing `GameStart` component before using it as a standalone test scene; otherwise `GameArchitecture` is not initialized.
 - Validation baseline: no committed automated tests or build scripts exist. The Git repository uses `main` and has an initial project commit.
 - Git/PR workflow decision (2026-08-06): after every agent push, check whether an open PR exists from the pushed branch to `main`; create one when absent and report its URL, otherwise verify that the existing PR contains the pushed commit. The user performs review and merge on GitHub; do not merge without explicit authorization.
+- Production pipeline decision (2026-08-24): all new features follow `Docs/DevelopmentPipeline.zh-CN.md`: requirements and design confirmation, bounded task decomposition, user-owned resource/UI preparation, QFramework implementation, focused review, local diff/build validation, Unity manual verification, PR/CI review, merge/release, and AGENTS change logging. Core modules must block only their own required flow; optional capabilities must fail isolated. “打个包” means a runnable GitHub Release build, not a source archive.
+- Project master-plan decision (2026-08-24): `Docs/ProjectMasterPlan.zh-CN.md` is the authoritative functional outline. It maps gameplay modules, implementation ownership, dependencies, persistence boundaries, milestones, and completion criteria; feature work must identify its module, upstream dependencies, pause behavior, snapshot fields, and milestone before entering the production pipeline.
 
 ### Change Log
+
+- 2026-08-28 | 修复地图事件完成后指示箭头不消失：`WorldGuideSystem` 每次更新先将现有视图标记为待回收，再从当前事件查询结果移除仍有效的 ID；事件完成后从 `MapEventSystem` 查询中移除时，旧箭头会在下一次更新销毁。待执行编译和 Unity 控制台验证。
+
+- 2026-08-28 | 修复地图事件指示箭头卡顿：`WorldGuideItemView` 改为每帧依据最新相机位置重新计算屏幕边缘目标，使用固定执行顺序让 `CameraFollow` 先于箭头视图更新，并改用指数插值/更高旋转响应速度；箭头在事件进入屏幕内时仅隐藏渲染器而不禁用 GameObject，避免重新出现时失去更新。`WorldGuideSystem` 只同步事件世界坐标和距离缩放。待执行编译和 Unity 控制台验证。
+
+- 2026-08-28 | 撤销本轮误改的 Sorting Layer、Prefab 序列化层级和运行时自动映射；层级归属由管理员在 WorldRoot 子节点及其渲染配置中手动维护。当前仅确认特效挂载位置：地面火焰使用 `GroundEffectRoot`，爆炸特效使用 `CombatEffectRoot`，火球/子弹使用 `ProjectileRoot`，不再由代码强制修改 Sorting Layer。
+
+- 2026-08-28 | 修复武器特效覆盖敌人和玩家：补齐九层 Sorting Layer，新增 WorldRootSlot 到 Sorting Layer 的统一运行时映射；区域特效、投射物、拾取物、可破坏物、敌人、玩家、地图事件和世界指示器实例化时自动应用所属层；地图 Tilemap 在区块配置时强制使用背景/装饰层。修改 `ProjectSettings/TagManager.asset`、`Scripts/Game/Presentation/WorldRootLocator.cs` 及相关工厂/生成系统；待执行编译和 Unity 控制台验证。
+
+- 2026-08-28 | 按管理员要求取消地图事件运行时动态挂载：`MapEventSystem` 现在要求 `EventPrefab` 预先挂载 `MapEventEntityView`、`MapEventTriggerView` 和 `CircleCollider2D`，缺失时跳过事件并记录错误；两个 View 仅配置现有组件，不再 `AddComponent`。Unity MCP Console 0 错误/警告，`git diff --check` 通过，dotnet 编译 0 错误。
+
+- 2026-08-28 | 接入用户创建的 `Art/Prefabs/Map/Events/MapEventRoot.prefab`：新增 `MapEventEntityView`，自动绑定 `ProgressCanvas/Image_Progress` 的 UI `Image.fillAmount`，并由 `MapEventConfig.EventPrefab` 配置引用；事件运行时优先实例化该实体，自动添加圆形 Trigger。Unity MCP 刷新后 Console 0 错误/警告，`git diff --check` 通过，dotnet 编译 0 错误。
+
+- 2026-08-28 | 实现地图事件本体第一版：新增无渲染 `MapEventTriggerView`，运行时创建无碰撞圆形 Trigger；玩家进入并持续停留达到 `MapEventConfig.HoldDurationSeconds` 后完成事件，通过现有 `PickupSystem` 按临时 `TemporaryRewardDropTableId` 生成一次奖励。事件退出区域会重置倒计时，完成或 Boss 出现时移除 Trigger；保存/恢复 `HoldElapsed`。Unity MCP 刷新后 Console 0 错误/警告，`git diff --check` 通过，dotnet 编译 0 错误；奖励配置后续需独立化。
+
+- 2026-08-27 | 重构地图事件生成：移除按区块生成逻辑，改为按 `MapThemeConfig.MapEventSpawnIntervalSeconds` 定时逐个随机生成；生成位置避开障碍物、玩家近距离和已有事件。`EnemySystem` 发布 Boss 生成事件并提供活动 Boss 查询，`MapEventSystem` 在 Boss 出现时立即清除未完成事件并暂停生成；事件完成后从运行态移除，未完成事件及生成计时/序号写入 `RunSaveData` 并在继续游戏时恢复。Unity MCP Console 0 错误/警告，`git diff --check` 通过，dotnet 编译 0 错误；保留既有程序集版本警告。
+
+- 2026-08-27 | 优化地图事件指引：确认 `WorldGuideSystem` 仅从 `MapEventSystem` 查询事件，不将可摧毁物加入指引目标；`WorldGuideItemView` 改为缓存目标位置、旋转和缩放并在 `LateUpdate` 平滑跟随，避免与相机 `LateUpdate` 错帧造成箭头跳动。Unity MCP 刷新后 Console 0 错误/警告，`git diff --check` 通过，dotnet 编译 0 错误；保留既有程序集版本警告。
+
+- 2026-08-27 | 接入金币经济闭环第一版：新增 `CoinEconomyConfig/Catalog`、`RunEconomyModel/System`，统计普通击杀与 Boss 击杀，按配置计算存活时间、胜利和无尽轮次奖励；`RunSettlementSystem` 结算后将金币并入 Profile；`RunSaveData/RunSaveSystem` 保存和恢复局内金币及统计；HUD、主菜单和结算面板统一显示 `金币数：`。新增 `EnemyConfig.IsBoss` 并标记 Boss 配置；结算乘法使用 `long` 后再转 BigCoin，避免计数溢出。Unity MCP 刷新后 Console 0 错误，`git diff --check` 通过，dotnet 编译 0 错误；无尽轮次与掉落道具仍待后续任务。
+
+- 2026-08-26 | 按用户提供的新守则新增“Agent 协作与任务 DAG 守则”章节，固化上下文优先级、需求澄清、任务拆解、worktree 隔离、固定 commit 审查、输出控制、长任务等待、变更安全和 commit/PR 授权边界。未修改运行时代码、资源或场景。
+
+- 2026-08-26 | 更新临时设计文档 `Docs/Temporary/GoldEconomyAndDestructibleObjects.draft.zh-CN.md`：补充 ProfileCoin/RunCoin 存档结构、BigCoin 大数规则、Profile 加载迁移、损坏备份恢复、异步原子保存、AES/HMAC 加密、通用弹窗队列和保存失败处理；仍未修改代码、Prefab、场景或正式 Docs 索引。
+
+- 2026-08-25 | 新增临时设计文档 `Docs/Temporary/GoldEconomyAndDestructibleObjects.draft.zh-CN.md`，记录已确认的 RunCoin/ProfileCoin 分层、结算规则、普通/Boss/无尽模式金币逻辑、可破坏物体生成与通用索敌、功能性掉落和全场经验吸附方案；未修改代码、Prefab、场景或正式 Docs 索引。
+
+- 2026-08-24 | 新增正式项目总纲 `Docs/ProjectMasterPlan.zh-CN.md`，基于当前实际模块重新整理完整游戏闭环、功能清单、实现方式、模块依赖、存档恢复顺序、开发里程碑和完成定义；未修改运行时代码、Prefab 或场景。已重新生成 27 篇 Docs 查看器分片并完成新增路径审查。
+
+- 2026-08-24 | 新增正式生产管线 `Docs/DevelopmentPipeline.zh-CN.md`，统一需求登记、设计确认、任务拆解、资源准备、QFramework 实现、Unity 接入、代码审查、编译验证、手动验证、PR/CI、Release 和回归记录流程；同步纳入核心/可选能力隔离、禁止新增 PlayerPrefs、游戏根目录持久化、UI/Prefab 所有权及冲突处理规则。未修改运行时代码、Prefab 或场景；已重新生成 Docs 查看器并完成新增路径审查，未执行 Unity/Play Mode 验证。
+
+- 2026-08-24 | 完成 QFramework 设置文件重构验证：`RuntimeSettingsStorage` 将 AudioKit、LocaleKit、ResKit 设置持久化到 `Settings/qframework-settings.json`，仅使用游戏根目录 ASCII 路径；代码扫描无 PlayerPrefs API。聚焦审查、`git diff --check`、Docs Viewer 生成和完整 `dotnet build Assembly-CSharp.csproj --no-restore --disable-build-servers /m:1 /p:UseSharedCompilation=false /p:BuildInParallel=false /nr:false` 均通过，0 错误；保留 5 组既有 QFramework/Unity/MCP 警告。Unity MCP/Play Mode 未执行。
+
+- 2026-08-24 | 重构 QFramework 设置持久化：新增 `RuntimeSettingsStorage`，将 AudioKit 音频开关/音量、LocaleKit 语言索引和 ResKit AssetBundle 读取开关写入游戏根目录 `Settings/qframework-settings.json`；不恢复 PlayerPrefs。更新 `RunSave.zh-CN.md` 与 `GameLogic.zh-CN.md`。聚焦审查和路径边界检查进行中。
+
+- 2026-08-24 | 完全移除项目运行链路中的 PlayerPrefs：`CharacterSelectionStorage` 和 `RunSaveStorage` 不再读取旧键或执行迁移；QFramework AudioKit 设置改为仅运行时内存属性，ResKit 的 AssetBundle 读取开关改为运行时属性，LocaleKit 语言选择改为进程内状态，ConsoleKit 清理按钮不再调用 PlayerPrefs。保留原有脚本路径以维持 Unity 工程引用和 GUID，文件内容已无 PlayerPrefs API。`rg` 代码扫描无命中，聚焦审查、`git diff --check` 和 dotnet 编译通过；编译保留第三方既有警告。
+
+- 2026-08-24 | 收紧运行时存储路径：`GameStoragePath.TryGetPath` 现在拒绝非 ASCII 安装根目录和非 ASCII 相对路径；存档、角色选择数据与游戏日志在中文路径下不再生成文件，仅输出一次安装路径警告。更新 `CharacterSelectionStorage`、`RunSaveStorage`、`GameLogSystem` 与 `Docs/Guides/RunSave.zh-CN.md`。聚焦审查通过；`git diff --check` 通过；`dotnet build Assembly-CSharp.csproj --no-restore --disable-build-servers /m:1 /p:UseSharedCompilation=false /p:BuildInParallel=false /nr:false` 通过，0 错误，保留 2 组既有 MCP 程序集版本警告。Unity MCP/Play Mode 未执行。
+
+- 2026-08-24 | 为 `GameStoragePath.GetPath` 增加安全相对路径校验：拒绝绝对路径、`.`/`..` 路径段、控制字符和非 ASCII 字符，确保项目运行时主动生成的存档、日志等路径不会引入中文目录或路径穿越。应用安装根目录本身的中文名称仍属于外部环境，程序不自动搬迁。
+
+- 2026-08-24 | 按 Windows 本地存储策略修复 `CharacterSelectionStorage` 的旧 PlayerPrefs 迁移：只有 JSON 成功写入游戏根目录 `SaveData/selected-character.json` 后才删除旧键；新增 `.gitignore` 的 `/SaveData/`，避免本机存档进入仓库。项目业务代码仅保留旧 PlayerPrefs 迁移，ResKit 热更新缓存、Unity 原生日志和崩溃报告仍属于暂时保留的系统/第三方路径。
+
+- 2026-08-24 | 完成运行时存储审查：项目业务存档和自定义日志已写入游戏根目录 `SaveData/`、`Logs/`；发现 QFramework AudioKit/LocaleKit、ResKit 热更新资源仍可能使用 PlayerPrefs 或 `Application.persistentDataPath`，Unity 原生 `Player.log`/崩溃报告也仍由系统路径管理。另发现角色选择旧 PlayerPrefs 迁移在文件写入失败时仍会删除旧键，暂未修改，需单独修复后再宣称所有数据都位于游戏目录。
+
+- 2026-08-24 | 同步正式 Docs：补充文件存档与日志路径、统一 Tick 完整链路与 0.05 秒单帧上限、地图区块/障碍/Flood Fill/NavMesh/九层 WorldRoot、通用属性/自然回血/角色专属升级、Weapon 进化退役和对象池恢复；新增 `Guides/MapSystem.zh-CN.md` 与 `Guides/Progression.zh-CN.md`。修正脚本索引为实际 `Game/Bootstrap/GameStart.cs`、地图脚本和 `WorldRootSlot` 路径，移除不存在的渲染脚本引用；临时文档仍排除，尚未提交或推送。
+
+- 2026-08-24 | 新增未提交临时交接文档 `Docs/Temporary/RunTimingSystemReference.draft.zh-CN.md`，整理 `GameStart -> Command -> GameLoopSystem -> RunTimerSystem -> IRunUpdateable/IRunFixedUpdateable` 链路、RunPhase 暂停边界、时间线、接入规则和禁止项，供其他对话参考；不进入正式 Docs 阅读器。
+
+- 2026-08-24 | 强化文件存储失败处理：`GameLogSystem` 无法创建日志文件时只降级为 Unity 警告，不阻断启动；运行存档写入、清理和角色选择写入增加异常保护，避免权限问题导致对局崩溃。新脚本临时加入生成项目完成真实编译后已移除临时项目项，最终 0 错误，既有 MCP 程序集警告保留。
+
+- 2026-08-24 | 将运行存档与角色选择从 PlayerPrefs 注册表迁移到游戏根目录的 `SaveData/active-run.json` 与 `SaveData/selected-character.json`；新增 `GameStoragePath` 统一解析 Windows、macOS 和编辑器路径，并新增 `GameLogSystem` 将 `Debug.Log`、Warning、Error 写入根目录 `Logs/game.log`。首次读取会迁移旧注册表键并删除成功迁移的旧数据。新增路径与日志系统通过串行 `dotnet build`（0 错误，既有 MCP 程序集警告）和 `git diff --check`。
 
 - 2026-08-24 | 地图流式加载优化已提交为 `56de610` 并推送到 PR #23（https://github.com/wodemay/HaofuSurvivor/pull/23）。静态审查与 Unity 编译验证通过；标签 `v0.1.2` 触发 Windows 构建成功，GitHub Release 已发布：https://github.com/wodemay/HaofuSurvivor/releases/tag/v0.1.2 。成品下载：https://github.com/wodemay/HaofuSurvivor/releases/download/v0.1.2/HaofuSurvivor-Windows-v0.1.2.zip 。后续用户所说“打个包”默认执行 GitHub Releases 成品构建。
 
@@ -433,3 +546,22 @@ Write all project documentation in the project-root `Docs/` directory, never und
 - 2026-08-24 | Verified the NavMesh type-resolution fix after Unity regenerated `Assembly-CSharp.csproj`: `dotnet build Assembly-CSharp.csproj --no-restore --disable-build-servers /p:UseSharedCompilation=false` passed with 0 errors; only the two existing MCP assembly-version warning groups remain. `git diff --check` passed.
 - 2026-08-24 | Reduced map-generation stalls by replacing synchronous `NavMeshSurface.BuildNavMesh()` with asynchronous initial/build-update operations, retaining the previous valid NavMesh during incremental chunk updates. `MapSystem` now batches load/unload dirty notifications per update instead of notifying once per chunk. Focused review pending; validation follows.
 - 2026-08-24 | Reviewed the async map-navigation change for stale NavMesh reuse, dirty-version races, reset lifecycle, and chunk pooling. `dotnet build Assembly-CSharp.csproj --no-restore --disable-build-servers /m:1 /p:UseSharedCompilation=false` passed with 0 errors and only the existing two MCP assembly-version warning groups; `git diff --check` passed.
+- 2026-08-26 | Added the standalone immutable `BigCoin` value type at `Scripts/Architecture/Save/BigCoin.cs`: 256-digit segmented decimal arithmetic, strict parsing, non-negative spending, Chinese-unit/scientific display formatting, and no framework or UI integration yet. Focused review completed; `git diff --check` passed and `dotnet build Assembly-CSharp.csproj --no-restore --disable-build-servers /m:1 /p:UseSharedCompilation=false /p:BuildInParallel=false /nr:false` passed with 0 errors. Existing System.Net.Http/System.IO.Compression reference warnings remain.
+- 2026-08-26 | 新增通用弹窗系统：`UIPopPanelSystem` 维护 FIFO 请求队列，局内阶段暂不显示，退出或结束对局后继续处理；`UIPopPanel` 接入标题、内容、确认、取消绑定和回调，新增请求与完成 Commands，并由 `GameStart` 桥接 `UIPopPanel` AssetBundle。未修改用户创建的 Prefab、场景层级或 Designer 绑定。Unity MCP Console 无错误；刷新 Unity 后 `dotnet build Assembly-CSharp.csproj --no-restore --disable-build-servers /m:1 /p:UseSharedCompilation=false /p:BuildInParallel=false /nr:false` 通过，保留既有程序集版本警告。尚未提交、推送或创建 PR。
+- 2026-08-27 | 按临时细节清单完成 Profile 生命周期基础闭环：新增 `ProfileModel`、`ProfileData`、`ProfileStorage`、`ProfileSystem`、读写 Commands/Query 和加载事件；Profile 使用游戏目录 `SaveData/profile.json` 与 `.bak`，启动时加载或创建零金币默认档，损坏/高版本结果通过 `UIPopPanel` 提示，金币变更进入待保存状态。`SaveFileStorage` 增加加载结果分类，`GameStart` 在架构初始化后加载 Profile 并刷新待保存数据。未修改用户 UI 层级或 Prefab。当前 Unity MCP Console 无错误，dotnet 编译 0 错误；仅保留既有程序集版本警告。尚未提交、推送或创建 PR。
+- 2026-08-27 | 收紧 Profile 保存失败边界：默认档首次保存失败现在会提示玩家，后台待保存状态最多自动重试三次；修正 `SaveFileStorage` 在主档损坏且备份为高版本时的加载结果分类。Unity MCP Console、`git diff --check` 和 dotnet 编译均通过，0 错误；既有程序集版本警告保留。
+- 2026-08-26 | 新增临时细节确认清单 `Docs/Temporary/ProjectDetailQuestions.draft.zh-CN.md`，整理存档加密、Profile 生命周期、快照恢复、金币经济、无尽模式、道具、地图事件、升级候选池和模块隔离的未闭环细节，并确定后续逐项询问顺序。未修改运行时代码、Prefab、场景或正式 Docs。
+- 2026-08-26 | 根据单机项目决策取消 SaveCrypto 加密方案：Profile 与局内快照改为明文 UTF-8 JSON，仅保留结构/字段校验、版本迁移、`.bak` 备份和原子替换。同步更新两个临时设计文档；未修改运行时代码、Prefab、场景或正式 Docs。
+- 2026-08-26 | 确认存档主文件与备份同时损坏时的处理：分别保留为带时间戳的 `.corrupt-*` 文件，将时间、文件类型、失败阶段、错误分类、简短原因和新档创建结果写入游戏目录 `Logs/save-recovery.log`，提示玩家后进入主菜单。同步临时设计文档，未修改运行时代码。
+- 2026-08-26 | 确认高版本存档策略：`SaveVersion` 高于当前程序版本时拒绝读取，不标记损坏、不创建空存档，保留原文件并停留在主菜单；同步临时设计文档，未修改运行时代码。
+- 2026-08-26 | 将 `Docs/Temporary/ProjectDetailQuestions.draft.zh-CN.md` 改为“问题 + 建议方案”清单，覆盖存档恢复、Profile、快照、金币、无尽、道具、地图事件、升级候选和模块隔离，后续由管理员集中指出需修改的条目。未修改运行时代码。
+- 2026-08-26 | 确认无尽模式敌人数量、生命、速度和伤害不设置设计上限，改用分段持续增长曲线，避免成型后挂机刷金币；仅保留 NaN、Infinity 和数值溢出安全检测。同步两份临时设计文档，未修改运行时代码。
+- 2026-08-26 | 确认地图事件指示器规则：所有未完成事件同时显示，允许重叠；距离越远尺寸越小但受最小尺寸限制；视觉结构固定为箭头底图加事件 Icon。同步临时细节清单，未修改运行时代码。
+- 2026-08-26 | 管理员确认细节清单中的其余方案作为当前实现基线；具体经济数值和性能阈值允许在测试后调整，不再作为架构实现阻塞。临时文档中的“建议方案”统一改为“当前基线方案”。
+- 2026-08-26 | 实现存档基础层：新增 `SaveFileStorage`，提供明文 UTF-8 JSON 校验、`.tmp` 原子写入、旧文件 `.bak` 备份、损坏文件 `.corrupt-时间戳` 保留、备份恢复、高版本拒绝读取和 `Logs/save-recovery.log` 记录；`RunSaveStorage` 接入该层并新增 `RunSaveData.SaveVersion`，清理时同时删除主档、备份和临时文件。Unity MCP 刷新后 Console 无错误，`git diff --check` 通过，dotnet 编译 0 错误；既有程序集冲突警告保留。Profile 尚未接入。
+- 2026-08-26 | 补全存档基础层边界：高版本主档/备份拒绝读取时写入恢复日志；读取旧版 `RunSaveData` 后自动保存当前版本。Unity MCP Console、`git diff --check` 和 dotnet 编译再次通过，0 错误。
+- 2026-08-27 | 实现任务6第一段可破坏物基础链路：新增 `BreakableObjectConfig/Catalog/System`、运行时对象池和 `BreakableObjectView`；地图按世界种子在每区块少量生成，避开障碍物、出生保护区和最小间距；可破坏物注册为 Enemy 阵营进入通用索敌，受到三点生命值伤害后销毁并写入地图快照。`RunSaveData` 保存已销毁稳定 ID，重载区块不会重新生成。Unity MCP Console 无错误，`git diff --check` 与 dotnet build 通过；掉落表和道具效果留待任务6第二段。
+- 2026-08-27 | 修正可破坏物受击规则：每次有效攻击固定计数 1 次，不按伤害值扣除；默认累计 3 次攻击后销毁，避免普通高伤武器一击摧毁。
+- 2026-08-27 | 修复掉落表未加载：`DropTable_Default.asset` 的 `m_Script` GUID 与 `DropTableConfig.cs.meta` 不一致，Unity 将资源识别为 `Unknown`，导致可破坏物销毁事件无法生成掉落。已改为正确 GUID；Unity 重新识别为 `HaoFuSurvivor.DropTableConfig`，Console 0 错误/警告，dotnet build 0 错误，`git diff --check` 通过。
+- 2026-08-27 | 实现地图事件第一版：新增 `MapEventConfig/Catalog/System`、`MapEventChangedEvent`、`WorldGuideSystem` 和 `WorldGuideItemView`；默认主题接入区域击杀事件配置，每区块生成一个固定世界坐标事件，玩家进入半径后统计区域内敌人击杀，完成后停止指引；事件状态、进度和完成状态写入 `RunSaveData` 并在继续游戏时恢复。使用用户创建的 `UIWorldGuideItem.prefab`（SpriteRenderer 子节点 `Image_Arrow`/`Image_Icon`）显示屏幕边缘箭头，距离越远缩放越小并受最小值限制。Unity 资源类型识别正常，Console 0 错误/警告，dotnet build 0 错误，`git diff --check` 通过；奖励领取和地图事件奖励内容仍未实现。
+- 2026-08-27 | 修正地图事件击杀判定时序：`MapEventSystem` 在收到 `EnemyDiedEvent` 时直接读取玩家当前位置，不再依赖上一帧缓存的 `IsActive`，避免玩家刚进入事件范围时漏记击杀；重新编译 0 错误，`git diff --check` 通过。

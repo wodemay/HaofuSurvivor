@@ -48,6 +48,7 @@ namespace HaoFuSurvivor
 			var experience = this.GetModel<ExperienceModel>();
 			var timer = this.GetModel<RunTimerModel>();
 			var world = this.GetModel<WorldMapModel>();
+			var economy = this.GetModel<RunEconomyModel>();
 			var data = new RunSaveData
 			{
 				HasMapSnapshot = world.HasWorld,
@@ -58,6 +59,10 @@ namespace HaoFuSurvivor
 				RandomStateJson = JsonUtility.ToJson(Random.state),
 				CharacterId = player.CharacterId,
 				ElapsedSeconds = timer.ElapsedSeconds,
+				RunCoin = economy.RunCoin.ToString(),
+				NormalKillCount = economy.NormalKillCount,
+				BossKillCount = economy.BossKillCount,
+				EndlessRound = economy.EndlessRound,
 				CurrentStageIndex = timer.CurrentStageIndex,
 				CurrentHealth = player.CurrentHealth,
 				PositionX = player.Position.x,
@@ -76,6 +81,8 @@ namespace HaoFuSurvivor
 				DodgeDirectionY = this.GetModel<DodgeModel>().Runtime?.Direction.y ?? 0f,
 				DodgeIsActive = this.GetModel<DodgeModel>().Runtime?.IsActive ?? false,
 				EnemySpawnElapsed = this.GetSystem<EnemySystem>().GetSpawnElapsed(),
+				MapEventSpawnElapsed = this.GetSystem<MapEventSystem>().GetSpawnElapsed(),
+				MapEventSpawnIndex = this.GetSystem<MapEventSystem>().GetSpawnIndex(),
 				CharacterPerkRuntime = this.GetSystem<CharacterExclusivePerkSystem>().GetRuntimeSaveData()
 			};
 			data.StatUpgrades.AddRange(this.GetModel<PlayerStatUpgradeModel>().GetSaveData());
@@ -88,6 +95,9 @@ namespace HaoFuSurvivor
 			data.GroundFlames.AddRange(this.GetSystem<ExplosiveAreaSystem>().GetGroundFlameSaveData());
 			data.TimedEffects.AddRange(this.GetSystem<ExplosiveAreaSystem>().GetTimedEffectSaveData());
 			data.Barrages.AddRange(this.GetSystem<BarrageProjectileSystem>().GetSaveData());
+			data.Breakables.AddRange(this.GetSystem<MapSystem>().GetBreakableSaveData());
+			data.MapEvents.AddRange(this.GetSystem<MapEventSystem>().GetSaveData());
+			data.Pickups.AddRange(this.GetSystem<PickupSystem>().GetSaveData());
 			data.AttackCooldowns.AddRange(this.GetSystem<AttackSystem>().GetPlayerCooldownSaveData(player.RuntimeRoot));
 
 			foreach (var skill in this.GetModel<PlayerLoadoutModel>().Skills)
@@ -120,9 +130,13 @@ namespace HaoFuSurvivor
 			var player = this.GetModel<PlayerModel>();
 			player.Position = new Vector2(data.PositionX, data.PositionY);
 			if (player.RuntimeRoot != null) player.RuntimeRoot.transform.position = player.Position;
+			this.GetSystem<MapSystem>().RestoreBreakables(data.Breakables);
 			if (data.HasMapSnapshot && !this.GetSystem<MapSystem>().TryRestoreWorld(data.WorldSeed, data.MapThemeId, data.MapGeneratorVersion)) return false;
+			this.GetSystem<MapEventSystem>().Restore(data.MapEvents, data.MapEventSpawnElapsed, data.MapEventSpawnIndex);
 			var timer = this.GetModel<RunTimerModel>();
 			var experience = this.GetModel<ExperienceModel>();
+			if (!BigCoin.TryParse(string.IsNullOrEmpty(data.RunCoin) ? "0" : data.RunCoin, out var runCoin)) return false;
+			this.GetSystem<RunEconomySystem>().Restore(runCoin, data.NormalKillCount, data.BossKillCount, data.EndlessRound);
 			player.CurrentHealth = Mathf.Max(0f, data.CurrentHealth);
 			player.DamageInvulnerabilityRemaining = Mathf.Max(0f, data.DamageInvulnerabilityRemaining);
 			player.DodgeInvulnerabilityRemaining = Mathf.Max(0f, data.DodgeInvulnerabilityRemaining);
@@ -161,6 +175,7 @@ namespace HaoFuSurvivor
 			this.GetSystem<ExplosiveAreaSystem>().RestoreGroundFlames(data.GroundFlames);
 			this.GetSystem<ExplosiveAreaSystem>().RestoreTimedEffects(data.TimedEffects);
 			this.GetSystem<BarrageProjectileSystem>().Restore(data.Barrages, player.RuntimeRoot);
+			this.GetSystem<PickupSystem>().Restore(data.Pickups);
 			this.GetSystem<AttackSystem>().RestorePlayerCooldowns(player.RuntimeRoot, data.AttackCooldowns);
 			RestoreRandomState(data.RandomStateJson);
 			this.SendEvent(new PlayerHealthRestoredEvent());

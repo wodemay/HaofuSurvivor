@@ -26,6 +26,8 @@ namespace HaoFuSurvivor
 		
 		protected override void OnShow()
 		{
+			var settlement = this.SendQuery(new GetRunSettlementStateQuery());
+			Text_Coins.text = $"金币数：{settlement.Data.Coins?.ToDisplayString() ?? "0"}";
 		}
 		
 		protected override void OnHide()

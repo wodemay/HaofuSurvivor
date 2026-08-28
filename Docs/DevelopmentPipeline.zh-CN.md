@@ -1,0 +1,213 @@
+# ProjectSurvivor 固定生产管线
+
+本文定义 ProjectSurvivor 从需求提出到版本发布的固定流程。它负责规定“如何交付功能”，不替代 `DevelopmentRoadmap.zh-CN.md` 的路线规划，也不重复 `GameArchitecture.zh-CN.md` 的代码架构细节。
+
+## 一、管线总览
+
+每个功能按以下顺序推进：
+
+1. 需求登记
+2. 设计确认
+3. 任务拆解
+4. 资源与配置准备
+5. 代码实现
+6. Unity 接入
+7. 代码审查
+8. 编译与静态验证
+9. Unity 手动验证
+10. 提交、推送与 PR
+11. 合并与版本发布
+12. 变更记录与回归
+
+任何阶段出现未解决的设计歧义、资源缺失、编译错误或验证失败，都必须停在当前阶段，不得把未完成状态当作完成交付。
+
+## 二、阶段标准
+
+### 1. 需求登记
+
+记录功能目标、玩家可见行为、使用场景、明确不做的内容和优先级。
+
+必须先判断该功能属于：
+
+- 核心模块：缺失时会阻止游戏启动或破坏主循环，例如运行时间、玩家生成、战斗基础链路。
+- 可选能力：缺失时只关闭局部功能，主流程仍可运行，例如特殊攻击、角色专属升级、地图事件。
+
+可选能力必须具备失败隔离：配置缺失、Prefab 缺失或初始化失败时，应记录错误并跳过该能力，不得让整局游戏无法启动，除非需求明确要求其为核心模块。
+
+### 2. 设计确认
+
+先形成简短设计说明，再开始写代码。说明至少包含：
+
+- 状态归属：哪个 Model 保存数据。
+- 行为归属：哪个 System 执行逻辑。
+- 外部入口：哪个 Controller、UI 或输入 Command 触发。
+- 读取方式：需要哪些 Query。
+- 通知方式：需要哪些 Event。
+- 时间依赖：是否注册 `IRunUpdateable` 或 `IRunFixedUpdateable`。
+- 暂停行为：暂停、升级选择、死亡、结算时是否停止。
+- 对象生命周期：创建、启用、禁用、池回收、跨场景处理。
+- 快照字段：是否需要保存和恢复。
+- 资源清单：配置、Prefab、场景节点、动画、音效和 UI 绑定。
+
+涉及多个阶段或存在数值设计的功能，必须先向管理员逐项确认；未确认前只讨论，不实现。
+
+### 3. 任务拆解
+
+将功能拆成可独立验证的小任务。每个任务必须写出：
+
+- 目标和范围。
+- 修改脚本与新增脚本。
+- 需要管理员创建的资源或场景结构。
+- 验收条件。
+- 明确不包含的后续任务。
+
+推荐顺序为“数据契约 → 核心逻辑 → Unity 桥接 → 资源接入 → UI 接入 → 保存恢复 → 性能优化”。一次只实现当前任务，不提前混入后续任务。
+
+### 4. 资源与配置准备
+
+静态数据统一放在 `Assets/Resources/Configs/`，并按所属模块分类。配置使用 ScriptableObject 和整数 ID；运行时状态不得回写配置资产。
+
+管理员负责创建或修改：
+
+- UI 面板、控件层级、Prefab 层级和 QFramework Bind。
+- 角色与敌人的内容 Prefab、动画、贴图、特效和音效。
+- 场景中的 Root、Container、Tilemap、Sorting Layer 和碰撞组件。
+
+代码负责验证引用是否存在、ID 是否有效、层级名称是否符合契约；不得静默创建会隐藏配置错误的替代资源。
+
+所有持久化业务数据优先写入游戏根目录下的 ASCII 路径，例如 `SaveData/`、`Settings/`、`Logs/`。禁止新增 `PlayerPrefs`；不得生成中文路径。
+
+### 5. 代码实现
+
+遵循 QFramework 依赖方向：
+
+`Controller/View → Command → System → Model/Utility`
+
+- Model 只保存状态。
+- System 负责业务行为和生命周期。
+- Command 负责改变状态或发起动作。
+- Query 只读数据。
+- Event 只表达跨模块通知。
+- Unity MonoBehaviour 只做输入、碰撞、渲染和生命周期桥接。
+
+所有随游戏时间变化的逻辑必须通过 `GameLoopSystem` 注册 Tick；不得在功能脚本中自行使用未受暂停控制的 Update、FixedUpdate、`Time.unscaledDeltaTime` 或 `Time.fixedUnscaledDeltaTime`。
+
+对象池对象在 `OnEnable`、`OnDisable` 和跨场景重建时都必须清理并重新注册运行时状态，不能重复添加组件或保留已销毁引用。
+
+### 6. Unity 接入
+
+接入顺序固定为：
+
+1. 导入并检查配置资产。
+2. 检查 Prefab 必需节点、组件、Layer 和 Sorting Layer。
+3. 检查场景 Root/Container 是否存在且名称正确。
+4. 检查 QFramework Bind 是否由管理员生成且未失效。
+5. 进入 Play Mode 验证初始化、运行、暂停、重开、返回和销毁流程。
+
+如果需要新建或重构 UI、Prefab 层级或场景结构，代码实现必须停在资源准备阶段，等待管理员完成编辑后再继续。
+
+### 7. 代码审查
+
+代码完成后、编译前必须进行 focused review，至少检查：
+
+- 编译错误、缺失引用和命名空间问题。
+- QFramework 边界是否被绕过。
+- 核心模块和可选能力是否隔离。
+- 空引用、失效配置、重复注册和对象池泄漏。
+- 暂停、重开、返回、死亡和跨场景生命周期。
+- 快照保存与恢复的一致性。
+- 是否意外修改 UI、Prefab、场景或无关文件。
+- 是否出现中文路径、PlayerPrefs 或未经授权的全局状态。
+
+发现问题必须先修复，再进入验证阶段。
+
+### 8. 编译与静态验证
+
+提交前至少执行：
+
+```powershell
+git diff --check
+dotnet build Assembly-CSharp.csproj --no-restore --disable-build-servers /m:1 /p:UseSharedCompilation=false /p:BuildInParallel=false /nr:false
+```
+
+Unity 资源文件还要检查空字段和尾随空格。Unity MCP 可用时查询 Console；不可用时必须明确标记为“未完成 Unity Console/Play Mode 验证”，不能用本地 C# 编译替代 Unity 验证。
+
+### 9. Unity 手动验证
+
+管理员负责最终 Play Mode 验证。功能验证至少覆盖：
+
+- 正常首次启动。
+- 暂停与恢复。
+- 升级选择和取消路径。
+- 玩家死亡、结算、重开、返回。
+- 场景切换和继续游戏（如果功能涉及存档）。
+- 对象池复用和长时间运行。
+- 缺少可选配置时主流程仍能运行。
+
+管理员未报告 Bug 不代表代码自动通过了未执行的 Unity 验证；交付记录必须区分“代码验证通过”和“Unity 手动验证通过”。
+
+### 10. 提交、推送与 PR
+
+提交保持单一目的，使用命令式、带范围的提交信息，例如：
+
+```text
+feat(map): add obstacle streaming
+fix(run): restore saved player state
+docs(pipeline): define production workflow
+```
+
+推送前确认工作区中没有误纳入的用户改动。推送后：
+
+1. 检查目标分支和现有 PR。
+2. 没有 PR 时创建 PR；已有 PR 时确认新提交已进入该 PR。
+3. 检查所有 CI 状态。
+4. CI 失败时读取完整日志，修复根因并重新执行本地审查和编译。
+5. GitHub 报冲突时同步 `origin/main`，解决全部冲突标记，保留双方有效逻辑，再重复验证。
+
+管理员负责 GitHub 页面审核和合并；未经明确授权不得代为合并。
+
+### 11. 合并与版本发布
+
+合并前必须满足：
+
+- PR 描述包含行为变化、受影响脚本/配置/场景、验证结果和已知限制。
+- 必需 CI 通过。
+- 无未解决冲突和未处理审查意见。
+- 代码、配置、Prefab、场景和文档已经同步。
+
+用户说“打个包”时，默认执行 GitHub Release 成品包流程，而不是上传源码压缩包。Release 应包含可直接运行的 Unity 构建产物，并注明平台、版本号、提交号和已知问题。
+
+### 12. 变更记录与回归
+
+每次代理执行了代码、资源、配置、架构或验证状态变更，都要在 `Assets/AGENTS.md` 的 `Change Log` 追加一条简短记录，包含日期、变化、原因、验证和未完成事项。
+
+正式文档写入项目根目录 `Docs/`；新增或修改 Markdown 后运行：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\Tools\GenerateDocsViewer.ps1
+```
+
+生成的 `Docs/docs-data.js` 和 `Docs/docs-content/` 必须与 Markdown 一起审查。临时方案放在 `Docs/Temporary/`，不进入正式文档索引，也不提交 GitHub，除非管理员明确要求。
+
+## 三、功能完成定义
+
+一个功能只有同时满足以下条件才算完成：
+
+- 需求范围和不做项已确认。
+- 设计、配置、代码、Prefab、场景和文档已同步。
+- focused review 无未解决问题。
+- `git diff --check` 和 C# 编译无新增错误。
+- Unity 手动验证已完成，或明确记录为待验证。
+- 暂停、重开、返回、对象池和存档影响已评估。
+- PR 已创建并通过必需检查。
+- `AGENTS.md` 已追加变更记录。
+
+## 四、禁止事项
+
+- 未确认设计就直接实现跨模块功能。
+- 用临时替代资源掩盖缺失配置。
+- 在 MonoBehaviour 中堆积核心业务逻辑。
+- 使用 PlayerPrefs 保存新的业务数据。
+- 未审查就提交、推送或声称功能完成。
+- 用源码压缩包冒充可运行 Release。
+- 为解决冲突直接丢弃主分支或功能分支逻辑。

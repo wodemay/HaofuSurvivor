@@ -6,12 +6,17 @@ namespace HaoFuSurvivor
 	[Serializable]
 	public class RunSaveData
 	{
+		public int SaveVersion;
 		public int CharacterId;
 		public bool HasMapSnapshot;
 		public int WorldSeed;
 		public int MapThemeId;
 		public int MapGeneratorVersion;
 		public float ElapsedSeconds;
+		public string RunCoin = "0";
+		public int NormalKillCount;
+		public int BossKillCount;
+		public int EndlessRound;
 		public int CurrentStageIndex;
 		public float CurrentHealth;
 		public float PositionX;
@@ -46,6 +51,11 @@ namespace HaoFuSurvivor
 		public List<TimedEffectSaveData> TimedEffects = new();
 		public List<BarrageSaveData> Barrages = new();
 		public List<AttackCooldownSaveData> AttackCooldowns = new();
+		public List<BreakableSaveData> Breakables = new();
+		public List<MapEventSaveData> MapEvents = new();
+		public float MapEventSpawnElapsed;
+		public int MapEventSpawnIndex;
+		public List<PickupSaveData> Pickups = new();
 	}
 
 	[Serializable] public class StatUpgradeSaveData { public int UpgradeId; public int Level; }
@@ -59,6 +69,9 @@ namespace HaoFuSurvivor
 	[Serializable] public class TimedEffectSaveData { public int AttackId; public float PositionX; public float PositionY; public float RemainingDuration; }
 	[Serializable] public class BarrageSaveData { public int AttackId; public int OwnerFaction; public float Damage; public bool IsUltimate; public float DurationRemaining; public float TimeUntilNextProjectile; public float OrbitAngle; }
 	[Serializable] public class AttackCooldownSaveData { public int RuntimeId; public int AttackId; public float CooldownRemaining; }
+	[Serializable] public class BreakableSaveData { public string StableId; public bool IsDestroyed; }
+	[Serializable] public class MapEventSaveData { public string StableId; public int ConfigId; public float PositionX; public float PositionY; public int Progress; public float HoldElapsed; public bool IsCompleted; }
+	[Serializable] public class PickupSaveData { public int TableId; public int EntryId; public float PositionX; public float PositionY; public bool IsCaptured; public float AbsorbSpeed; }
 
 	[Serializable]
 	public class SkillSaveData
