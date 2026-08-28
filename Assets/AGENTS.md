@@ -144,6 +144,8 @@ Write all project documentation in the project-root `Docs/` directory, never und
 
 ### Change Log
 
+- 2026-08-28 | 将当前进度保存、金币经济、掉落、可破坏物、地图事件、世界指示器和弹窗等已完成改动提交为 `72cc7b4` 并推送；已创建 PR #24（https://github.com/wodemay/HaofuSurvivor/pull/24）。本地 `Mac/` 构建目录未纳入提交；等待 GitHub CI 和管理员手动验证。
+
 - 2026-08-28 | 修复地图事件完成后指示箭头不消失：`WorldGuideSystem` 每次更新先将现有视图标记为待回收，再从当前事件查询结果移除仍有效的 ID；事件完成后从 `MapEventSystem` 查询中移除时，旧箭头会在下一次更新销毁。待执行编译和 Unity 控制台验证。
 
 - 2026-08-28 | 修复地图事件指示箭头卡顿：`WorldGuideItemView` 改为每帧依据最新相机位置重新计算屏幕边缘目标，使用固定执行顺序让 `CameraFollow` 先于箭头视图更新，并改用指数插值/更高旋转响应速度；箭头在事件进入屏幕内时仅隐藏渲染器而不禁用 GameObject，避免重新出现时失去更新。`WorldGuideSystem` 只同步事件世界坐标和距离缩放。待执行编译和 Unity 控制台验证。
