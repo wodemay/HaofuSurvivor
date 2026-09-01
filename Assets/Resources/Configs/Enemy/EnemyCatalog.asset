@@ -1,10 +1,17 @@
-%YAML 1.1
+﻿%YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1c85a5d2137e10f41b327a13055cb9be, type: 3}
   m_Name: EnemyCatalog
+  m_EditorClassIdentifier:
   Enemies:
   - {fileID: 11400000, guid: 14fd2b04d1234c63be061c59d2fdc826, type: 2}
   - {fileID: 11400000, guid: 9b2e6f3760d249d6a672aeb1f35179cb, type: 2}
@@ -17,3 +24,5 @@ MonoBehaviour:
   MaxEnemiesPerWave: 6
   MaxAliveEnemies: 200
   ViewportPadding: 0.12
+  BossSpawnTimeSeconds: 1800
+  BossIds: 04000000

@@ -153,6 +153,7 @@ namespace HaoFuSurvivor
 
 		protected override void OnInit()
 		{
+			this.RegisterEvent<BossDefeatedEvent>(_ => EndWithVictory());
 		}
 	}
 }

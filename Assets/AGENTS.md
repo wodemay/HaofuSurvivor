@@ -144,6 +144,11 @@ Write all project documentation in the project-root `Docs/` directory, never und
 
 ### Change Log
 
+- 2026-09-01 | 接入管理员在 `UIGameHUDPanel` 中新增的 `Slider_BossHP`：HUD 通过 `GetBossHealthStateQuery` 读取 Boss 当前/最大生命值，Boss 出现或受伤时刷新比例，Boss 死亡后隐藏；继续游戏恢复 Boss 时调整出现事件顺序，确保生命值恢复后再刷新血条。dotnet 编译通过（0 错误，保留既有依赖版本警告）；Unity MCP 当前无可用 Editor 会话，未执行运行时验证。
+- 2026-09-01 | 补充 HUD 在重新显示时主动刷新 Boss 血条，覆盖面板重开或恢复流程中的已有 Boss 状态。dotnet 编译通过；Unity MCP 当前仍无可用 Editor 会话。
+
+- 2026-09-01 | 完成 Boss 与通用结算第一版：EnemyCatalog 在 1800 秒触发 Boss，停止普通敌人生成并通过 MapNavMeshSystem 选择可行走位置；Boss 配置设为持久实体，避免离开导航窗口后被回收；Boss 击败发布 `BossDefeatedEvent` 并立即结束胜利流程。新增普通/Boss 击杀统计和 `UIRunSettlementPanel` 结算显示，胜利/失败共用面板，结算后清除局内快照。dotnet 编译通过（0 错误，保留既有依赖版本警告）；Unity MCP 当前无可用 Editor 会话，未能执行 Console/Play Mode 验证。
+
 - 2026-08-28 | 合并 `origin/main` 到 PR #24 分支并解决地图、敌人、运行循环、存档和配置冲突；保留主分支的敌人恢复/地图区块卸载与导航修复，同时保留本分支的金币、可破坏物、地图事件、掉落物和 Profile 存档功能。待完成编译、差异检查和 CI 复核。
 
 - 2026-08-28 | 冲突解决后的 `rg` 标记扫描、`git diff --check` 和 `dotnet build Assembly-CSharp.csproj --no-restore --disable-build-servers /m:1 /p:UseSharedCompilation=false /p:BuildInParallel=false /nr:false` 均通过；PR #24 静态审查通过，Unity 编译检查仍在 GitHub 运行中。未跟踪的本地 `Mac/` 构建目录未纳入提交。

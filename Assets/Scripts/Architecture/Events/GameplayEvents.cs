@@ -136,6 +136,10 @@ namespace HaoFuSurvivor
 		}
 	}
 
+	public readonly struct BossDefeatedEvent
+	{
+	}
+
 	public struct RunEconomyChangedEvent
 	{
 		public readonly RunEconomyState State;

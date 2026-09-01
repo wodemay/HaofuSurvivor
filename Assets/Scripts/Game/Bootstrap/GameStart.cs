@@ -71,9 +71,9 @@ namespace HaoFuSurvivor
 		{
 			UIKit.ClosePanel<UIGameHUDPanel>();
 			UIKit.ClosePanel<UILevelUpPanel>();
-			UIKit.OpenPanel<UIGameOverPanel>(
-				assetBundleName: "uigameoverpanel_prefab",
-				prefabName: UIGameOverPanel.Name);
+			UIKit.OpenPanel<UIRunSettlementPanel>(
+				assetBundleName: "uirunsettlementpanel_prefab",
+				prefabName: UIRunSettlementPanel.Name);
 		}
 
 		private void Start()

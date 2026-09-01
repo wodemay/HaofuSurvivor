@@ -67,7 +67,11 @@ namespace HaoFuSurvivor
 		private void OnEnemyDied(EnemyDiedEvent enemyDiedEvent)
 		{
 			var model = this.GetModel<RunEconomyModel>();
-			if (enemyDiedEvent.IsBoss) model.BossKillCount++;
+			if (enemyDiedEvent.IsBoss)
+			{
+				model.BossKillCount++;
+				this.SendEvent(new BossDefeatedEvent());
+			}
 			else model.NormalKillCount++;
 			PublishChanged();
 		}
