@@ -29,12 +29,12 @@ namespace HaoFuSurvivor
 			if (!settlement.HasSettlement) return;
 			var data = settlement.Data;
 			var victory = data.Result == RunPhase.Victory;
-			Text_Title.text = victory ? "鑳滃埄" : "澶辫触";
-			Text_Result.text = victory ? "Boss 宸茶鍑昏触" : "鏈眬鎸戞垬缁撴潫";
-			Text_Time.text = $"瀛樻椿鏃堕棿锛歿data.SurvivalSeconds / 60:00}:{data.SurvivalSeconds % 60:00}";
-			Text_Kills.text = $"鏅€氬嚮鏉€锛歿data.NormalKillCount}";
-			Text_BossKills.text = $"Boss 鍑绘潃锛歿data.BossKillCount}";
-			Text_Coin.text = $"閲戝竵鏁帮細{data.Coins?.ToDisplayString() ?? "0"}";
+			Text_Title.text = victory ? "胜利" : "失败";
+			Text_Result.text = victory ? "Boss 已被击败" : "本局挑战结束";
+			Text_Time.text = $"存活时间：{data.SurvivalSeconds / 60:00}:{data.SurvivalSeconds % 60:00}";
+			Text_Kills.text = $"普通击杀：{data.NormalKillCount}";
+			Text_BossKills.text = $"Boss 击杀：{data.BossKillCount}";
+			Text_Coin.text = $"金币数：{data.Coins?.ToDisplayString() ?? "0"}";
 		}
 
 		protected override void OnHide()

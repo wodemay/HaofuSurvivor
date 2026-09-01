@@ -143,6 +143,7 @@ Write all project documentation in the project-root `Docs/` directory, never und
 - Project master-plan decision (2026-08-24): `Docs/ProjectMasterPlan.zh-CN.md` is the authoritative functional outline. It maps gameplay modules, implementation ownership, dependencies, persistence boundaries, milestones, and completion criteria; feature work must identify its module, upstream dependencies, pause behavior, snapshot fields, and milestone before entering the production pipeline.
 
 ### Change Log
+- 2026-09-01 | 根据 GitHub `v0.1.5` 构建完整日志修复 `UIRunSettlementPanel.cs` 中被破坏的插值括号和中文字符串；失败原因是 CS8086，非 Unity 许可证问题。待本地编译通过后重新推送并触发 Release。
 - 2026-09-01 | 修正 GitHub Unity Windows Release 工作流：将 `game-ci/unity-builder@v4` 已移除的 `buildPath` 改为 `buildsPath`，用于恢复 `v0.1.4` 可运行包构建。上一次构建因参数不兼容失败，待修复提交推送后重新触发。
 
 - 2026-09-01 | 接入管理员在 `UIGameHUDPanel` 中新增的 `Slider_BossHP`：HUD 通过 `GetBossHealthStateQuery` 读取 Boss 当前/最大生命值，Boss 出现或受伤时刷新比例，Boss 死亡后隐藏；继续游戏恢复 Boss 时调整出现事件顺序，确保生命值恢复后再刷新血条。dotnet 编译通过（0 错误，保留既有依赖版本警告）；Unity MCP 当前无可用 Editor 会话，未执行运行时验证。
