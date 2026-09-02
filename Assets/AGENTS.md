@@ -143,6 +143,8 @@ Write all project documentation in the project-root `Docs/` directory, never und
 - Project master-plan decision (2026-08-24): `Docs/ProjectMasterPlan.zh-CN.md` is the authoritative functional outline. It maps gameplay modules, implementation ownership, dependencies, persistence boundaries, milestones, and completion criteria; feature work must identify its module, upstream dependencies, pause behavior, snapshot fields, and milestone before entering the production pipeline.
 
 ### Change Log
+- 2026-09-02 | PR #25 冲突合并提交 `800fd6a` 已推送，PR 状态 CLEAN；Static review 与 Unity compile validation 全部通过。基于该提交创建并推送标签 `v0.1.7`，GitHub Unity Windows Build 成功，Release 已发布可运行 Windows 压缩包；本地 `Mac/` 目录仍未跟踪。
+
 - 2026-09-02 | 解决 PR #25 与 `origin/main` 的冲突：保留 Boss 持久化、恢复生命值后发送生成事件、Boss 击杀统计/结算数据、Boss 血条绑定与刷新逻辑，同时保留主分支敌人生成回收和 HUD 变更。冲突标记扫描、`git diff --check`、dotnet 编译均通过（0 错误；保留既有程序集版本警告）。本地 `Mac/` 构建目录未纳入提交。
 
 - 2026-09-01 | PR #25 已推送修复提交 `761e9b7`；修正 Unity Builder `buildsPath` 参数和结算面板插值编译错误。GitHub CI 的 Static review、Unity compile validation、Unity Windows Build 均通过；Release `v0.1.6` 已发布可运行 Windows 包。
