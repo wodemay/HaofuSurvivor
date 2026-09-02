@@ -13,5 +13,7 @@ namespace HaoFuSurvivor
 		public int MaxEnemiesPerWave=6; 
 		public int MaxAliveEnemies=200; 
 		public float ViewportPadding=.12f;
+		public float BossSpawnTimeSeconds=1800f;
+		public List<int> BossIds=new();
 	} 
 }

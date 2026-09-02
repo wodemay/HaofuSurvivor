@@ -13,6 +13,7 @@ namespace HaoFuSurvivor
 			var player = this.GetModel<PlayerModel>();
 			var experience = this.GetModel<ExperienceModel>();
 			var coins = this.GetSystem<RunEconomySystem>().CalculateSettlementCoins(result, Mathf.FloorToInt(this.GetModel<RunTimerModel>().ElapsedSeconds));
+			var economy = this.GetModel<RunEconomyModel>();
 			settlementModel.LastSettlement = new RunSettlementData(
 				player.CharacterId,
 				result,
@@ -20,7 +21,9 @@ namespace HaoFuSurvivor
 				experience.Level,
 				experience.CurrentExperience,
 				coins,
-				0);
+				0,
+				economy.NormalKillCount,
+				economy.BossKillCount);
 			settlementModel.HasSettlement = true;
 			this.GetSystem<ProfileSystem>().AddCoins(coins);
 			this.SendEvent(new RunSettledEvent(settlementModel.LastSettlement));

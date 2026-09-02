@@ -22,8 +22,15 @@ namespace HaoFuSurvivor
 				.UnRegisterWhenGameObjectDestroyed(gameObject);
 			this.RegisterEvent<RunEconomyChangedEvent>(OnRunEconomyChanged)
 				.UnRegisterWhenGameObjectDestroyed(gameObject);
+			this.RegisterEvent<EnemySpawnedEvent>(_ => RefreshBossHealth())
+				.UnRegisterWhenGameObjectDestroyed(gameObject);
+			this.RegisterEvent<EnemyDamagedEvent>(_ => RefreshBossHealth())
+				.UnRegisterWhenGameObjectDestroyed(gameObject);
+			this.RegisterEvent<EnemyDiedEvent>(OnEnemyDied)
+				.UnRegisterWhenGameObjectDestroyed(gameObject);
 			RefreshTime();
 			RefreshRunCoin();
+			RefreshBossHealth();
 		}
 		
 		protected override void OnOpen(IUIData uiData = null)
@@ -32,6 +39,7 @@ namespace HaoFuSurvivor
 		
 		protected override void OnShow()
 		{
+			RefreshBossHealth();
 		}
 		
 		protected override void OnHide()
@@ -93,6 +101,21 @@ namespace HaoFuSurvivor
 		{
 			var economy = this.SendQuery(new GetRunEconomyStateQuery());
 			Text_RunCoin.text = $"金币数：{economy.RunCoin.ToDisplayString()}";
+		}
+
+		private void OnEnemyDied(EnemyDiedEvent enemyDiedEvent)
+		{
+			if (enemyDiedEvent.IsBoss) Slider_BossHP.gameObject.SetActive(false);
+		}
+
+		private void RefreshBossHealth()
+		{
+			var state = this.SendQuery(new GetBossHealthStateQuery());
+			Slider_BossHP.gameObject.SetActive(state.IsActive);
+			if (!state.IsActive) return;
+			Slider_BossHP.minValue = 0f;
+			Slider_BossHP.maxValue = 1f;
+			Slider_BossHP.SetValueWithoutNotify(Mathf.Clamp01(state.CurrentHealth / Mathf.Max(0.01f, state.MaxHealth)));
 		}
 
 		private static string FormatTime(int seconds)

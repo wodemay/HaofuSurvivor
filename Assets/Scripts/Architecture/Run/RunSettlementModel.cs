@@ -9,8 +9,10 @@ namespace HaoFuSurvivor
 		public readonly float RunExperience;
 		public readonly BigCoin Coins;
 		public readonly int MetaExperience;
+		public readonly int NormalKillCount;
+		public readonly int BossKillCount;
 
-		public RunSettlementData(int characterId, RunPhase result, int survivalSeconds, int level, float runExperience, BigCoin coins, int metaExperience)
+		public RunSettlementData(int characterId, RunPhase result, int survivalSeconds, int level, float runExperience, BigCoin coins, int metaExperience, int normalKillCount, int bossKillCount)
 		{
 			CharacterId = characterId;
 			Result = result;
@@ -19,6 +21,8 @@ namespace HaoFuSurvivor
 			RunExperience = runExperience;
 			Coins = coins;
 			MetaExperience = metaExperience;
+			NormalKillCount = normalKillCount;
+			BossKillCount = bossKillCount;
 		}
 	}
 

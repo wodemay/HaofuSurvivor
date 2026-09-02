@@ -34,7 +34,7 @@ jobs:
           unityVersion: 2022.3.62f3
           targetPlatform: StandaloneWindows64
           buildMethod: HaoFuSurvivor.Editor.ProjectBuild.BuildWindows
-          buildPath: Build/StandaloneWindows64/HaofuSurvivor.exe
+          buildsPath: Build/StandaloneWindows64
 
       - name: Upload Windows package
         uses: actions/upload-artifact@v4

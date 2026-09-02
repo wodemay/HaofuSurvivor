@@ -15,6 +15,7 @@ namespace HaoFuSurvivor
 		private const float DefaultBodyRadius = 0.5f;
 		private const int SeparationIterations = 2;
 		private float mSpawnElapsed;
+		private bool mBossSpawned;
 		public void Reset()
 		{
 			var navigation = this.GetSystem<MapNavMeshSystem>();
@@ -26,7 +27,7 @@ namespace HaoFuSurvivor
 				EnemyFactory.Instance.Release(enemy);
 			}
 			EnemyFactory.Instance.ReleaseAllActive();
-			mEnemies.Clear(); mMoveSpeeds.Clear(); mBodyRadii.Clear(); mMoveEnemies.Clear(); mNextPositions.Clear(); mSpawnElapsed = 0f; this.GetModel<EnemyModel>().AliveCount = 0;
+			mEnemies.Clear(); mMoveSpeeds.Clear(); mBodyRadii.Clear(); mMoveEnemies.Clear(); mNextPositions.Clear(); mSpawnElapsed = 0f; mBossSpawned = false; this.GetModel<EnemyModel>().AliveCount = 0;
 		}
 
 		public void Release(Transform enemy)
@@ -74,9 +75,10 @@ namespace HaoFuSurvivor
 					mEnemies.Add(enemy);
 					mMoveSpeeds[enemy] = Mathf.Max(0f, entry.MoveSpeed);
 					mBodyRadii[enemy] = GetBodyRadius(enemy);
-					if (config.IsBoss) this.SendEvent(new EnemySpawnedEvent(true));
+					if (config.IsBoss) mBossSpawned = true;
 					this.GetSystem<EnemyHealthSystem>().RestoreCurrentHealth(enemy.GetComponent<CombatEntity>(), entry.CurrentHealth);
 					this.GetSystem<AttackSystem>().RestoreCooldowns(enemy.gameObject, entry.AttackCooldowns);
+					if (config.IsBoss) this.SendEvent(new EnemySpawnedEvent(true));
 				}
 			mSpawnElapsed = Mathf.Max(0f, spawnElapsed);
 			this.GetModel<EnemyModel>().AliveCount = mEnemies.Count;
@@ -89,18 +91,72 @@ namespace HaoFuSurvivor
 				if (enemy != null && EnemyFactory.Instance.GetConfig(enemy)?.IsBoss == true) return true;
 			return false;
 		}
+		public BossHealthState GetBossHealthState()
+		{
+			foreach (var enemy in mEnemies)
+			{
+				var config = EnemyFactory.Instance.GetConfig(enemy);
+				if (enemy == null || config == null || !config.IsBoss) continue;
+				var entity = enemy.GetComponent<CombatEntity>();
+				var maxHealth = Mathf.Max(1f, config.BaseHealth * this.GetModel<RunTimerModel>().EnemyHealthMultiplier);
+				return new BossHealthState(true, this.GetSystem<EnemyHealthSystem>().GetCurrentHealth(entity), maxHealth);
+			}
+			return default;
+		}
 		public void OnRunFixedUpdate(float deltaTime)
 		{
 			var player = this.GetModel<PlayerModel>();
 			var catalog = this.GetUtility<EnemyCatalog>();
+			var timer = this.GetModel<RunTimerModel>();
 			var stageIndex = this.GetModel<RunTimerModel>().CurrentStageIndex;
 			if (!player.IsRegistered || player.IsDead || catalog.Config == null) return;
 			var ids = this.GetUtility<RunTimelineCatalog>().Config.Stages[Mathf.Max(0, stageIndex)].EnemyIds;
-			if (ids.Count == 0) return;
 			if (!this.GetSystem<MapNavMeshSystem>().IsReady) return;
 			RecycleOutsideNavigationWindow();
+			if (timer.ElapsedSeconds >= Mathf.Max(0f, catalog.Config.BossSpawnTimeSeconds))
+			{
+				if (!mBossSpawned) TrySpawnBoss(catalog, deltaTime);
+				Move(player.Position, deltaTime);
+				return;
+			}
+			if (ids.Count == 0) return;
 			Spawn(catalog, ids, deltaTime);
 			Move(player.Position, deltaTime);
+		}
+		private void TrySpawnBoss(EnemyCatalog catalog, float deltaTime)
+		{
+			var bossIds = catalog.Config.BossIds;
+			if (bossIds == null || bossIds.Count == 0)
+			{
+				bossIds = new List<int>();
+				foreach (var config in catalog.Config.Enemies)
+					if (config != null && config.IsBoss) bossIds.Add(config.Id);
+			}
+			if (bossIds.Count == 0) return;
+			var navigation = this.GetSystem<MapNavMeshSystem>();
+			var playerPosition = this.GetModel<PlayerModel>().Position;
+			for (var attempt = 0; attempt < 24; attempt++)
+			{
+				if (!navigation.TryFindSpawnPosition(playerPosition, catalog.Config.ViewportPadding, DefaultBodyRadius, out var spawnPosition)) continue;
+				var bossConfig = catalog.Get(bossIds[Random.Range(0, bossIds.Count)]);
+				if (bossConfig == null || !bossConfig.IsBoss) continue;
+				var boss = EnemyFactory.Instance.Create(bossConfig, spawnPosition);
+				if (boss == null || !navigation.IsWalkable(boss.position, GetBodyRadius(boss)))
+				{
+					if (boss != null)
+					{
+						this.GetSystem<EnemyHealthSystem>().Unregister(boss.GetComponent<CombatEntity>());
+						EnemyFactory.Instance.Release(boss);
+					}
+					continue;
+				}
+				mEnemies.Add(boss);
+				mMoveSpeeds[boss] = bossConfig.MoveSpeed;
+				mBodyRadii[boss] = GetBodyRadius(boss);
+				mBossSpawned = true;
+				this.SendEvent(new EnemySpawnedEvent(true));
+				return;
+			}
 		}
 		private void Spawn(EnemyCatalog catalog, List<int> ids, float deltaTime)
 		{
@@ -288,5 +344,24 @@ namespace HaoFuSurvivor
 			return new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
 		}
 		protected override void OnInit() { }
+	}
+
+	public readonly struct BossHealthState
+	{
+		public readonly bool IsActive;
+		public readonly float CurrentHealth;
+		public readonly float MaxHealth;
+
+		public BossHealthState(bool isActive, float currentHealth, float maxHealth)
+		{
+			IsActive = isActive;
+			CurrentHealth = currentHealth;
+			MaxHealth = maxHealth;
+		}
+	}
+
+	public class GetBossHealthStateQuery : AbstractQuery<BossHealthState>
+	{
+		protected override BossHealthState OnDo() => this.GetSystem<EnemySystem>().GetBossHealthState();
 	}
 }
