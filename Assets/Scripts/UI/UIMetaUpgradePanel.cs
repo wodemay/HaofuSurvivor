@@ -20,20 +20,20 @@ namespace HaoFuSurvivor
 			this.RegisterEvent<MetaUpgradeChangedEvent>(_ => Refresh())
 				.UnRegisterWhenGameObjectDestroyed(gameObject);
 		}
-		
+
 		protected override void OnOpen(IUIData uiData = null)
 		{
 			Refresh();
 		}
-		
+
 		protected override void OnShow()
 		{
 		}
-		
+
 		protected override void OnHide()
 		{
 		}
-		
+
 		protected override void OnClose()
 		{
 			Button_Back.onClick.RemoveListener(BackToMainMenu);

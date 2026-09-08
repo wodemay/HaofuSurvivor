@@ -9,7 +9,7 @@ namespace HaoFuSurvivor
 	public partial class UIMetaUpgradePanel
 	{
 		public const string Name = "UIMetaUpgradePanel";
-		
+
 		[SerializeField]
 		public UnityEngine.GameObject Content;
 		[SerializeField]
@@ -18,19 +18,19 @@ namespace HaoFuSurvivor
 		public UnityEngine.UI.Button Button_Back;
 		[SerializeField]
 		public UnityEngine.UI.Text Text_Coin;
-		
+
 		private UIMetaUpgradePanelData mPrivateData = null;
-		
+
 		protected override void ClearUIComponents()
 		{
 			Content = null;
 			UpgradeItem = null;
 			Button_Back = null;
 			Text_Coin = null;
-			
+
 			mData = null;
 		}
-		
+
 		public UIMetaUpgradePanelData Data
 		{
 			get
@@ -38,7 +38,7 @@ namespace HaoFuSurvivor
 				return mData;
 			}
 		}
-		
+
 		UIMetaUpgradePanelData mData
 		{
 			get
