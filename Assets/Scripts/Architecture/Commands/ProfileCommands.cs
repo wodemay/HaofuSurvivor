@@ -32,6 +32,21 @@ namespace HaoFuSurvivor
 		}
 	}
 
+	public class UpgradeMetaUpgradeCommand : AbstractCommand
+	{
+		private readonly int mUpgradeId;
+
+		public UpgradeMetaUpgradeCommand(int upgradeId)
+		{
+			mUpgradeId = upgradeId;
+		}
+
+		protected override void OnExecute()
+		{
+			this.GetSystem<MetaUpgradeSystem>().TryUpgrade(mUpgradeId);
+		}
+	}
+
 	public class AddRunCoinsCommand : AbstractCommand
 	{
 		private readonly BigCoin mAmount;

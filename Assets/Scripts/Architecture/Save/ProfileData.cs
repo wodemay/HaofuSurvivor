@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace HaoFuSurvivor
 {
@@ -7,5 +8,13 @@ namespace HaoFuSurvivor
 	{
 		public int SaveVersion;
 		public string ProfileCoin = "0";
+		public List<MetaUpgradeSaveData> MetaUpgrades = new();
+	}
+
+	[Serializable]
+	public class MetaUpgradeSaveData
+	{
+		public int UpgradeId;
+		public int Level;
 	}
 }

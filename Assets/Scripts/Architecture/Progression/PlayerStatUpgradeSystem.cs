@@ -51,12 +51,14 @@ namespace HaoFuSurvivor
 		private void Recalculate()
 		{
 			var stats = this.GetModel<PlayerStatModel>();
-			stats.AttackDamageMultiplier = 1f + GetTotalPercent(PlayerStatUpgradeType.AttackDamage);
+			var meta = this.GetSystem<MetaUpgradeSystem>();
+			stats.MaxHealth = stats.BaseMaxHealth * (1f + meta.GetTotalPercent(MetaUpgradeType.MaxHealth));
+			stats.AttackDamageMultiplier = (1f + GetTotalPercent(PlayerStatUpgradeType.AttackDamage)) * meta.GetAttackDamageMultiplier();
 			stats.CooldownMultiplier = Mathf.Max(0.01f, 1f - GetTotalPercent(PlayerStatUpgradeType.CooldownReduction));
 			stats.ExperienceMultiplier = 1f + GetTotalPercent(PlayerStatUpgradeType.ExperienceMultiplier);
 			stats.RecoveryEfficiencyMultiplier = 1f + GetTotalPercent(PlayerStatUpgradeType.RecoveryEfficiency);
 			stats.NaturalHealthRegenerationRatio = GetTotalPercent(PlayerStatUpgradeType.NaturalHealthRegeneration);
-			stats.MoveSpeed = stats.BaseMoveSpeed * (1f + GetTotalPercent(PlayerStatUpgradeType.MoveSpeed));
+			stats.MoveSpeed = stats.BaseMoveSpeed * (1f + GetTotalPercent(PlayerStatUpgradeType.MoveSpeed) + meta.GetTotalPercent(MetaUpgradeType.MoveSpeed));
 			stats.ExperienceAbsorbRadius = stats.BaseExperienceAbsorbRadius * (1f + GetTotalPercent(PlayerStatUpgradeType.ExperienceAbsorbRadius));
 		}
 

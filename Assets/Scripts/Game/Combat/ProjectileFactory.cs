@@ -27,6 +27,7 @@ namespace HaoFuSurvivor
 			var projectile = Get(parameters);
 			if (projectile == null) return;
 			projectile.gameObject.SetActive(true);
+			ApplySortingOrder(projectile.gameObject);
 			projectile.ConfigureParameters(parameters);
 			projectile.Launch(position, direction, ownerFaction, damage, moveSpeed, parameters.Lifetime, pierce);
 			GameArchitecture.Interface.GetSystem<ProjectileSystem>().Register(projectile);
@@ -37,6 +38,7 @@ namespace HaoFuSurvivor
 			var projectile = Get(parameters);
 			if (projectile == null || data == null) return;
 			projectile.gameObject.SetActive(true);
+			ApplySortingOrder(projectile.gameObject);
 			projectile.ConfigureParameters(parameters);
 			projectile.Restore(data);
 			GameArchitecture.Interface.GetSystem<ProjectileSystem>().Register(projectile);
@@ -95,6 +97,11 @@ namespace HaoFuSurvivor
 		private static Transform GetContainer()
 		{
 			return WorldRootLocator.Get(WorldRootSlot.Projectile);
+		}
+
+		private static void ApplySortingOrder(GameObject projectile)
+		{
+			foreach (var renderer in projectile.GetComponentsInChildren<Renderer>(true)) renderer.sortingOrder = -10;
 		}
 
 		private void PruneDestroyedProjectiles()

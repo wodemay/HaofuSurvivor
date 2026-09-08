@@ -23,12 +23,12 @@ namespace HaoFuSurvivor
 			playerModel.Position = initialPosition;
 			playerModel.RuntimeRoot = runtimeRoot;
 			mRigidbody = runtimeRoot.GetComponent<Rigidbody2D>();
-			playerModel.CurrentHealth = statModel.MaxHealth;
 			playerModel.DamageInvulnerabilityRemaining = 0f;
 			playerModel.DodgeInvulnerabilityRemaining = 0f;
 			playerModel.IsDead = false;
 			playerModel.IsRegistered = true;
 			this.GetSystem<PlayerStatUpgradeSystem>().Reset();
+			playerModel.CurrentHealth = statModel.MaxHealth;
 		}
 
 		public void Unregister(GameObject runtimeRoot)

@@ -21,4 +21,16 @@ namespace HaoFuSurvivor
 			Coins = coins;
 		}
 	}
+
+	public struct MetaUpgradeChangedEvent
+	{
+		public readonly int UpgradeId;
+		public readonly int Level;
+
+		public MetaUpgradeChangedEvent(int upgradeId, int level)
+		{
+			UpgradeId = upgradeId;
+			Level = level;
+		}
+	}
 }
