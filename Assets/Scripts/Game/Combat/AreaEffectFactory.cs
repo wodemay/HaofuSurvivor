@@ -30,6 +30,7 @@ namespace HaoFuSurvivor
 			if (container == null) return null;
 			effect.transform.SetParent(container, false);
 			effect.transform.position = position;
+			ApplySortingOrder(effect, rootSlot);
 			mRoots[effect] = rootSlot;
 			effect.SetActive(true);
 			return effect;
@@ -83,6 +84,12 @@ namespace HaoFuSurvivor
 		private static Transform GetContainer(WorldRootSlot rootSlot)
 		{
 			return WorldRootLocator.Get(rootSlot);
+		}
+
+		private static void ApplySortingOrder(GameObject effect, WorldRootSlot rootSlot)
+		{
+			var sortingOrder = rootSlot == WorldRootSlot.GroundEffect ? -100 : -50;
+			foreach (var renderer in effect.GetComponentsInChildren<Renderer>(true)) renderer.sortingOrder = sortingOrder;
 		}
 
 		private void Awake()

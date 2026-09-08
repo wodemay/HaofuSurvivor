@@ -5,7 +5,7 @@ using QFramework;
 
 namespace HaoFuSurvivor
 {
-	// Generate Id:03ce0587-4938-41cd-bc77-efd927a7990c
+	// Generate Id:fde2bc9b-93c6-4498-b2a4-3dce673ace80
 	public partial class UIMainMenuPanel
 	{
 		public const string Name = "UIMainMenuPanel";
@@ -14,6 +14,8 @@ namespace HaoFuSurvivor
 		public UnityEngine.UI.Button Button_ContinueGame;
 		[SerializeField]
 		public UnityEngine.UI.Button Button_StartGame;
+		[SerializeField]
+		public UnityEngine.UI.Button Button_MetaUpgrade;
 		[SerializeField]
 		public UnityEngine.UI.Button Button_Settings;
 		[SerializeField]
@@ -27,6 +29,7 @@ namespace HaoFuSurvivor
 		{
 			Button_ContinueGame = null;
 			Button_StartGame = null;
+			Button_MetaUpgrade = null;
 			Button_Settings = null;
 			Button_QuitGame = null;
 			Text_ProfileCoin = null;

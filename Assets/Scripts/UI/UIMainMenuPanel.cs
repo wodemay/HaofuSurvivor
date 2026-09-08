@@ -17,6 +17,7 @@ namespace HaoFuSurvivor
 			Button_StartGame.onClick.AddListener(StartGame);
 			Button_ContinueGame.onClick.AddListener(ContinueGame);
 			Button_QuitGame.onClick.AddListener(QuitGame);
+			Button_MetaUpgrade.onClick.AddListener(OpenMetaUpgrade);
 		}
 		
 		protected override void OnOpen(IUIData uiData = null)
@@ -39,6 +40,7 @@ namespace HaoFuSurvivor
 			Button_StartGame.onClick.RemoveListener(StartGame);
 			Button_ContinueGame.onClick.RemoveListener(ContinueGame);
 			Button_QuitGame.onClick.RemoveListener(QuitGame);
+			Button_MetaUpgrade.onClick.RemoveListener(OpenMetaUpgrade);
 		}
 
 		private void StartGame()
@@ -59,6 +61,12 @@ namespace HaoFuSurvivor
 		private void QuitGame()
 		{
 			Application.Quit();
+		}
+
+		private void OpenMetaUpgrade()
+		{
+			CloseSelf();
+			UIKit.OpenPanel<UIMetaUpgradePanel>(assetBundleName: "uimetaupgradepanel_prefab", prefabName: UIMetaUpgradePanel.Name);
 		}
 	}
 }

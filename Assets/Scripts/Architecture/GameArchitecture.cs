@@ -24,6 +24,7 @@ namespace HaoFuSurvivor
 			RegisterModel(new MapModel());
 			RegisterModel(new WorldMapModel());
 			RegisterModel(new ProfileModel());
+			RegisterModel(new MetaUpgradeModel());
 			RegisterModel(new RunEconomyModel());
 
 			RegisterUtility(new CharacterCatalog());
@@ -47,6 +48,7 @@ namespace HaoFuSurvivor
 			RegisterUtility(new BreakableObjectCatalog());
 			RegisterUtility(new MapEventCatalog());
 			RegisterUtility(new ProfileStorage());
+			RegisterUtility(new MetaUpgradeCatalog());
 			RegisterUtility(new CoinEconomyCatalog());
 			RegisterUtility(new DropTableCatalog());
 
@@ -74,6 +76,7 @@ namespace HaoFuSurvivor
 			RegisterSystem(new LevelUpSystem());
 			RegisterSystem(new RunSaveSystem());
 			RegisterSystem(new DodgeSystem());
+			RegisterSystem(new MetaUpgradeSystem());
 			RegisterSystem(new PlayerStatUpgradeSystem());
 			RegisterSystem(new CharacterExclusivePerkSystem());
 			RegisterSystem(new PlayerRegenerationSystem());

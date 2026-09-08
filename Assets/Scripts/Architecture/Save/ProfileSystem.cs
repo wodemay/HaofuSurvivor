@@ -17,6 +17,7 @@ namespace HaoFuSurvivor
 			if (!storage.HasProfile())
 			{
 				model.ProfileCoin = BigCoin.Zero;
+				this.GetSystem<MetaUpgradeSystem>().Restore(null);
 				model.IsLoaded = true;
 				if (!SaveNow()) this.SendEvent(new ProfileLoadCompletedEvent(true, "Profile 创建失败，请检查游戏目录权限。"));
 				return;
@@ -25,12 +26,14 @@ namespace HaoFuSurvivor
 			if (storage.TryLoad(out var data, out var status))
 			{
 				model.ProfileCoin = new BigCoin(data.ProfileCoin);
+				this.GetSystem<MetaUpgradeSystem>().Restore(data.MetaUpgrades);
 				model.IsLoaded = true;
 				this.SendEvent(new ProfileLoadCompletedEvent(false, string.Empty));
 				return;
 			}
 
 			model.ProfileCoin = BigCoin.Zero;
+			this.GetSystem<MetaUpgradeSystem>().Restore(null);
 			model.IsLoaded = true;
 			if (status == ProfileLoadStatus.UnsupportedVersion)
 			{
@@ -72,6 +75,7 @@ namespace HaoFuSurvivor
 		{
 			var model = this.GetModel<ProfileModel>();
 			var data = new ProfileData { ProfileCoin = model.ProfileCoin.ToString() };
+			foreach (var entry in this.GetModel<MetaUpgradeModel>().GetSaveData()) data.MetaUpgrades.Add(entry);
 			if (!this.GetUtility<ProfileStorage>().Save(data, out var error))
 			{
 				UnityEngine.Debug.LogError($"Profile save failed: {error}");

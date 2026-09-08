@@ -16,7 +16,7 @@ namespace HaoFuSurvivor
 	{
 		private const string SaveFile = "SaveData/profile.json";
 		private const string BackupFile = "SaveData/profile.json.bak";
-		private const int CurrentSaveVersion = 1;
+		private const int CurrentSaveVersion = 2;
 
 		public bool HasProfile()
 		{
@@ -42,7 +42,7 @@ namespace HaoFuSurvivor
 				data = JsonUtility.FromJson<ProfileData>(json);
 				if (data == null || !BigCoin.TryParse(data.ProfileCoin, out var coin)) return false;
 				data.ProfileCoin = coin.ToString();
-				if (data.SaveVersion == 0)
+				if (data.SaveVersion < CurrentSaveVersion)
 				{
 					data.SaveVersion = CurrentSaveVersion;
 					Save(data);
