@@ -4,6 +4,26 @@ using UnityEngine;
 
 namespace HaoFuSurvivor
 {
+	public readonly struct SkillCooldownState
+	{
+		public readonly string Name;
+		public readonly float Remaining;
+		public readonly float Duration;
+		public bool IsAvailable => Name != null;
+
+		public SkillCooldownState(string name, float remaining, float duration)
+		{
+			Name = name;
+			Remaining = remaining;
+			Duration = duration;
+		}
+	}
+
+	public class GetSkillCooldownStateQuery : AbstractQuery<SkillCooldownState>
+	{
+		protected override SkillCooldownState OnDo() => this.GetSystem<AttackSystem>().GetSkillCooldownState();
+	}
+
 	public class AttackSystem : AbstractSystem, IRunUpdateable
 	{
 		private readonly Dictionary<int, AttackRuntime> mRuntimes = new();
@@ -84,7 +104,8 @@ namespace HaoFuSurvivor
 				cooldownMultiplier *= this.GetSystem<StatSystem>().GetCooldownMultiplier();
 				if (weaponRuntime != null) cooldownMultiplier *= this.GetSystem<CharacterExclusivePerkSystem>().GetWeaponCooldownMultiplier();
 			}
-			runtime.CooldownRemaining = Mathf.Max(0.01f, runtime.Config.Cooldown * Mathf.Max(0.01f, cooldownMultiplier));
+			runtime.CooldownDuration = Mathf.Max(0.01f, runtime.Config.Cooldown * Mathf.Max(0.01f, cooldownMultiplier));
+			runtime.CooldownRemaining = runtime.CooldownDuration;
 			var skillRuntime = GetSkillRuntime(runtime);
 			executor.Execute(new AttackExecutionContext(runtime.Owner, runtime.OwnerFaction, target, runtime.Config, weaponRuntime, skillRuntime));
 			if (skillRuntime != null) this.SendEvent(new SkillUsedEvent(skillRuntime.SkillId));
@@ -107,6 +128,30 @@ namespace HaoFuSurvivor
 		private WeaponRuntimeData GetWeaponRuntime(AttackRuntime runtime)
 		{
 			return runtime.WeaponRuntimeId == 0 ? null : this.GetModel<PlayerLoadoutModel>().GetWeapon(runtime.WeaponRuntimeId);
+		}
+
+		public SkillCooldownState GetSkillCooldownState()
+		{
+			var loadout = this.GetModel<PlayerLoadoutModel>();
+			foreach (var skill in loadout.Skills)
+			{
+				var config = this.GetUtility<SkillCatalog>().Get(skill.SkillId);
+				if (config == null) continue;
+				var found = false;
+				var remaining = 0f;
+				var duration = 0f;
+				foreach (var runtime in mRuntimes.Values)
+				{
+					if (runtime.Owner != loadout.Owner || runtime.WeaponRuntimeId != skill.RuntimeId) continue;
+					found = true;
+					if (runtime.CooldownRemaining < remaining) continue;
+					remaining = runtime.CooldownRemaining;
+					duration = Mathf.Max(remaining, runtime.CooldownDuration > 0f ? runtime.CooldownDuration
+						: runtime.Config.Cooldown * this.GetSystem<StatSystem>().GetCooldownMultiplier());
+				}
+				if (found) return new SkillCooldownState(config.DisplayName, remaining, duration);
+			}
+			return default;
 		}
 
 		public IEnumerable<AttackCooldownSaveData> GetPlayerCooldownSaveData(GameObject owner)
@@ -169,6 +214,7 @@ namespace HaoFuSurvivor
 			public readonly CombatFaction OwnerFaction;
 			public readonly int WeaponRuntimeId;
 			public float CooldownRemaining;
+			public float CooldownDuration;
 
 			public AttackRuntime(AttackConfig config, GameObject owner, CombatFaction ownerFaction, int weaponRuntimeId)
 			{

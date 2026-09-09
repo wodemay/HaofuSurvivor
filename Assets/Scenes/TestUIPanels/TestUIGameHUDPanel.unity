@@ -1,4 +1,4 @@
-﻿%YAML 1.1
+%YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
 --- !u!29 &1
 OcclusionCullingSettings:
@@ -882,6 +882,14 @@ PrefabInstance:
     - target: {fileID: 6625190060569577955, guid: e8634ed150e2fbb4581f0535ae6ee0a2, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6864395301773436086, guid: e8634ed150e2fbb4581f0535ae6ee0a2, type: 3}
+      propertyPath: mComponentName
+      value: UnityEngine.UI.Text
+      objectReference: {fileID: 0}
+    - target: {fileID: 6864395301773436086, guid: e8634ed150e2fbb4581f0535ae6ee0a2, type: 3}
+      propertyPath: CustomComponentName
+      value: Text_SkillName
       objectReference: {fileID: 0}
     - target: {fileID: 8289213458112205566, guid: e8634ed150e2fbb4581f0535ae6ee0a2, type: 3}
       propertyPath: m_SizeDelta.x

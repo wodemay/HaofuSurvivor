@@ -196,7 +196,7 @@ MonoBehaviour:
   m_Name:
   m_EditorClassIdentifier:
   m_Material: {fileID: 0}
-  m_Color: {r: 0.90, g: 0.95, b: 0.94, a: 1}
+  m_Color: {r: 0.9, g: 0.95, b: 0.94, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -343,7 +343,7 @@ MonoBehaviour:
     m_BestFit: 0
     m_MinSize: 15
     m_MaxSize: 122
-    m_Alignment: 0
+    m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
@@ -518,7 +518,7 @@ MonoBehaviour:
   m_Name:
   m_EditorClassIdentifier:
   m_Material: {fileID: 0}
-  m_Color: {r: 0.90, g: 0.95, b: 0.94, a: 1}
+  m_Color: {r: 0.9, g: 0.95, b: 0.94, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -538,7 +538,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1.12
-  m_Text: "\u672c\u6b21\u884c\u52a8\u7ed3\u675f"
+  m_Text: "\u672C\u6B21\u884C\u52A8\u7ED3\u675F"
 --- !u!114 &7376420959639449938
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -614,7 +614,7 @@ MonoBehaviour:
   m_Name:
   m_EditorClassIdentifier:
   m_Material: {fileID: 0}
-  m_Color: {r: 0.20, g: 0.78, b: 0.66, a: 1}
+  m_Color: {r: 0.2, g: 0.78, b: 0.66, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1

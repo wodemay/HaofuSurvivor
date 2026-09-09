@@ -55,9 +55,9 @@
 | 角色专属升级 | 角色固定的专属升级和联动效果 | 角色专属 Catalog + System，作为独立候选类型 | 基础版 | Character、LevelUp、Weapon、Dodge、Skill |
 | 地图 | 无限区块、地面、障碍、碰撞、寻路和流式加载 | `MapSystem` 生成数据，`MapChunkView` 显示，NavMesh 提供寻路 | 基础版 | Run、Player、Enemy、Combat |
 | 存档 | 继续游戏、玩家和地图状态恢复 | 根目录 JSON 快照，Model 数据优先，View 运行时重建 | 基础版，需增强 | Run、Player、Enemy、Map、Progression |
-| 地图事件 | 击杀目标、区域事件、奖励和事件状态 | 事件配置 + 运行时状态 + 地图数据持久化 | 待开发 | Map、Enemy、Progression、Save |
-| 道具与奖励 | 金币、恢复道具、宝箱和掉落物 | 配置化 Drop/Reward，运行时对象池和数据快照 | 待开发 | Enemy、Map、Player、Save |
-| 局外成长 | 金币、解锁、永久升级、图鉴和成就 | 独立 Profile 存档，不混入局内快照 | 待开发 | RunSettlement、Save、UI |
+| 地图事件 | 击杀目标、区域事件、奖励和事件状态 | 事件配置 + 运行时状态 + 地图数据持久化 | 基础版 | Map、Enemy、Progression、Save |
+| 道具与奖励 | 金币、恢复道具、宝箱和掉落物 | 配置化 Drop/Reward，运行时对象池和数据快照 | 基础版 | Enemy、Map、Player、Save |
+| 局外成长 | 金币、解锁、永久升级、图鉴和成就 | 独立 Profile 存档，不混入局内快照 | 基础版 | RunSettlement、Save、UI |
 | 表现层 | 九层世界渲染、血条、特效、伤害反馈 | Presentation 只负责渲染层和 View | 基础版 | 所有运行时模块 |
 | 工具链 | 文档查看、静态检查、Unity 编译、Release | PowerShell 文档生成 + GitHub Actions | 已接入 | Git、Unity |
 
@@ -118,7 +118,6 @@ RunTimerSystem
 EnemyHealthSystem
   -> EnemyDiedEvent
       -> ExperienceSystem
-      -> Future Drop/RewardSystem
   -> ExperienceCollected
   -> ExperienceSystem
   -> PlayerLevelUpEvent
@@ -126,6 +125,9 @@ EnemyHealthSystem
   -> UILevelUpPanel
   -> ConfirmLevelUpOptionCommand
   -> PlayerLoadoutSystem / PlayerStatUpgradeSystem / CharacterExclusiveSkillUpgradeSystem
+
+BreakableObjectSystem / MapEventSystem
+  -> PickupSystem
 ```
 
 升级系统只负责候选生成和选择阶段，不直接实现每种升级效果。具体升级由对应模块执行，失败时由 `LevelUpSystem` 重新生成候选，不能让对局卡在半初始化状态。

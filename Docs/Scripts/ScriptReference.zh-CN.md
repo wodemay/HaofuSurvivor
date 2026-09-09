@@ -65,3 +65,6 @@
 - `Game/Player/PlayerController.cs`、`PlayerHealthBarView.cs`：角色内容兼容标记和血条视图。
 - `UI/*.cs`：面板行为；`*.Designer.cs` 是 QFramework 生成 Bind，禁止手改。
 - `Editor/ConfigurationCreatorWindow.cs`、`Editor/ProjectBuild.cs`：创建配置资产和 Unity 构建入口。
+
+- `UI/UIGameHUDPanel.cs`：通过经验查询与技能冷却查询刷新等级、经验进度及技能倒计时；控件存于 HUD 预制体，Designer 由 QFramework 生成。
+- `Architecture/Combat/AttackSystem.cs` 中的 `GetSkillCooldownStateQuery`：提供首个已装备技能的真实剩余冷却和进度分母。

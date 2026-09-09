@@ -17,7 +17,7 @@ MonoBehaviour:
   OccupiedCells:
   - {x: 0, y: 0}
   Weight: 1
-  MinimumSpacing: 3
+  MinimumSpacing: 5
   AllowQuarterTurnRotation: 0
   AllowMirror: 0
   BlocksMovement: 1

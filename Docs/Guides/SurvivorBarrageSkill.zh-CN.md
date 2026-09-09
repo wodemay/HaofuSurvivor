@@ -27,3 +27,7 @@
 幸存者的初始投射 Weapon 和初始 Dodge 均满级后，下一次升级的第一个候选固定为 `终末环流`；未选择时，后续每次升级仍固定出现，直至选中。投射 Weapon 替换为聚能投射后也满足 Weapon 前置。
 
 选中后，Skill ID `1` 由 Level 1 升至 Level 2：持续时间为 5 秒、发射间隔为 0.0125 秒、环绕速度为 1080 度/秒、轨道半径为 2、伤害倍率为 2、投射速度倍率为 1.5，并获得 2 次穿透。该升级状态已沿用现有 Skill 快照字段保存和恢复。
+
+## HUD 技能冷却
+
+HUD 底部显示当前首个已装备技能的名称、Space 提示、剩余秒数和恢复进度。`GetSkillCooldownStateQuery` 读取 AttackSystem 中对应 SkillRuntime 的真实冷却；同一技能含多个 Attack 时显示最长剩余冷却。释放时记录本次有效冷却时长，进度由 0 恢复到 1，结束显示“就绪”，无有效技能显示“未装备技能”。HUD 复用 `RunTimerUpdatedEvent` 和 `SkillUsedEvent` 刷新，不新增独立 Update 或计时器；暂停和升级选择期间跟随玩法时间冻结，重新显示时重新查询状态。

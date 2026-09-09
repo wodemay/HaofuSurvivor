@@ -4,7 +4,7 @@
 
 ## 配置
 
-`EnemyConfig.ExperienceDrop` 直接引用 `ExperienceDropConfig`。该配置定义经验球 Prefab、基础经验和预留的 `DropTableId`；当前不实现掉落表查询。
+`EnemyConfig.ExperienceDrop` 直接引用 `ExperienceDropConfig`，该配置定义经验球 Prefab 和基础经验。可破坏物与地图事件分别通过自身的 `DropTableId` 调用掉落表；敌人死亡目前仍只生成经验球。
 
 吸取范围、吸附加速度和最高速度属于 `PlayerStatModel`，经验值和经验倍率使用浮点计算，显示层再格式化为小数点后一位。经验球一旦进入吸取范围即被捕获，之后持续追踪玩家，不会因玩家移动而脱离。
 
@@ -14,6 +14,10 @@
 
 `ExperienceSystem` 不生成升级候选，也不改变对局阶段。
 
-## 预留接口
+## 掉落表
 
-`DropTableId` 仅是后续掉落表的扩展字段，不参与当前运行时查询。
+`BreakableObjectConfig.DropTableId` 与 `MapEventConfig.TemporaryRewardDropTableId` 由 `PickupSystem` 通过 `DropTableCatalog` 查询并生成拾取物，当前支持金币、生命恢复和经验吸附效果。`EnemyConfig.DropTableId` 暂不参与敌人死亡流程。
+
+## HUD 经验条
+
+`UIGameHUDPanel` 使用预制体中的 `Image_ExperienceFill`、`Text_PlayerLevel` 和 `Text_Experience` 显示当前等级、经验数值及归一化进度。打开、显示面板和收到 `ExperienceCollectedEvent` 时，通过 `GetExperienceStateQuery` 刷新；升级后的剩余经验沿用 ExperienceModel，不额外计算等级或修改经验。控件由 QFramework Bind 生成绑定，不在运行时创建。

@@ -35,4 +35,4 @@ QFramework ResKit 的热更新资源缓存、Unity 原生日志和崩溃报告�
 
 主菜单通过 `HasSavedRunQuery` 控制“继续游戏”。`ContinueSavedRunCommand` 先按 Seed、主题和生成器版本重建 PlayerRoot 与基础地图，再恢复 Loadout、属性、角色专属效果、位置、生命和时间；敌人、经验球、投射物、地面火焰和弹幕等池对象按快照数据重新生成。无效的可选能力会跳过，必要 Weapon 恢复失败则中止继续流程。
 
-当前仍未实现存档版本号、校验和、损坏文件备份与修复提示；这些属于后续存档健壮性任务。
+当前已支持 `RunSaveData.SaveVersion` 与基础结构校验；损坏主档或备份会隔离为 `.corrupt-*`，可从有效备份恢复，高版本存档拒绝读取，相关恢复过程写入 `Logs/save-recovery.log`。尚未实现校验和、复杂语义完整性校验，以及 RunSave 专属的用户修复提示。
