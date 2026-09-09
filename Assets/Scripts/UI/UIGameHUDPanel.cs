@@ -28,6 +28,12 @@ namespace HaoFuSurvivor
 				.UnRegisterWhenGameObjectDestroyed(gameObject);
 			this.RegisterEvent<EnemyDiedEvent>(OnEnemyDied)
 				.UnRegisterWhenGameObjectDestroyed(gameObject);
+			this.RegisterEvent<ExperienceCollectedEvent>(_ => RefreshExperience())
+				.UnRegisterWhenGameObjectDestroyed(gameObject);
+			this.RegisterEvent<SkillUsedEvent>(_ => RefreshSkillCooldown())
+				.UnRegisterWhenGameObjectDestroyed(gameObject);
+			RefreshExperience();
+			RefreshSkillCooldown();
 			RefreshTime();
 			RefreshRunCoin();
 			RefreshBossHealth();
@@ -40,6 +46,8 @@ namespace HaoFuSurvivor
 		protected override void OnShow()
 		{
 			RefreshBossHealth();
+			RefreshExperience();
+			RefreshSkillCooldown();
 		}
 		
 		protected override void OnHide()
@@ -84,6 +92,26 @@ namespace HaoFuSurvivor
 		private void OnRunTimerUpdated(RunTimerUpdatedEvent timerEvent)
 		{
 			Text_RemainingTime.text = FormatTime(timerEvent.ElapsedSeconds);
+			RefreshSkillCooldown();
+		}
+
+		private void RefreshExperience()
+		{
+			var state = this.SendQuery(new GetExperienceStateQuery());
+			Text_PlayerLevel.text = $"Lv. {state.Level}";
+			Text_Experience.text = $"经验  {state.CurrentExperienceText} / {state.RequiredExperienceText}";
+			Image_ExperienceFill.fillAmount = state.RequiredExperience > 0f
+				? Mathf.Clamp01(state.CurrentExperience / state.RequiredExperience) : 0f;
+		}
+
+		private void RefreshSkillCooldown()
+		{
+			var state = this.SendQuery(new GetSkillCooldownStateQuery());
+			Text_SkillName.text = state.IsAvailable ? state.Name : "未装备技能";
+			Text_SkillCooldown.text = !state.IsAvailable ? "—" : state.Remaining > 0f
+				? $"冷却  {Mathf.Ceil(state.Remaining * 10f) / 10f:0.0}s" : "就绪";
+			Image_SkillCooldownFill.fillAmount = !state.IsAvailable ? 0f : state.Duration > 0f
+				? 1f - Mathf.Clamp01(state.Remaining / state.Duration) : 1f;
 		}
 
 		private void RefreshTime()

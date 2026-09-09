@@ -267,7 +267,7 @@ namespace HaoFuSurvivor
 			if (templates == null || templates.Count == 0) return candidates;
 
 			var random = new System.Random(CombineSeed(this.GetModel<WorldMapModel>().WorldSeed, coordinate, mConfig.GeneratorVersion));
-			var targetCount = Mathf.Min(8, Mathf.Max(0, chunkSize * chunkSize / 128));
+			var targetCount = Mathf.Min(1, Mathf.Max(0, chunkSize * chunkSize / 256));
 			for (var attempt = 0; attempt < targetCount * 16 && candidates.Count < targetCount; attempt++)
 			{
 				var template = PickTemplate(templates, random);
