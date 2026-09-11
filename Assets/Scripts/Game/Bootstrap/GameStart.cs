@@ -7,10 +7,14 @@ namespace HaoFuSurvivor
 	{
 		public IArchitecture GetArchitecture() => GameArchitecture.Interface;
 
+		[SerializeField]
+		private AudioClip MainMenuBgm;
+
 		private void Awake()
 		{
 			ResKit.Init();
 			GameArchitecture.InitArchitecture();
+			this.SendCommand(new ConfigureMainMenuBgmCommand(MainMenuBgm));
 			this.RegisterEvent<RunStartedEvent>(_ => OpenGameHud())
 				.UnRegisterWhenGameObjectDestroyed(gameObject);
 			this.RegisterEvent<LevelUpSelectionRequestedEvent>(_ => OpenLevelUpPanel())

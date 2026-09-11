@@ -90,6 +90,7 @@ namespace HaoFuSurvivor
 			RegisterSystem(new ProfileSystem());
 			RegisterSystem(new RunEconomySystem());
 			RegisterSystem(new PickupSystem());
+			RegisterSystem(new BgmSystem());
 		}
 	}
 }
