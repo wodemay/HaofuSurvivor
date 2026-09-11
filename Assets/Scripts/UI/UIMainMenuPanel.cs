@@ -26,6 +26,7 @@ namespace HaoFuSurvivor
 		
 		protected override void OnShow()
 		{
+			this.SendCommand(new PlayMainMenuBgmCommand());
 			Button_ContinueGame.gameObject.SetActive(this.SendQuery(new HasSavedRunQuery()).HasSave);
 			var profile = this.SendQuery(new GetProfileStateQuery());
 			Text_ProfileCoin.text = $"金币数：{profile.ProfileCoin.ToDisplayString()}";

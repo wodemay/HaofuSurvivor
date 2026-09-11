@@ -654,3 +654,6 @@ Write all project documentation in the project-root `Docs/` directory, never und
 - 2026-09-09 | 按进一步反馈将每个 32x32 区块的障碍候选上限从 4 降至 1，保留 5 格间距与原有放置检查；实际可少于 1 个。已生成区块不立即重排，重新开局查看完整效果。dotnet 编译结果见本轮验证；未执行 Unity 运行验证，未提交或推送。
 - 2026-09-09 | 同步正式文档与当前实现：更新 RunSave 版本/校验/备份恢复边界、DropTable/Pickup 运行时、地图事件与世界指引基础版、Profile 基础版状态及开发路线；同步 `Docs/docs-content/` 查看器内容，保留未完成的 BGM 交接文档不进入索引。`git diff --check`、正式文档索引一致性检查和 dotnet 编译均通过；未提交或推送。
 - 2026-09-09 | 合并最新 `origin/main` 时审查并解决 4 个 UI 预制体三方冲突，保留已验证的颜色、对齐和结算文案改动；冲突标记扫描、`git diff --check` 和干净提交树 dotnet 编译通过，0 错误，仅保留既有 2 组程序集版本警告。BGM 未完成改动继续保留在本地 stash，未纳入本次 PR。
+- 2026-09-11 | 完成 BGM 接入：恢复暂存音乐与脚本，GameStart.Awake 配置场景音乐引用，菜单/开局 Stop+Play 循环重播且 Pitch 重置 1；对局 Pitch=Clamp(1+秒数/3000,1,2)，暂停/升级冻结，存档恢复同步。修正菜单沿用上一局音高；dotnet 0 错误、2 个既有引用警告，Unity 临时状态验证循环/单音源/重播/Pitch 上限/暂停/恢复通过，Console 无错误。未做听感、整局或发布包验收；详见 BgmSystem 指南与交接文档。已退出 Play Mode，stash 备份保留，未提交推送。
+- 2026-09-11 | 按反馈将 BGM Pitch 达峰时间从 50 分钟缩短至 30 分钟：Clamp(1+秒数/1800,1,2)，15 分钟 1.5、30 分钟及之后 2；同步指南和交接说明。
+- 2026-09-11 | 按授权准备 BGM PR 与 Windows v0.1.8 成品发布：新分支 codex/bgm-release 基于已合并 UI 的 origin/main，包含音乐资源、菜单/开局重播、30 分钟 Pitch=2 上限及文档；已有编译和 Unity 状态验证通过，发布包交由 GitHub Actions 构建。PR 不自动合并。
