@@ -21,6 +21,10 @@ namespace HaoFuSurvivor
 				.UnRegisterWhenGameObjectDestroyed(gameObject);
 			this.RegisterEvent<RunEndedEvent>(OnRunEnded)
 				.UnRegisterWhenGameObjectDestroyed(gameObject);
+			this.RegisterEvent<RunContinueFailedEvent>(OnRunContinueFailed)
+				.UnRegisterWhenGameObjectDestroyed(gameObject);
+			this.RegisterEvent<RunSaveFailedEvent>(e => ShowSaveNotice(e.Message))
+				.UnRegisterWhenGameObjectDestroyed(gameObject);
 			this.RegisterEvent<UIPopPanelRequestedEvent>(_ => OpenPopPanel())
 				.UnRegisterWhenGameObjectDestroyed(gameObject);
 			this.RegisterEvent<ProfileLoadCompletedEvent>(OnProfileLoadCompleted)
@@ -44,6 +48,19 @@ namespace HaoFuSurvivor
 			UIKit.OpenPanel<UIGameHUDPanel>(
 				assetBundleName: "uigamehudpanel_prefab",
 				prefabName: UIGameHUDPanel.Name);
+		}
+
+		private void OnRunContinueFailed(RunContinueFailedEvent failed)
+		{
+			UIKit.ClosePanel<UIGameHUDPanel>();
+			UIKit.ClosePanel<UILevelUpPanel>();
+			UIKit.OpenPanel<UIMainMenuPanel>(assetBundleName: "uimainmenupanel_prefab", prefabName: UIMainMenuPanel.Name);
+			ShowSaveNotice(failed.Message);
+		}
+
+		private void ShowSaveNotice(string message)
+		{
+			this.SendCommand(new RequestUIPopPanelCommand(new UIPopPanelRequest("存档提示", message, "确认", string.Empty)));
 		}
 
 		private void OpenLevelUpPanel()

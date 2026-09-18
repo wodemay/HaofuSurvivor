@@ -39,12 +39,14 @@ namespace HaoFuSurvivor
 			timer.DeltaTime = 0f;
 			timer.FixedDeltaTime = 0f;
 			Time.timeScale = 0f;
+			this.SendEvent(new RunTimerPauseChangedEvent(true));
 		}
 
 		public void Resume()
 		{
 			this.GetModel<RunTimerModel>().IsPaused = false;
 			Time.timeScale = 1f;
+			this.SendEvent(new RunTimerPauseChangedEvent(false));
 		}
 
 		public void Stop()

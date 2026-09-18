@@ -49,6 +49,8 @@ namespace HaoFuSurvivor
 
 		private void ReturnToMainMenu()
 		{
+			this.SendCommand(new RetryRunSettlementCommand());
+			if (!this.SendQuery(new GetRunSettlementStateQuery()).IsCommitted) return;
 			this.SendCommand(new ExitRunToCharacterSelectionCommand());
 			CloseSelf();
 			UIKit.OpenPanel<UIMainMenuPanel>(assetBundleName: "uimainmenupanel_prefab", prefabName: UIMainMenuPanel.Name);

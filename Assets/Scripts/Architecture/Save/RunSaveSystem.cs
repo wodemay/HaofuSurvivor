@@ -26,10 +26,12 @@ namespace HaoFuSurvivor
 	{
 		private const float AutoSaveIntervalSeconds = 30f;
 		private float mAutoSaveElapsed;
+		private bool mSaveFailureReported;
 
 		public void ResetAutoSaveTimer()
 		{
 			mAutoSaveElapsed = 0f;
+			mSaveFailureReported = false;
 		}
 
 		public void OnRunUpdate(float deltaTime)
@@ -42,7 +44,7 @@ namespace HaoFuSurvivor
 		public void SaveCurrentRun()
 		{
 			var run = this.GetModel<RunModel>();
-			if (run.Phase != RunPhase.Active && run.Phase != RunPhase.Paused && run.Phase != RunPhase.LevelUpSelection) return;
+			if (run.Phase == RunPhase.None || this.GetModel<RunSettlementModel>().IsCommitted) return;
 
 			var player = this.GetModel<PlayerModel>();
 			var experience = this.GetModel<ExperienceModel>();
@@ -51,6 +53,7 @@ namespace HaoFuSurvivor
 			var economy = this.GetModel<RunEconomyModel>();
 			var data = new RunSaveData
 			{
+				RunId = run.RunId,
 				HasMapSnapshot = world.HasWorld,
 				WorldSeed = world.WorldSeed,
 				MapThemeId = world.ThemeId,
@@ -117,7 +120,12 @@ namespace HaoFuSurvivor
 				data.Weapons.Add(weaponData);
 			}
 
-			this.GetUtility<RunSaveStorage>().Save(data);
+			if (this.GetUtility<RunSaveStorage>().Save(data, out _)) mSaveFailureReported = false;
+			else if (!mSaveFailureReported)
+			{
+				mSaveFailureReported = true;
+				this.SendEvent(new RunSaveFailedEvent("局内进度保存失败，请检查磁盘空间和目录权限。"));
+			}
 		}
 
 		public RunSaveData Load() => this.GetUtility<RunSaveStorage>().Load();
@@ -127,6 +135,7 @@ namespace HaoFuSurvivor
 		public bool Restore(RunSaveData data)
 		{
 			if (data == null) return false;
+			this.GetModel<RunModel>().RunId = data.RunId;
 			var player = this.GetModel<PlayerModel>();
 			player.Position = new Vector2(data.PositionX, data.PositionY);
 			if (player.RuntimeRoot != null) player.RuntimeRoot.transform.position = player.Position;

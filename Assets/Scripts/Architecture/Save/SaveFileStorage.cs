@@ -7,6 +7,7 @@ namespace HaoFuSurvivor
 {
 	public enum SaveValidationResult
 	{
+		Missing,
 		Valid,
 		Corrupt,
 		UnsupportedVersion
@@ -119,7 +120,7 @@ namespace HaoFuSurvivor
 		{
 			json = null;
 			reason = null;
-			if (!File.Exists(path)) return SaveValidationResult.Corrupt;
+			if (!File.Exists(path)) return SaveValidationResult.Missing;
 			try
 			{
 				json = File.ReadAllText(path, Encoding.UTF8);

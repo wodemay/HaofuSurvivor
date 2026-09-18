@@ -5,7 +5,7 @@
 ## 1. 先看架构入口
 
 1. `Assets/Scripts/Architecture/GameArchitecture.cs`：模块注册、Model/System/Utility 的组合。
-2. `Assets/Scripts/Game/GameStart.cs`：Unity 生命周期如何驱动 QFramework Command。
+2. `Assets/Scripts/Game/Bootstrap/GameStart.cs`：Unity 生命周期如何驱动 QFramework Command；全工程唯一的 Update/FixedUpdate 宿主。
 3. `Assets/Scripts/Architecture/Commands/GameplayCommands.cs`：所有主要操作入口。
 4. `Assets/Scripts/Architecture/Events/GameplayEvents.cs`：跨模块通知的数据结构。
 
@@ -21,14 +21,14 @@
 1. `CharacterCatalog.cs`、`CharacterConfig.cs`：角色配置如何加载。
 2. `PlayerSpawnSystem.cs`：PlayerRoot、角色内容、血条的组装。
 3. `PlayerSystem.cs`、`PlayerModel.cs`、`PlayerStatModel.cs`：移动、生命、伤害和属性。
-4. `PlayerController.cs`：Unity 输入与移动请求的桥接。
+4. `PlayerController.cs`：已降级为空的兼容占位（保留给旧角色内容 Prefab），不要在这里加逻辑；输入桥接在 `Architecture/Input/InputSystem.cs`，移动与碰撞在 `PlayerSystem`。
 
 ## 4. 查看技能与攻击链
 
 1. `SkillGroupCatalog.cs`、`SkillGroupConfig.cs`：角色初始技能组。
 2. `PlayerLoadoutSystem.cs`：玩家 Weapon 容器、Attack 装配、升级和进化。
-3. `AttackSystem.cs`、`AttackExecutorRegistry.cs`：通用攻击运行时和 Executor 查找。
-4. `CollisionAttackExecutor.cs`、`ProjectileAttackExecutor.cs`：具体攻击实现。
+3. `AttackSystem.cs`、`AttackExecutorRegistry.cs`：通用攻击运行时、冷却、自动/手动注册入口和 Executor 查找；四个 Executor（`collision` / `projectile` / `explosive-projectile` / `barrage-projectile`）都实现在 `AttackExecutorRegistry.cs` 内，没有独立文件。
+4. `AttackExecutorRegistry.cs`（`CollisionAttackExecutor` / `ProjectileAttackExecutor` / `ExplosiveProjectileAttackExecutor` / `BarrageProjectileAttackExecutor`）：具体攻击实现；碰撞型配套 `Game/Combat/CollisionAttackTrigger.cs`，投射物配套 `Game/Combat/ProjectileFactory.cs`、`ProjectileController.cs`、`ExplosiveProjectileController.cs`。
 5. `WeaponRuntimeData.cs`：运行时等级、修正值和 Attack 替换。
 
 ## 5. 最后查看敌人、成长和可选能力

@@ -4,8 +4,9 @@
 
 ## 近期
 
-- 补充校验和或更强语义校验、RunSave 恢复失败的用户反馈，并完成存档边界测试。
-- 补充 Unity Test Framework 的 System、Command、Query 测试，以及主场景 Play Mode 回归。
+- 完成长时间整局继续、结算和异常退出后的快照恢复回归。
+- 将现有手工 Unity 检查固化为可重复运行的 Unity Test Framework System、Command、Query 测试和主场景 Play Mode 回归。
+- 为存档写入补充指标，并跟进 .NET SDK 10 RC 标准 dotnet 编译触发的 Roslyn 进程异常。
 - 为地图 NavMesh、区块流式加载、对象池跨场景恢复和动态 Tick 注册增加自动化验证。
 
 ## 战斗与成长
@@ -25,3 +26,4 @@
 
 - 对象池容量监控、NavMesh/区块加载性能采样和存档写入指标。
 - 依据采样结果评估实体批处理与 `.asmdef` 编译隔离。
+- 仅在出现明确防篡改需求时评估存档 checksum 或签名，不作为当前正确性闭环的前置条件。

@@ -9,6 +9,7 @@ namespace HaoFuSurvivor
 		public int SaveVersion;
 		public string ProfileCoin = "0";
 		public List<MetaUpgradeSaveData> MetaUpgrades = new();
+		public List<string> SettledRunIds = new();
 	}
 
 	[Serializable]

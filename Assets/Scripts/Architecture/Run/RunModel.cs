@@ -13,10 +13,12 @@ namespace HaoFuSurvivor
 	public class RunModel : QFramework.AbstractModel
 	{
 		public RunPhase Phase { get; internal set; }
+		public string RunId { get; internal set; }
 
 		protected override void OnInit()
 		{
 			Phase = RunPhase.None;
+			RunId = string.Empty;
 		}
 	}
 }

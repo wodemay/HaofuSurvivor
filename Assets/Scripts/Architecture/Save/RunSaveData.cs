@@ -7,6 +7,7 @@ namespace HaoFuSurvivor
 	public class RunSaveData
 	{
 		public int SaveVersion;
+		public string RunId;
 		public int CharacterId;
 		public bool HasMapSnapshot;
 		public int WorldSeed;

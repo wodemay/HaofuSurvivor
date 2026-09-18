@@ -29,11 +29,13 @@ namespace HaoFuSurvivor
 	public class RunSettlementModel : QFramework.AbstractModel
 	{
 		public bool HasSettlement { get; internal set; }
+		public bool IsCommitted { get; internal set; }
 		public RunSettlementData LastSettlement { get; internal set; }
 
 		public void Reset()
 		{
 			HasSettlement = false;
+			IsCommitted = false;
 			LastSettlement = default;
 		}
 
