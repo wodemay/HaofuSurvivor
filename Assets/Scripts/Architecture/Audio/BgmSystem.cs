@@ -6,6 +6,8 @@ namespace HaoFuSurvivor
 	public class BgmSystem : AbstractSystem
 	{
 		private AudioClip mClip;
+		private AudioSource mSource;
+		private bool mMusicPaused;
 
 		public AudioClip CurrentClip => mClip;
 
@@ -22,6 +24,8 @@ namespace HaoFuSurvivor
 
 			AudioKit.StopMusic();
 			AudioKit.PlayMusic(clip);
+			mSource = System.Array.Find(Object.FindObjectsOfType<AudioSource>(true), source => source.clip == clip && source.loop);
+			mMusicPaused = false;
 			SetPitch(0f);
 		}
 
@@ -29,6 +33,28 @@ namespace HaoFuSurvivor
 		{
 			this.RegisterEvent<RunStartedEvent>(_ => PlayFromStart(mClip));
 			this.RegisterEvent<RunTimerUpdatedEvent>(OnRunTimerUpdated);
+			this.RegisterEvent<RunTimerPauseChangedEvent>(OnPauseChanged);
+		}
+
+		private void OnPauseChanged(RunTimerPauseChangedEvent pauseEvent)
+		{
+			if (mClip == null) return;
+			var source = mSource;
+			if (source == null || source.clip != mClip) return;
+
+			if (pauseEvent.IsPaused)
+			{
+				AudioKit.PauseMusic();
+				mMusicPaused = true;
+			}
+			else if (mMusicPaused)
+			{
+				// AudioKit.ResumeMusic calls Play, so preserve the playback cursor.
+				var samples = source.timeSamples;
+				AudioKit.ResumeMusic();
+				source.timeSamples = samples;
+				mMusicPaused = false;
+			}
 		}
 
 		private void OnRunTimerUpdated(RunTimerUpdatedEvent timerEvent)

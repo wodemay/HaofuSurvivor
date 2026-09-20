@@ -36,6 +36,16 @@ namespace HaoFuSurvivor
 		}
 	}
 
+	public struct RunTimerPauseChangedEvent
+	{
+		public readonly bool IsPaused;
+
+		public RunTimerPauseChangedEvent(bool isPaused)
+		{
+			IsPaused = isPaused;
+		}
+	}
+
 	public struct RunTimerUpdatedEvent
 	{
 		public readonly int ElapsedSeconds;
@@ -138,6 +148,26 @@ namespace HaoFuSurvivor
 
 	public readonly struct BossDefeatedEvent
 	{
+	}
+
+	public struct RunContinueFailedEvent
+	{
+		public readonly string Message;
+
+		public RunContinueFailedEvent(string message)
+		{
+			Message = message;
+		}
+	}
+
+	public struct RunSaveFailedEvent
+	{
+		public readonly string Message;
+
+		public RunSaveFailedEvent(string message)
+		{
+			Message = message;
+		}
 	}
 
 	public struct RunEconomyChangedEvent

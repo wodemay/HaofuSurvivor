@@ -4,7 +4,7 @@
 
 `GameStart.Awake` 发送 ConfigureMainMenuBgmCommand；主菜单 OnShow 发送 PlayMainMenuBgmCommand。BgmSystem 订阅 RunStartedEvent，在开局或重开时播放同一首音乐。每次重播先调用 AudioKit.StopMusic，再 PlayMusic，位置归零、Pitch 重置为 1，循环播放且复用单个音乐音源。
 
-Pitch 使用对局逻辑时间：`Clamp(1 + ElapsedSeconds / 1800, 1, 2)`。10 分钟约为 1.33，15 分钟为 1.5，30 分钟起保持 2。提高 Pitch 同时提高播放速度和音高。暂停及升级选择时音乐继续，Pitch 冻结；继续存档时由 RunTimerSystem.Restore 发布时间事件，立即恢复对应 Pitch。结算保持最后的 Pitch，返回菜单重置。
+Pitch 使用对局逻辑时间：`Clamp(1 + ElapsedSeconds / 1800, 1, 2)`。10 分钟约为 1.33，15 分钟为 1.5，30 分钟起保持 2。提高 Pitch 同时提高播放速度和音高。暂停及升级选择时音乐暂停，Pitch 冻结；恢复时从原播放位置继续。RunTimerSystem.Pause/Resume 发布 RunTimerPauseChangedEvent，由 BgmSystem 同步音频状态；AudioKit 恢复使用 Play，因此恢复后还原采样位置。继续存档时由 RunTimerSystem.Restore 发布时间事件，立即恢复对应 Pitch。结算保持最后的 Pitch，返回菜单重置。
 
 不新增独立 Update，不修改 QFramework 源文件，保留 AudioKit 原有音乐开关及音量设置。
 

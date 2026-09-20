@@ -10,6 +10,7 @@ namespace HaoFuSurvivor
 			if (runModel.Phase == RunPhase.Active) return;
 
 			runModel.Phase = RunPhase.Active;
+			runModel.RunId = System.Guid.NewGuid().ToString("N");
 			this.GetSystem<RunTimerSystem>().StartTimer();
 			this.GetSystem<RunSaveSystem>().ResetAutoSaveTimer();
 			this.GetSystem<RunSettlementSystem>().Reset();
@@ -37,7 +38,7 @@ namespace HaoFuSurvivor
 			runModel.Phase = RunPhase.Victory;
 			this.GetSystem<RunTimerSystem>().Stop();
 			this.GetSystem<GameLoopSystem>().EndRun();
-			this.GetSystem<RunSaveSystem>().Clear();
+			this.GetSystem<RunSaveSystem>().SaveCurrentRun();
 			this.GetSystem<RunSettlementSystem>().Settle(RunPhase.Victory);
 			this.SendEvent(new RunEndedEvent(RunPhase.Victory));
 		}
@@ -50,7 +51,7 @@ namespace HaoFuSurvivor
 			runModel.Phase = RunPhase.Defeat;
 			this.GetSystem<RunTimerSystem>().Stop();
 			this.GetSystem<GameLoopSystem>().EndRun();
-			this.GetSystem<RunSaveSystem>().Clear();
+			this.GetSystem<RunSaveSystem>().SaveCurrentRun();
 			this.GetSystem<RunSettlementSystem>().Settle(RunPhase.Defeat);
 			this.SendEvent(new RunEndedEvent(RunPhase.Defeat));
 		}
@@ -111,6 +112,7 @@ namespace HaoFuSurvivor
 		public void RestartSelectedCharacterRun()
 		{
 			if (this.GetModel<RunModel>().Phase != RunPhase.Defeat) return;
+			if (!this.GetSystem<RunSettlementSystem>().Settle(RunPhase.Defeat)) return;
 
 			ReleaseRunRuntime();
 			if (!this.GetSystem<PlayerSpawnSystem>().SpawnSelectedCharacter()) return;
@@ -120,18 +122,40 @@ namespace HaoFuSurvivor
 		public void ContinueSavedRun()
 		{
 			var save = this.GetSystem<RunSaveSystem>().Load();
-			if (save == null) return;
+			if (save == null)
+			{
+				ContinueFailed("存档不存在、已损坏或版本不兼容，无法继续游戏。请检查存档目录。");
+				return;
+			}
+			if (this.GetModel<ProfileModel>().HasSettledRun(save.RunId))
+			{
+				this.GetSystem<RunSaveSystem>().Clear();
+				ContinueFailed("这局游戏已经结算，不能重复领取奖励。");
+				return;
+			}
 			this.GetModel<CharacterSelectionModel>().SelectedCharacterId = save.CharacterId;
 			ReleaseRunRuntime();
-			if (!this.GetSystem<PlayerSpawnSystem>().SpawnSelectedCharacter()) return;
+			if (!this.GetSystem<PlayerSpawnSystem>().SpawnSelectedCharacter())
+			{
+				ContinueFailed("角色资源无法加载，已返回主菜单。");
+				return;
+			}
 			StartRun();
 			if (!this.GetSystem<RunSaveSystem>().Restore(save))
 			{
-				ReleaseRunRuntime();
-				this.GetModel<RunModel>().Phase = RunPhase.None;
-				this.GetSystem<RunTimerSystem>().Stop();
+				ContinueFailed("存档恢复失败，已清理本次恢复的对象并返回主菜单。");
 				return;
 			}
+			if (save.SavedPhase == (int)RunPhase.Defeat) EndWithDefeat();
+			else if (save.SavedPhase == (int)RunPhase.Victory) EndWithVictory();
+		}
+
+		private void ContinueFailed(string message)
+		{
+			this.GetModel<RunModel>().Phase = RunPhase.None;
+			ReleaseRunRuntime();
+			this.GetSystem<RunTimerSystem>().Stop();
+			this.SendEvent(new RunContinueFailedEvent(message));
 		}
 
 		private void ReleaseRunRuntime()

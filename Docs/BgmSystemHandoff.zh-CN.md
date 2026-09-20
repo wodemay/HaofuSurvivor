@@ -1,9 +1,9 @@
 # BGM 任务交接
 
-状态：实现及 Unity 运行状态验证完成（2026-09-11），未提交或推送。
+状态：基础 BGM 已随 PR #28 合并至 `main`（提交 `1c6a8fb`），Windows `v0.1.8` 已发布；2026-09-14 暂停/恢复续播修正已完成并通过 Unity 运行状态验证，已纳入当前分支但尚未合并或发布。
 
-已恢复原 stash 中的音乐资源、BgmSystem、BgmCommands 和场景引用；stash 保留作为备份，不要再次 apply。主菜单/开局从头循环播放，Pitch 从 1 随对局时间增加、30 分钟达到 2 并封顶；暂停和升级选择冻结 Pitch。修正了返回菜单沿用旧局 Pitch 的问题，并把音乐配置移到 GameStart.Awake。
+已恢复原 stash 中的音乐资源、BgmSystem、BgmCommands 和场景引用；stash 保留作为备份，不要再次 apply。主菜单/开局从头循环播放，Pitch 从 1 随对局时间增加、30 分钟达到 2 并封顶；暂停和升级选择暂停音乐并冻结 Pitch，恢复时从原位置续播（2026-09-14 修正）。修正了返回菜单沿用旧局 Pitch 的问题，并把音乐配置移到 GameStart.Awake。
 
-编译 0 错误、2 个既有引用警告，git diff --check 和 Unity Console 检查通过。此前 50 分钟曲线的 Play Mode 注入事件/时间验证：正常循环播放、单音源、重播位置归零、0/600/1800/3000/6000 秒 Pitch=1/1.2/1.6/2/2，暂停/升级冻结，恢复存档时间即恢复 Pitch。已退出 Play Mode。
+基础功能的编译、git diff --check、Unity Console、循环播放、单音源、重播位置归零、Pitch 上限和存档时间恢复检查已通过；当前曲线为 `Clamp(1 + ElapsedSeconds / 1800, 1, 2)`。2026-09-14 续播修正另行通过暂停位置冻结、原位置恢复、恢复后推进、暂停后菜单重播及 Pitch 重置检查。已退出 Play Mode。
 
-尚未覆盖：实际听感验收、整局游戏回归、发布包播放测试。核心实现细节见 Docs/Guides/BgmSystem.zh-CN.md。当前项目 MCP 是 8800，禁止操作 8801；没有 Git 提交/推送授权。
+尚未覆盖：实际听感验收、整局游戏回归、发布包实际播放测试。核心实现细节见 Docs/Guides/BgmSystem.zh-CN.md。当前项目 MCP 是 8800，禁止操作 8801。

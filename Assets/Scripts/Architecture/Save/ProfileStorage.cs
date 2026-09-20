@@ -16,7 +16,7 @@ namespace HaoFuSurvivor
 	{
 		private const string SaveFile = "SaveData/profile.json";
 		private const string BackupFile = "SaveData/profile.json.bak";
-		private const int CurrentSaveVersion = 2;
+		private const int CurrentSaveVersion = 3;
 
 		public bool HasProfile()
 		{
@@ -40,8 +40,9 @@ namespace HaoFuSurvivor
 			try
 			{
 				data = JsonUtility.FromJson<ProfileData>(json);
-				if (data == null || !BigCoin.TryParse(data.ProfileCoin, out var coin)) return false;
+				if (!IsValidData(data, out var coin)) return false;
 				data.ProfileCoin = coin.ToString();
+				data.SettledRunIds ??= new System.Collections.Generic.List<string>();
 				if (data.SaveVersion < CurrentSaveVersion)
 				{
 					data.SaveVersion = CurrentSaveVersion;
@@ -62,11 +63,13 @@ namespace HaoFuSurvivor
 			error = null;
 			if (data == null) return false;
 			data.SaveVersion = CurrentSaveVersion;
-			if (!BigCoin.TryParse(data.ProfileCoin, out _))
+			if (!IsValidData(data, out var coin))
 			{
 				error = "profile_coin_invalid";
 				return false;
 			}
+			data.ProfileCoin = coin.ToString();
+			data.SettledRunIds ??= new System.Collections.Generic.List<string>();
 			var json = JsonUtility.ToJson(data);
 			return GameArchitecture.Interface.GetUtility<SaveFileStorage>().TryWrite(SaveFile, BackupFile, json, Validate, out error);
 		}
@@ -79,8 +82,8 @@ namespace HaoFuSurvivor
 			try
 			{
 				var data = JsonUtility.FromJson<ProfileData>(json);
-				if (data == null || !BigCoin.TryParse(data.ProfileCoin, out _)) return SaveValidationResult.Corrupt;
-				if (data.SaveVersion > CurrentSaveVersion) return SaveValidationResult.UnsupportedVersion;
+				if (data != null && data.SaveVersion > CurrentSaveVersion) return SaveValidationResult.UnsupportedVersion;
+				if (!IsValidData(data, out _)) return SaveValidationResult.Corrupt;
 				if (data.SaveVersion < 0) return SaveValidationResult.Corrupt;
 				return SaveValidationResult.Valid;
 			}
@@ -88,6 +91,27 @@ namespace HaoFuSurvivor
 			{
 				return SaveValidationResult.Corrupt;
 			}
+		}
+
+		private static bool IsValidData(ProfileData data, out BigCoin coin)
+		{
+			coin = null;
+			if (data == null || !BigCoin.TryParse(data.ProfileCoin, out coin)) return false;
+			if (data.SaveVersion < 0) return false;
+			var seenRunIds = new System.Collections.Generic.HashSet<string>();
+			if (data.SettledRunIds != null)
+				foreach (var runId in data.SettledRunIds)
+					if (string.IsNullOrWhiteSpace(runId) || runId.Length > 64 || !seenRunIds.Add(runId)) return false;
+
+			var catalog = GameArchitecture.Interface.GetUtility<MetaUpgradeCatalog>();
+			var seenUpgrades = new System.Collections.Generic.HashSet<int>();
+			if (data.MetaUpgrades != null)
+				foreach (var entry in data.MetaUpgrades)
+				{
+					var definition = entry == null ? null : catalog.Get(entry.UpgradeId);
+					if (definition == null || entry.Level < 0 || entry.Level > definition.MaxLevel || !seenUpgrades.Add(entry.UpgradeId)) return false;
+				}
+			return true;
 		}
 	}
 }
