@@ -84,7 +84,7 @@ namespace HaoFuSurvivor
 			if (runModel.Phase != RunPhase.Active) return;
 
 			runModel.Phase = RunPhase.LevelUpSelection;
-			this.GetSystem<RunTimerSystem>().Pause();
+			this.GetSystem<RunTimerSystem>().Pause(affectMusic: false);
 		}
 
 		public void EndLevelUpSelection()
@@ -93,7 +93,7 @@ namespace HaoFuSurvivor
 			if (runModel.Phase != RunPhase.LevelUpSelection) return;
 
 			runModel.Phase = RunPhase.Active;
-			this.GetSystem<RunTimerSystem>().Resume();
+			this.GetSystem<RunTimerSystem>().Resume(affectMusic: false);
 		}
 
 		public void ExitToCharacterSelection()

@@ -32,21 +32,21 @@ namespace HaoFuSurvivor
 			this.SendEvent(new RunTimerUpdatedEvent((int)timer.ElapsedSeconds));
 		}
 
-		public void Pause()
+		public void Pause(bool affectMusic = true)
 		{
 			var timer = this.GetModel<RunTimerModel>();
 			timer.IsPaused = true;
 			timer.DeltaTime = 0f;
 			timer.FixedDeltaTime = 0f;
 			Time.timeScale = 0f;
-			this.SendEvent(new RunTimerPauseChangedEvent(true));
+			if (affectMusic) this.SendEvent(new RunTimerPauseChangedEvent(true));
 		}
 
-		public void Resume()
+		public void Resume(bool affectMusic = true)
 		{
 			this.GetModel<RunTimerModel>().IsPaused = false;
 			Time.timeScale = 1f;
-			this.SendEvent(new RunTimerPauseChangedEvent(false));
+			if (affectMusic) this.SendEvent(new RunTimerPauseChangedEvent(false));
 		}
 
 		public void Stop()
