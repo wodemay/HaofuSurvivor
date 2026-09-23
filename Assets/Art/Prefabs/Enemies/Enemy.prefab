@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 331016250300992585}
   - component: {fileID: 6650837142901351687}
+  - component: {fileID: 4823991810134993575}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Untagged
@@ -73,7 +74,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 3625043607559282579, guid: 19fb86013d8c24d6cb8410c0aadf30fa, type: 3}
+  m_Sprite: {fileID: -9207324096461601957, guid: c2d0492ce3fe4924ab4650bc52a73770, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -84,3 +85,27 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &4823991810134993575
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 606102115199416587}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 22712bec65fa9ef43b8e452001306466, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  IdleFrames:
+  - {fileID: -9207324096461601957, guid: c2d0492ce3fe4924ab4650bc52a73770, type: 3}
+  - {fileID: 3564163816650131253, guid: c2d0492ce3fe4924ab4650bc52a73770, type: 3}
+  - {fileID: 7226368915143443176, guid: c2d0492ce3fe4924ab4650bc52a73770, type: 3}
+  - {fileID: 3442889351701288250, guid: c2d0492ce3fe4924ab4650bc52a73770, type: 3}
+  MoveFrames:
+  - {fileID: -4179841175207084588, guid: c2d0492ce3fe4924ab4650bc52a73770, type: 3}
+  - {fileID: 1477917652949279130, guid: c2d0492ce3fe4924ab4650bc52a73770, type: 3}
+  - {fileID: 1872872686426392312, guid: c2d0492ce3fe4924ab4650bc52a73770, type: 3}
+  - {fileID: -8065901692248756248, guid: c2d0492ce3fe4924ab4650bc52a73770, type: 3}
+  IdleFrameRate: 4
+  MoveFrameRate: 8

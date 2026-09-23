@@ -1,0 +1,30 @@
+# 素材目录与角色序列帧
+
+所有图片位于 `Assets/Art/Sprites/`。22 张图片通过 Unity AssetDatabase.MoveAsset 移动，GUID 全部保持不变。
+
+| 目录 | 内容 |
+| --- | --- |
+| Characters | Survivor、Vanguard、Scout 静态图和各自 Animation 图集 |
+| Enemies | Enemy、Boss 静态图和各自 Animation 图集 |
+| Environment | Ground、Tree、Chest |
+| Pickups | Coin、Health、Absorb |
+| Indicators | WorldGuide 指引图，原哈希文件已改为明确名称 |
+| Legacy | 五张旧版道具、树木、宝箱；保留已有引用和回退用途 |
+
+新版正式素材移除 `-v2` 后缀。静态图保留供选角图标等用途，游戏中的五个内容预制体使用序列帧。
+
+## 动画合同
+
+- 每套图集为四列两行，第一行四帧待机，第二行四帧移动。三个角色、普通怪、Boss 共 40 帧。
+- 图集通过内置 image_gen 基于既有造型生成，Unity importer 切帧；未使用运行时图片切割。
+- `ActorFrameAnimationView` 只控制 SpriteRenderer。通过 Command 注册到 GameLoopSystem，跟随对局计时，不添加 MonoBehaviour.Update。
+- 待机 4 FPS、移动 8 FPS；根据世界位移判断移动，使用 0.1 秒停步缓冲避免固定物理帧与渲染帧频率差引起闪烁。
+- 暂停、升级选择和对局结束时，现有 GameLoop 不再更新动画。对象禁用时注销，重新启用及新局开始时重置到待机首帧并注册。
+- 切帧按 alpha 内容校准水平中心和脚底。史莱姆保留跳跃高度变化；碰撞器和根节点不参与动画。
+- 当前是正面待机/移动循环，不包含四方向转身、攻击、受击、死亡动作。AI 生成帧仍可能有局部细节变化，未做人工逐像素修帧。
+
+## 验证
+
+Unity Play Mode 临时实例检查：五种单位全部通过待机换帧、移动换帧、暂停冻结、停止回待机、对象池重置与重新注册检查。测试实例已销毁并退出本轮播放模式。
+2026-09-23 标准 dotnet build（启用分析器）通过：0 错误、35 个既有工具链/框架警告。未进行整局游玩或发布包测试。
+本轮通过 codex/sprite-art-animation 分支提交 PR。8800 MCP 按用户要求继续运行；临时诊断目录为系统 TEMP/survivor-art-20260922，此前清理被策略拦截，仍保留。

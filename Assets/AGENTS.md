@@ -1,5 +1,19 @@
 # Repository Guidelines
 
+- 2026-09-23 | 素材与序列帧 PR 已创建：https://github.com/wodemay/HaofuSurvivor/pull/31 ，分支 codex/sprite-art-animation，功能提交 dd5555c。GitHub 静态检查通过，Unity 编译检查运行中；PR 可合并但未自动合并。保留无关 .workbuddy 目录。
+
+- 2026-09-23 | 完成素材/序列帧/目录整理的提交前审查：修正 Unity 写出的预制体尾随空白，移除 Square 的无关 Rigidbody 序列化改写。标准 dotnet build（启用分析器）0 错误、35 个既有警告；五种单位 Play Mode 动画、暂停和复用检查已通过。基于 origin/main 创建 codex/sprite-art-animation 提交 PR；不纳入 .workbuddy。完整范围及已知限制见 Docs/SpriteAnimationAndFolders.md。
+
+- 2026-09-22 | 为三个角色、普通怪、Boss 生成并接入五套 4 帧待机+4 帧移动图集；ActorFrameAnimationView 经 Command 注册 GameLoop，跟随暂停且兼容对象池重启。五个内容预制体的 Play Mode 待机/移动/暂停/停步/复用验证全部通过；dotnet 关闭异常分析器后 0 错误、2 个既有警告。Sprites 的 22 张图通过 AssetDatabase 分类为 Characters/Enemies/Environment/Pickups/Indicators/Legacy，GUID 保留；正式素材去除 v2 后缀，旧图保留。最新合同见 Docs/SpriteAnimationAndFolders.md。未提交推送。
+
+- 2026-09-22 | 生图额度恢复后补齐 Scout/Enemy/Boss/Tree/Chest-v2，接入角色/敌人/宝箱内容预制体、Scout.Icon 和障碍 Tile。保留旧素材；树木旧物理轮廓迁移至新 meta，Unity 验证世界坐标一致，其他碰撞/技能未改。五张图 alpha、导入和所有消费引用检查通过；未做 Play Mode 游玩与构建。Console 仍有既存 RendererUpdateManager 更新错误。完整记录及提示词见 Docs/CharacterEnvironmentArtHandoff-20260922.md；未提交推送。
+
+- 2026-09-22 | 角色素材重绘部分完成：新增 Survivor-v2、Vanguard-v2（1254×1254，PPU=1254），接入 Square/Triangle 内容预制体及对应 CharacterConfig.Icon，保留技能、碰撞和根节点。Unity alpha、尺寸、引用检查通过；Console 有一条 RendererUpdateManager 更新错误，关联性未确认。生图额度耗尽，斥候、普通怪、Boss、树木、宝箱五张未完成；完整提示词和接入位置见 Docs/CharacterEnvironmentArtHandoff-20260922.md。未提交或推送。
+
+- 2026-09-22 | 素材验收补充：8800 已连接 ProjectSurvivor@662e2df93b4f2899；Unity 刷新后确认三张 v2 Sprite 的 alpha、尺寸、PPU 及四个预制体引用正确，Console 当前无错误。实际游玩视觉验收和构建未执行。MCP 服务按用户要求保持运行。
+
+- 2026-09-22 | 内置 image_gen 原创重绘 Coin/Health/Absorb，新增 Art/Sprites/*-v2.png 与独立 meta；更新三个掉落预制体及 MapEventRoot 的金币引用。保留旧素材，按宽度比例调整 PPU。透明通道与静态引用检查通过；8800 未运行，Unity 导入和场景验收待做。完整提示词与范围见 Docs/ArtRefresh-20260922.md；未提交或推送。
+
 - 2026-09-14 | 修复暂停不停止 BGM：RunTimerSystem.Pause/Resume 发布 RunTimerPauseChangedEvent，BgmSystem 同步暂停/恢复；缓存音乐 AudioSource，恢复 AudioKit 后还原 timeSamples，覆盖暂停菜单及升级选择共用计时路径。未修改框架、UI 或存档逻辑。8800 Unity Play Mode 注入检查通过：暂停冻结、原位置恢复、恢复后推进、暂停后菜单重播及 Pitch=1。dotnet 关闭既有异常分析器后 0 错误、2 个既有引用警告；git diff --check 通过。未提交或推送。
 
 ## Project Structure & Module Organization

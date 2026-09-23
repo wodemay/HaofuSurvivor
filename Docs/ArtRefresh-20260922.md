@@ -1,0 +1,25 @@
+# 掉落素材优化 · 2026-09-22
+
+目录更新：正式道具现位于 `Assets/Art/Sprites/Pickups/`，文件名已移除 `-v2`；旧图位于 `Legacy/`。GUID 保留，详情见 SpriteAnimationAndFolders.md。
+
+本轮范围：Coin、Health、Absorb 三种掉落图。使用内置 image_gen 原创重绘，未使用 API CLI。旧图和旧 meta 保留，新图以 `-v2.png` 存入 `Assets/Art/Sprites/`。
+
+已接入 CoinDrop、HealthDrop、ExperienceAbsorbDrop；MapEventRoot 共用的金币图同步更新。未修改脚本、碰撞器、预制体层级和 UI。
+
+新图均为 1254×1254，具有真实 alpha 透明通道。PPU 按新旧画布宽度比调整，保持原画布世界宽度；透明留白和长宽比变化仍会影响可见轮廓大小，需在 Unity 中最终目测。金币 PPU=1178.57143，红心=1031.25，磁铁=1222.22222。
+
+已检查生成图视觉、PNG 透明角点和预制体 GUID 引用。8800 已连接 ProjectSurvivor@662e2df93b4f2899，Unity 刷新后确认三张 Sprite 均导入成功、具有 alpha、尺寸和 PPU 正确，四个预制体均指向新版素材，Console 当前无错误。未做实际游玩视觉验收或构建。原树木、宝箱、地面及方向标记未在本轮重绘。
+
+## 最终提示词
+
+### Coin
+
+Create one original production-ready 2D survivor-game pickup sprite: a single gold coin viewed straight-on, embossed yuan currency symbol ¥, warm gold beveled rim and restrained engraved rim detail. Polished hand-painted casual fantasy game style, bold readable silhouette, warm highlights top-left and darker amber bottom-right, medium dark outline, simplified detail legible at 32 pixels. Exactly one coin centered, occupies 88% of square canvas. Genuine transparent alpha background, no checkerboard drawn, no surrounding scene, no cast shadow outside silhouette, no text other than currency emblem, no watermark. Save as PNG. This is an original replacement game asset, not a photo.
+
+### Health
+
+Create one original production-ready 2D survivor-game healing pickup sprite: a single plump bright ruby red heart viewed straight-on. Polished hand-painted casual fantasy game style, bold readable symmetrical silhouette, smooth bevel and soft painted gradients, warm pale highlight on top-left lobe, deep crimson bottom-right edge, medium dark burgundy outline, simplified detail legible at 32 pixels. No gold frame. Exactly one heart centered, occupies 88% of square canvas. Genuine transparent alpha background, no checkerboard drawn, no scene, no exterior cast shadow, no text, no watermark. PNG. Match polished golden pickup coin aesthetic through lighting and edge quality.
+
+### Absorb
+
+Create one original production-ready 2D survivor-game loot-magnet pickup sprite, polished hand-painted casual fantasy style matching a beveled golden coin and glossy ruby heart. Single upright U-shaped horseshoe magnet viewed straight-on, opening at top, left arm cobalt blue, right arm crimson red, both tips silver steel, restrained warm edge highlights top left, dark shaded lower right, strong clean outline. One small gold lightning bolt centered in the open U gap, clear separation from arms. Bold silhouette readable at 32 pixels, simplified forms, no excessive detail. Centered object occupies 88% of square canvas. Genuine transparent alpha background including U gap; no checkerboard drawn, no scene, no ground shadow, no label, no watermark. PNG.
