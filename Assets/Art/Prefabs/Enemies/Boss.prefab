@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 331016250300992585}
   - component: {fileID: 6650837142901351687}
+  - component: {fileID: 5949097555191606036}
   m_Layer: 0
   m_Name: Boss
   m_TagString: Untagged
@@ -73,7 +74,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -2135585597343286014, guid: eed45a33cd08446c8b88325cf82fc52f, type: 3}
+  m_Sprite: {fileID: -6051521588232645407, guid: f8c6ee23f2b2e1e4dbe9e4207511c9e9, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -84,3 +85,27 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &5949097555191606036
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 606102115199416587}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 22712bec65fa9ef43b8e452001306466, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  IdleFrames:
+  - {fileID: -6051521588232645407, guid: f8c6ee23f2b2e1e4dbe9e4207511c9e9, type: 3}
+  - {fileID: 8390920959967012993, guid: f8c6ee23f2b2e1e4dbe9e4207511c9e9, type: 3}
+  - {fileID: -3676956495255988514, guid: f8c6ee23f2b2e1e4dbe9e4207511c9e9, type: 3}
+  - {fileID: 8700899219577642350, guid: f8c6ee23f2b2e1e4dbe9e4207511c9e9, type: 3}
+  MoveFrames:
+  - {fileID: -3789336689584132452, guid: f8c6ee23f2b2e1e4dbe9e4207511c9e9, type: 3}
+  - {fileID: -6418652976556831974, guid: f8c6ee23f2b2e1e4dbe9e4207511c9e9, type: 3}
+  - {fileID: 6535039638285363306, guid: f8c6ee23f2b2e1e4dbe9e4207511c9e9, type: 3}
+  - {fileID: 8894553716840691386, guid: f8c6ee23f2b2e1e4dbe9e4207511c9e9, type: 3}
+  IdleFrameRate: 4
+  MoveFrameRate: 8

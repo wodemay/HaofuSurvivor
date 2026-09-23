@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 9077298757725260890}
   - component: {fileID: 5219541077965944727}
   - component: {fileID: -2741125583577452609}
+  - component: {fileID: 4895107959828136798}
   m_Layer: 0
   m_Name: Triangle
   m_TagString: Untagged
@@ -75,7 +76,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 75f5f34dc1b5347e0b8351032682f224, type: 3}
+  m_Sprite: {fileID: -2152808802922897569, guid: b07978f25b6aa5140825534f55b203c1, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -123,5 +124,29 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3d5f5ab6419108b409219c9d37c61b68, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
+--- !u!114 &4895107959828136798
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7151673315206538592}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 22712bec65fa9ef43b8e452001306466, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  IdleFrames:
+  - {fileID: -2152808802922897569, guid: b07978f25b6aa5140825534f55b203c1, type: 3}
+  - {fileID: -8520769977440105136, guid: b07978f25b6aa5140825534f55b203c1, type: 3}
+  - {fileID: -6555364839340150335, guid: b07978f25b6aa5140825534f55b203c1, type: 3}
+  - {fileID: -6167621470438372002, guid: b07978f25b6aa5140825534f55b203c1, type: 3}
+  MoveFrames:
+  - {fileID: -8337870772604236968, guid: b07978f25b6aa5140825534f55b203c1, type: 3}
+  - {fileID: 6555622247868243909, guid: b07978f25b6aa5140825534f55b203c1, type: 3}
+  - {fileID: 1445209541892733688, guid: b07978f25b6aa5140825534f55b203c1, type: 3}
+  - {fileID: -964967872729394880, guid: b07978f25b6aa5140825534f55b203c1, type: 3}
+  IdleFrameRate: 4
+  MoveFrameRate: 8

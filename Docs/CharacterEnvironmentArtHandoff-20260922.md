@@ -1,0 +1,68 @@
+# 角色与场景素材重绘交接
+
+后续更新：素材已分类移动到 Sprites/Characters、Enemies、Environment、Pickups、Indicators、Legacy，正式静态图移除 `-v2` 后缀。五个角色/敌人内容预制体现已接入待机和移动序列帧；下文静态图路径为重绘时的历史路径。最新目录和验收见 SpriteAnimationAndFolders.md。
+
+## 当前状态
+
+用户要求重绘怪物、角色、树木、宝箱。使用内置 image_gen，曾因额度暂停；本轮额度恢复，七张素材现已全部生成并接入。未使用付费 API CLI。
+
+- 已生成 Survivor-v2.png：蓝色兜帽幸存者，接入 Characters/Square.prefab 和 Character_Survivor.Icon。
+- 已生成 Vanguard-v2.png：银甲红披风先锋，接入 Characters/Triangle.prefab 和 Character_Vanguard.Icon。
+- 新图位于 Assets/Art/Sprites/，独立 meta，1254×1254，PPU=1254，居中 pivot；保留旧资源，未改碰撞、技能和角色根节点。
+- 本轮已补齐 Scout-v2、Enemy-v2、Boss-v2、Tree-v2、Chest-v2，均保存至 Assets/Art/Sprites/，有独立 meta 和真实透明通道。
+- 现有角色均无动画，本轮为静态 Sprite 重绘。
+
+## 已接入位置
+
+| 素材 | 消费位置 |
+| --- | --- |
+| Scout-v2 | Characters/Circle.prefab；Character_Scout.asset 的 Icon |
+| Enemy-v2 | Enemies/Enemy.prefab；原 Sprite 世界尺寸 1×0.5 |
+| Boss-v2 | Enemies/Boss.prefab；原 Sprite 世界尺寸 0.88×1，预制体 scale=2 |
+| Tree-v2 | Resources/Configs/Map/Tiles/Tile_Obstacle_Test.asset 的 m_DefaultSprite |
+| Chest-v2 | Breakable/BreakableObject.prefab；检查 MapEventRoot.prefab 共用旧宝箱的 Image_Progress，避免把界面进度图片错误处理为世界物体 |
+
+预制体完整路径前缀为 Assets/Art/Prefabs/。配置位于 Assets/Resources/Configs/。
+树旧图为 Art/Sprites/40738d221403a9a7f78414ae8873cd43.png，宝箱旧图为 6ce895b862f3d37f59b3bcaa03325422.png。角色和怪物旧图为 Unity package 默认几何图形，不能覆盖包内文件。
+
+## 已使用最终提示词
+
+### Survivor
+
+Original 2D survivor-game sprite, one full-body chibi survivor adventurer, round readable silhouette, blue teal hooded coat, brown belt and boots, small brass shoulder clasp, determined friendly face, empty hands at sides, no weapons. Standing idle facing camera with slightly top-down three-quarter game view, head about 40 percent height. Polished hand-painted casual fantasy style, strong dark clean outline, warm top-left highlights, restrained texture, readable at 64 pixels. Centered entire body inside square frame with 8 percent padding, true transparent alpha background, no ground, no shadow outside silhouette, no text or watermark. Match glossy red heart and beveled golden coin game art. Single character only.
+
+### Vanguard
+
+One original full-body chibi vanguard knight sprite for 2D survivor game. Broad square silhouette, stocky silver and warm brass armor, red short cape, open helmet showing determined face, large shoulder plates, empty gloved hands at sides, no weapon or shield. Head 40 percent height, standing idle facing camera slight top-down game view. Polished hand-painted casual fantasy, dark crisp outline, warm upper-left highlights, readable at 64 pixels. Match blue hooded chibi adventurer style, not realistic. Entire body centered with 8 percent padding in square canvas. True transparent alpha background, no floor, no cast shadow outside character, no labels, no text, no watermark, single character.
+
+## 本轮生成提示词
+
+### Scout
+
+One original full-body chibi scout character sprite for 2D survivor game. Slim triangular silhouette, forest green pointed hood and short leaf-shaped cloak, fitted brown leather outfit, light boots, alert friendly face, empty hands at sides, no bow no weapons. Head 40 percent height, idle facing camera slightly top-down view. Polished hand-painted casual fantasy style matching blue hooded adventurer and silver armored chibi knight, dark crisp outline, warm upper-left highlights, simple readable forms at 64 pixels. Entire character centered inside square with 8 percent padding. True transparent alpha background, no floor, no exterior cast shadow, no text no watermark. Single character only.
+
+### Enemy
+
+One original squat violet slime monster sprite for a 2D survivor game, broad low silhouette approximately twice as wide as tall, two amber eyes and small fangs, menacing but cute, front slight top-down view. Polished hand-painted casual fantasy matching the new hero sprites, bold outline, upper-left highlights, readable at small scale. Single complete monster, transparent alpha background, generous padding, no scene, no external shadow, no text or watermark.
+
+### Boss
+
+One original chibi armored horned stone monster boss sprite for a 2D survivor game. Broad heavy silhouette, charcoal stone armor, crimson crystal core, amber eyes, short ivory horns, large fists, no weapons. Standing facing camera, slight top-down view. Polished hand-painted casual fantasy, clear silhouette, upper-left warm lighting, minimal small detail. Whole body centered with padding, transparent alpha, no floor, no external cast shadow, no text or watermark.
+
+### Tree
+
+One original deciduous tree sprite for a 2D survivor game, rounded layered green canopy, stout brown trunk and two visible branches, front slight top-down view. Polished hand-painted casual fantasy matching chibi heroes, clean dark contours, warm upper-left light, simplified foliage masses readable at small scale. Entire isolated tree centered, transparent alpha, no ground patch, no exterior shadow, no text or watermark.
+
+### Chest
+
+One original closed treasure chest sprite for a 2D survivor game, warm brown wooden planks, chunky gold bands, central diamond lock plate with keyhole, front slight top-down view. Polished hand-painted casual fantasy matching the new golden coin, strong outline, warm upper-left highlights, restrained wood grain, readable at small scale. Single chest centered with padding, true transparent alpha, no ground, no exterior cast shadow, no text or watermark.
+
+## 验收与资源保留
+
+本轮五张 Sprite 的 Unity 导入、alpha、四个预制体引用、Scout.Icon 和树木 Tile 引用全部通过。Sprite 世界画布尺寸依次为 1×1、1×0.67、0.88×0.94、1.99×2.01、0.91×0.72；保留原纵横比，不拉伸图片。树木采用 PPU=627.0528，并迁移旧 Sprite 的物理轮廓，验证每个世界坐标误差小于 0.001；避免 Tile 使用 Sprite 碰撞时改变阻挡范围。Boss 原 scale=2 保留。MapEventRoot 的旧宝箱进度填充图未替换，不属于本轮世界宝箱。
+未进行 Play Mode 实际游玩验收或构建；Console 仍有下述既存编辑器渲染更新错误。未提交或推送。
+
+已完成两张角色的 Unity 导入验证：透明通道、1×1 世界画布尺寸、PPU=1254、预制体 Sprite 与配置 Icon 引用均通过。未进行 Play Mode 游玩验收。Console 有一条编辑器渲染更新错误：`In order to call GetTransformInfoExpectUpToDate, RendererUpdateManager.UpdateAll must be called first.`，未清除日志，尚未确认与本次素材修改有关。
+
+接入后通过 8800 MCP 确认 ProjectSurvivor 会话，刷新导入并检查 Sprite/alpha/PPU、角色配置图标及预制体引用，补充场景视觉验收。不可使用 8801。
+MCP 为用户要求运行的服务，保留运行；临时检查文件位于系统 TEMP/survivor-art-20260922，前次清理被策略拦截，保留并披露。

@@ -1,0 +1,23 @@
+# 序列帧生成提示词
+
+内置 image_gen，参考图为各单位此前生成的静态图。生成图集保存于 Assets/Art/Sprites/Characters 和 Enemies，名称为 <单位名>-Animation.png。
+
+## Survivor
+
+Using this exact blue hooded adventurer as identity reference, create a production 2D animation SPRITE SHEET. Exactly 8 full-body frames in uniform 4 columns by 2 rows grid on transparent alpha canvas, landscape 2:1 aspect ratio. Each cell equal size, same character scale, same centered alignment, feet baseline fixed relative to cell. Top row: 4 sequential subtle breathing idle poses. Bottom row: 4 distinct sequential walk-cycle poses alternating left foot forward, passing, right foot forward, passing; arms counter-swing, coat reacts. ALL frames face front; no turning. Preserve exact blue coat, face, brown boots, brass clasp, hand-painted chibi style. No weapons. Every character fully contained with generous 12% cell padding, no overlap, no labels, no grid lines, no ground, no cast shadow, no watermark. Real changed limb poses, not duplicates or translated copies.
+
+## Vanguard
+
+Edit reference into animation sprite sheet retaining exact silver armored red cape knight identity. Exactly eight whole-body poses, 4 equal columns x 2 equal rows, landscape 2:1 canvas, genuine transparent background. Top row 4 subtle breathing idle frames; bottom row 4 sequential walking frames: left foot forward, passing, right foot forward, passing, arms counter swing cape follows. Same front-facing view, constant body scale and center, fixed feet baseline in every cell. Every pose fully inside its cell with 10% margin, no overlap. Preserve face outfit colors and hand-painted chibi style. No grid lines, no labels, no background or shadows. Frames change limbs, not just copies.
+
+## Scout
+
+Turn this exact green hooded scout into 2D animation sprite sheet: eight full-body frames in regular 4 columns by 2 rows, landscape 2:1 canvas with real transparent alpha. Top row four subtle breathing idle poses, bottom row four sequential walk poses alternating left foot lead / passing / right foot lead / passing, arms counter-swing. Preserve green leaf cloak, brown leather, face, style. All face front, equal scale, same center and foot baseline per cell. Every body fits entirely in its own equal cell with 10% clear padding. Clean hand-painted chibi art, no text no labels no grid no ground no shadow. Distinct limb movement across walking frames.
+
+## Enemy
+
+Make a production animation spritesheet of the EXACT purple slime monster in reference. Eight complete frames on regular four columns two rows grid, true transparent alpha canvas landscape 2:1. Row one four idle squish/breathing frames, row two four looping hopping locomotion phases: crouch, stretch lift, rounded apex, squash landing. Preserve amber eyes two fangs and purple body, front view, same size overall, centered per cell, fully contained with 12 percent padding; slight height variation intentional for bounce. Remove exterior glow from reference. Hand-painted chibi game art. No labels no grid lines no floor no ground shadow, no extra creatures.
+
+## Boss
+
+Create animation spritesheet from exact horned charcoal stone red-crystal boss reference. Eight full body frames on exactly four equal columns by two equal rows, 2:1 landscape canvas, real transparent background. Top row four breathing idle poses with slight shoulder shifts, bottom row four distinct heavy walking steps alternating left forward, passing, right forward, passing, fists counter swing. Keep horns red crystals face armor identity unchanged, same front view and scale, same centered placement and feet baseline per cell. Whole boss including fists and horns stays inside cell with 12 percent padding. Hand-painted chibi game style. No labels no grid no shadows no floor no background glow. Separate nonoverlapping frames.
