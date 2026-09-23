@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2e8a7d1cf62548b28daa4123adf567f0, type: 3}
   m_Name: Character_Survivor
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier:
   Id: 1
   DisplayName: "\u5E78\u5B58\u8005"
   SkillDescription: "\u4E13\u5C5E\u6280\u80FD\uFF1A\u8FDE\u7EED\u91CA\u653E\u4E09\u8F6E\u73AF\u5F62\u5F39\u5E55\u3002"

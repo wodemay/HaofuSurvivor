@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2e8a7d1cf62548b28daa4123adf567f0, type: 3}
   m_Name: Character_Vanguard
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier:
   Id: 2
   DisplayName: "\u5148\u950B"
   SkillDescription: "\u575A\u97E7\uFF1A\u66F4\u9AD8\u751F\u547D\u4E0E\u653B\u51FB\u529B\u3002"

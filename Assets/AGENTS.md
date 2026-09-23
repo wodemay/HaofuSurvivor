@@ -1,5 +1,7 @@
 # Repository Guidelines
 
+- 2026-09-23 | 素材与序列帧 PR 已创建：https://github.com/wodemay/HaofuSurvivor/pull/31 ，分支 codex/sprite-art-animation，功能提交 dd5555c。GitHub 静态检查通过，Unity 编译检查运行中；PR 可合并但未自动合并。保留无关 .workbuddy 目录。
+
 - 2026-09-23 | 完成素材/序列帧/目录整理的提交前审查：修正 Unity 写出的预制体尾随空白，移除 Square 的无关 Rigidbody 序列化改写。标准 dotnet build（启用分析器）0 错误、35 个既有警告；五种单位 Play Mode 动画、暂停和复用检查已通过。基于 origin/main 创建 codex/sprite-art-animation 提交 PR；不纳入 .workbuddy。完整范围及已知限制见 Docs/SpriteAnimationAndFolders.md。
 
 - 2026-09-22 | 为三个角色、普通怪、Boss 生成并接入五套 4 帧待机+4 帧移动图集；ActorFrameAnimationView 经 Command 注册 GameLoop，跟随暂停且兼容对象池重启。五个内容预制体的 Play Mode 待机/移动/暂停/停步/复用验证全部通过；dotnet 关闭异常分析器后 0 错误、2 个既有警告。Sprites 的 22 张图通过 AssetDatabase 分类为 Characters/Enemies/Environment/Pickups/Indicators/Legacy，GUID 保留；正式素材去除 v2 后缀，旧图保留。最新合同见 Docs/SpriteAnimationAndFolders.md。未提交推送。
