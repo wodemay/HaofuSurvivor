@@ -11,11 +11,11 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7f7a4ef7c0e44f1a9d3f1d1a0a000002, type: 3}
   m_Name: Dodge_Basic
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier:
   Id: 1
   DisplayName: "\u666E\u901A\u95EA\u907F"
   Description: "\u5411\u79FB\u52A8\u65B9\u5411\u5FEB\u901F\u51B2\u523A\u5E76\u77ED\u6682\u65E0\u654C"
-  Icon: {fileID: 0}
+  Icon: {fileID: 21300005, guid: 02996dd12d5440ddb70e6e99c7f2e487, type: 3}
   ExecutorId: dash
   Cooldown: 1
   Duration: 0.2

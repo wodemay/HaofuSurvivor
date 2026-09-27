@@ -1,0 +1,36 @@
+# 投射物与火焰素材优化
+
+2026-09-26 使用内置 image_gen 生成四张原创透明 PNG，替换默认圆形占位图。
+
+| 图片（Assets/Art/Sprites/Effects/） | 预制体（Assets/Art/Prefabs/Attack/） | 表现 |
+| --- | --- | --- |
+| Bullet.png | Bullet.prefab | 金白色能量弹 |
+| FireBall.png | FireBall/FireBall.prefab | 黄白核心、橙红火舌 |
+| FireExplosion.png | FireBall/FireBallExplosion.prefab | 径向爆炸冲击 |
+| GroundFlame.png | FireBall/FireGroundFlame.prefab | 中心透明的持续火环 |
+
+四图均为 1254×1254，单 Sprite，PPU 1254，中心轴心，透明通道保留。SpriteRenderer 使用白色，避免旧红橙叠色改变贴图。原预制体缩放分别为 0.2、0.5、2、2；碰撞、伤害、生命周期不变。本轮为静态特效图，不包含序列帧。投射物采用无方向性构图，兼容现有不旋转贴图的移动逻辑。
+
+## 验证与剩余任务
+
+PNG 透明通道及四个预制体的 GUID 引用已检查。2026-09-26 接续验证：8800 已连接 ProjectSurvivor，四个 Sprite 加载、alpha、白色叠色及预制体引用全部通过，贴图画布世界尺寸均为 1×1。
+
+后续可在整局游玩中观察普通弹、火球、爆炸和地面火环的小尺寸可读性。未提交、推送或创建本轮 PR。
+
+## 最终生成提示词
+
+### Bullet
+
+One original production-ready sprite for a tiny magic projectile in a top-down 2D fantasy survivor game. Compact circular warm ivory-gold energy bead, brilliant cream core with a crisp amber gold rim, subtle hand-painted concentric energy contour, simple readable silhouette at 12-24 screen pixels. Radially symmetric, no direction no tail no weapon no casing. Match polished hand-painted chibi fantasy game assets. Entire bead centered, 80 percent square canvas diameter, genuine transparent alpha background, no black rectangle, no floor, no external large halo, no text no watermark. Single projectile only.
+
+### FireBall
+
+One original game fireball projectile sprite for top-down 2D fantasy survivor. Compact circular white-hot yellow core enclosed by swirling orange and vermilion flame tongues around all sides, radial nondirectional design, NO directional tail. Readable strong silhouette at small sizes, hand-painted stylized chibi fantasy VFX matching golden energy bead. Isolated single fireball centered with 12 percent padding, full effect visible, genuinely transparent alpha outside flames, no black background, no scene, no floor no drop shadow, no text watermark or icon border.
+
+### FireExplosion
+
+One isolated top-down circular fire EXPLOSION impact VFX sprite for a polished hand-painted 2D fantasy survivor game. Radial orange flame shockwave burst, jagged outward flame tongues and a luminous yellow-white core, a few closely contained sparks. Strong instantaneous explosive silhouette distinct from round fireball. Balanced circular footprint seen overhead, centered inside square with 12 percent transparent padding, bright center but limited coverage. Genuine transparent alpha outside fire, no black background, no floor no smoke cloud no ground texture, no icon frame no text no watermark.
+
+### GroundFlame
+
+One isolated circular ground fire area VFX sprite viewed directly overhead for a hand-painted 2D fantasy survivor game. Irregular broken ring of low orange flame tongues and ember arcs, mostly transparent open center with only a few sparse dark orange embers. Readable circular danger perimeter, less bright than impact explosion, no solid white disk. Top-down circular footprint not elliptical, no campfire logs or rocks, no scorched ground texture. Whole ring centered with clear padding, true transparent alpha background AND transparent center so gameplay remains visible underneath. Single game effect, no black background no floor no smoke no text watermark or UI frame.

@@ -1,5 +1,11 @@
 # Repository Guidelines
 
+- 2026-09-27 | 收尾审查弹药特效、技能图标、地砖及角色侧向动画；PR #31 已合并，当前 HEAD 与最新 origin/main 文件树一致，从 origin/main 创建 codex/combat-art-facing 承接本轮改动。沿用已通过的 Unity 导入/朝向测试与编译结果，准备独立 PR；保留无关 .workbuddy，不包含构建包或玩法数值修改。
+
+- 2026-09-26 | 内置 image_gen 完成三角色侧向待机/移动图集、16 枚技能图标与新版深色石砖；三个角色内容预制体启用 FaceMovement，SpriteRenderer 按水平位移镜像，停步/纵移保留，开局/复用重置；原静态图继续用于选角。16 图标绑定 12 配置的 22 处 Icon。Unity 导入和临时 Play Mode 朝向/零增量/复用检查通过，dotnet build 0 错误、2 个既有警告。前轮四种弹药特效也通过 Unity 导入/引用/透明检查。详情及提示词见 Docs/SkillGroundFacingArt-20260926.md；未提交推送，未做整局验收。
+
+- 2026-09-26 | 内置 image_gen 生成普通弹、火焰弹、爆炸与地面火焰四张透明图，存入 Art/Sprites/Effects；四个 Attack 预制体替换默认圆形并使用白色叠色。单 Sprite、PPU 1254，保留原缩放与玩法逻辑。图片透明通道和 YAML 引用检查通过；8800 服务运行但无 Unity 会话，导入与场景验收待连接后完成。提示词、接入路径和待办见 Docs/ProjectileEffectArt-20260926.md。未提交推送。
+
 - 2026-09-23 | 素材与序列帧 PR 已创建：https://github.com/wodemay/HaofuSurvivor/pull/31 ，分支 codex/sprite-art-animation，功能提交 dd5555c。GitHub 静态检查通过，Unity 编译检查运行中；PR 可合并但未自动合并。保留无关 .workbuddy 目录。
 
 - 2026-09-23 | 完成素材/序列帧/目录整理的提交前审查：修正 Unity 写出的预制体尾随空白，移除 Square 的无关 Rigidbody 序列化改写。标准 dotnet build（启用分析器）0 错误、35 个既有警告；五种单位 Play Mode 动画、暂停和复用检查已通过。基于 origin/main 创建 codex/sprite-art-animation 提交 PR；不纳入 .workbuddy。完整范围及已知限制见 Docs/SpriteAnimationAndFolders.md。

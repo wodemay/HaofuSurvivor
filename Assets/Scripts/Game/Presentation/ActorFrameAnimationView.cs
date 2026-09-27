@@ -8,6 +8,7 @@ namespace HaoFuSurvivor
 	{
 		[SerializeField] private Sprite[] IdleFrames;
 		[SerializeField] private Sprite[] MoveFrames;
+		[SerializeField] private bool FaceMovement;
 		[SerializeField, Min(1f)] private float IdleFrameRate = 4f;
 		[SerializeField, Min(1f)] private float MoveFrameRate = 8f;
 		private SpriteRenderer mRenderer;
@@ -44,6 +45,7 @@ namespace HaoFuSurvivor
 			mMoving = false;
 			mMovingRemaining = 0f;
 			mFrameTime = 0f;
+			if (FaceMovement) mRenderer.flipX = false;
 			if (IdleFrames != null && IdleFrames.Length > 0) mRenderer.sprite = IdleFrames[0];
 		}
 
@@ -51,6 +53,9 @@ namespace HaoFuSurvivor
 		{
 			if (!isActiveAndEnabled || deltaTime <= 0f) return;
 			var position = transform.position;
+			var horizontalMovement = position.x - mLastPosition.x;
+			if (FaceMovement && Mathf.Abs(horizontalMovement) > 0.001f)
+				mRenderer.flipX = horizontalMovement < 0f;
 			if ((position - mLastPosition).sqrMagnitude > 0.000001f) mMovingRemaining = 0.1f;
 			else mMovingRemaining = Mathf.Max(0f, mMovingRemaining - deltaTime);
 			mLastPosition = position;

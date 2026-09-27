@@ -11,11 +11,11 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d8f4f1ef12c28b64eb58148529e525a2, type: 3}
   m_Name: Weapon_FireBallInferno
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier:
   Id: 4
   DisplayName: 炼狱火球
   Description: 命中后引爆并在地面留下灼烧火焰。
-  Icon: {fileID: 0}
+  Icon: {fileID: 21300003, guid: 02996dd12d5440ddb70e6e99c7f2e487, type: 3}
   InitialAttackIds:
   - 1006
   MaxLevel: 1

@@ -10,7 +10,7 @@ MonoBehaviour:
     Type: 0
     DisplayName: 最大生命值
     Description: 后续对局最大生命值提升10%
-    Icon: {fileID: 0}
+    Icon: {fileID: 21300013, guid: 02996dd12d5440ddb70e6e99c7f2e487, type: 3}
     PercentPerLevel: 0.1
     MaxLevel: 5
     Costs:
@@ -23,7 +23,7 @@ MonoBehaviour:
     Type: 1
     DisplayName: 攻击力
     Description: 后续对局所有伤害提升8%
-    Icon: {fileID: 0}
+    Icon: {fileID: 21300006, guid: 02996dd12d5440ddb70e6e99c7f2e487, type: 3}
     PercentPerLevel: 0.08
     MaxLevel: 5
     Costs:
@@ -36,7 +36,7 @@ MonoBehaviour:
     Type: 2
     DisplayName: 移动速度
     Description: 后续对局移动速度提升6%
-    Icon: {fileID: 0}
+    Icon: {fileID: 21300010, guid: 02996dd12d5440ddb70e6e99c7f2e487, type: 3}
     PercentPerLevel: 0.06
     MaxLevel: 5
     Costs:
