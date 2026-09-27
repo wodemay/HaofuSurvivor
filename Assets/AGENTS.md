@@ -1,5 +1,7 @@
 # Repository Guidelines
 
+- 2026-09-27 | 已提交推送 2777828，创建 PR #32：https://github.com/wodemay/HaofuSurvivor/pull/32 ，分支 codex/combat-art-facing。包含两轮弹药/技能/地面/角色朝向美术升级，静态差异检查通过；沿用已完成 Unity 与编译验证。未合并，.workbuddy 保留且未提交。
+
 - 2026-09-27 | 收尾审查弹药特效、技能图标、地砖及角色侧向动画；PR #31 已合并，当前 HEAD 与最新 origin/main 文件树一致，从 origin/main 创建 codex/combat-art-facing 承接本轮改动。沿用已通过的 Unity 导入/朝向测试与编译结果，准备独立 PR；保留无关 .workbuddy，不包含构建包或玩法数值修改。
 
 - 2026-09-26 | 内置 image_gen 完成三角色侧向待机/移动图集、16 枚技能图标与新版深色石砖；三个角色内容预制体启用 FaceMovement，SpriteRenderer 按水平位移镜像，停步/纵移保留，开局/复用重置；原静态图继续用于选角。16 图标绑定 12 配置的 22 处 Icon。Unity 导入和临时 Play Mode 朝向/零增量/复用检查通过，dotnet build 0 错误、2 个既有警告。前轮四种弹药特效也通过 Unity 导入/引用/透明检查。详情及提示词见 Docs/SkillGroundFacingArt-20260926.md；未提交推送，未做整局验收。
