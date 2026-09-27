@@ -11,14 +11,14 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 243aa6e12ef24dc9a7c2a42dc999f001, type: 3}
   m_Name: CharacterExclusivePerkCatalog
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier:
   Perks:
   - Id: 1
     CharacterId: 1
     Type: 0
     DisplayName: 绝境意志
     Description: 生命值不高于50%时，所有伤害提高。
-    Icon: {fileID: 0}
+    Icon: {fileID: 21300013, guid: 02996dd12d5440ddb70e6e99c7f2e487, type: 3}
     CandidateWeight: 2
     HealthThreshold: 0.5
     TriggerDodgeId: 0
@@ -38,7 +38,7 @@ MonoBehaviour:
     Type: 1
     DisplayName: 战术翻滚
     Description: 闪避结束后2秒内，武器子弹数量增加。
-    Icon: {fileID: 0}
+    Icon: {fileID: 21300014, guid: 02996dd12d5440ddb70e6e99c7f2e487, type: 3}
     CandidateWeight: 2
     HealthThreshold: 0.5
     TriggerDodgeId: 1
@@ -58,7 +58,7 @@ MonoBehaviour:
     Type: 2
     DisplayName: 环流蓄能
     Description: 施放环形弹幕后，武器攻击冷却缩减。
-    Icon: {fileID: 0}
+    Icon: {fileID: 21300015, guid: 02996dd12d5440ddb70e6e99c7f2e487, type: 3}
     CandidateWeight: 2
     HealthThreshold: 0.5
     TriggerDodgeId: 0

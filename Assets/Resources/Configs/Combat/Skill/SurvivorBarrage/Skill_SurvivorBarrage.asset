@@ -15,7 +15,7 @@ MonoBehaviour:
   Id: 1
   DisplayName: "\u73af\u5f62\u5f39\u5e55"
   Description: "\u8fde\u7eed\u91ca\u653e\u4e09\u8f6e\u73af\u5f62\u5f39\u5e55\u3002"
-  Icon: {fileID: 0}
+  Icon: {fileID: 21300004, guid: 02996dd12d5440ddb70e6e99c7f2e487, type: 3}
   InitialAttackIds:
   - 1004
   MaxLevel: 2

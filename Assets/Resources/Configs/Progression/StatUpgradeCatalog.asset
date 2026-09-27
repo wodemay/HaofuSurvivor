@@ -10,48 +10,48 @@ MonoBehaviour:
     Type: 0
     DisplayName: 攻击强化
     Description: 所有伤害提高10%
-    Icon: {fileID: 0}
+    Icon: {fileID: 21300006, guid: 02996dd12d5440ddb70e6e99c7f2e487, type: 3}
     PercentPerLevel: 0.1
     MaxLevel: 5
   - Id: 2
     Type: 1
     DisplayName: 冷却优化
     Description: 所有冷却缩短8%
-    Icon: {fileID: 0}
+    Icon: {fileID: 21300007, guid: 02996dd12d5440ddb70e6e99c7f2e487, type: 3}
     PercentPerLevel: 0.08
     MaxLevel: 5
   - Id: 3
     Type: 2
     DisplayName: 吸收范围
     Description: 经验吸收范围提高20%
-    Icon: {fileID: 0}
+    Icon: {fileID: 21300008, guid: 02996dd12d5440ddb70e6e99c7f2e487, type: 3}
     PercentPerLevel: 0.2
     MaxLevel: 5
   - Id: 4
     Type: 3
     DisplayName: 经验增幅
     Description: 获得经验提高15%
-    Icon: {fileID: 0}
+    Icon: {fileID: 21300009, guid: 02996dd12d5440ddb70e6e99c7f2e487, type: 3}
     PercentPerLevel: 0.15
     MaxLevel: 5
   - Id: 5
     Type: 4
     DisplayName: 疾行
     Description: 移动速度提高8%
-    Icon: {fileID: 0}
+    Icon: {fileID: 21300010, guid: 02996dd12d5440ddb70e6e99c7f2e487, type: 3}
     PercentPerLevel: 0.08
     MaxLevel: 5
   - Id: 6
     Type: 5
     DisplayName: 自愈
     Description: 每秒恢复最大生命值的0.5%
-    Icon: {fileID: 0}
+    Icon: {fileID: 21300011, guid: 02996dd12d5440ddb70e6e99c7f2e487, type: 3}
     PercentPerLevel: 0.005
     MaxLevel: 5
   - Id: 7
     Type: 6
     DisplayName: 恢复效率
     Description: 外部治疗效果提高20%
-    Icon: {fileID: 0}
+    Icon: {fileID: 21300012, guid: 02996dd12d5440ddb70e6e99c7f2e487, type: 3}
     PercentPerLevel: 0.2
     MaxLevel: 5
