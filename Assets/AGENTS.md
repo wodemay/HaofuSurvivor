@@ -1,5 +1,7 @@
 # Repository Guidelines
 
+- 2026-09-29 | 按授权整理PR：分支codex/character-combat-polish，提交18d9179及主分支合并b37adf9；保留六帧跑步和新角色技能配置，重生成文档索引解决旧PR合并冲突。覆盖角色战斗、美术/UI比例、存档替换/道具生命周期及日志限流；合并后dotnet 0错误/2个既有警告，差异检查通过。存档、Logs、.workbuddy未纳入。长局平衡、人工听感与原生SceneView崩溃长期复现仍未验收；准备推送并创建PR，不自动合并。
+
 - 2026-09-29 | 替换地图事件边缘指引白底红线占位图：imagegen生成透明青金箭头/符文徽章，覆盖Indicators/WorldGuide.png且保留GUID；直接修改UIWorldGuideItem预制体，Image_Arrow白色原色显示、排序20，Image_Icon移除重复占位图并保留事件覆盖节点、排序21/等比0.3。PPU1280、徽章中心轴心、无压缩与透明导入；Unity预制体引用及隔离预览验证通过，截图Logs/world-guide-preview.png。临时预览场景/材质/纹理/脚本已清理，未修改玩法或存档。
 
 - 2026-09-29 | 修复返回菜单后换角色新开局残留不可拾取道具：RunSystem.StartRun和ReleaseRunRuntime补齐PickupSystem.Clear；此前GameLoop停止后道具列表/池对象残留且未重新注册，Continue的Restore才恢复更新。退出仍先保存再清理，继续保留快照恢复语义。Unity六项流程检查通过（生成回血道具、退出清理、换角色无残留、新局吸收、继续恢复与吸收），dotnet 0错误/2个既有警告；测试后退出Play、恢复原存档并校验，临时脚本清理。未提交推送。
