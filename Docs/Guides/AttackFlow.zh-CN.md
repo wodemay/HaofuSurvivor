@@ -6,7 +6,7 @@
 
 所有 Attack 由 `Resources/Configs/Combat/Attack/AttackCatalog.asset` 以数字 ID 索引。`ExecutorId` 选择具体实现；目标阵营从运行时拥有者的 `CombatFaction` 推导，配置不写目标阵营，也不使用 AttackType 分支。
 
-当前已在 `AttackExecutorRegistry` 注册的 Executor（全部实现在 `Architecture/Combat/AttackExecutorRegistry.cs`）：
+当前已在 `AttackExecutorRegistry` 注册的 Executor（基础实现在同名文件，新角色行为在 `CharacterAttackExecutors.cs`）：
 
 | ExecutorId | 实现类 | 需要目标 | 注册方式 | 参考攻击 ID |
 | --- | --- | --- | --- | --- |
@@ -14,6 +14,11 @@
 | `projectile` | `ProjectileAttackExecutor` | 是 | `AttackSystem.RegisterAutomatic` | 1002 初始武器投射物、1005 火球 |
 | `explosive-projectile` | `ExplosiveProjectileAttackExecutor` | 是 | `AttackSystem.RegisterAutomatic` | 1006 炼狱火球 |
 | `barrage-projectile` | `BarrageProjectileAttackExecutor` | 否（手动） | `AttackSystem.RegisterManual` | 1004 幸存者环形弹幕 |
+| `sword` | `SwordAttackExecutor` | 是 | 自动 | 1007 裂阵剑术 |
+| `spin-sword` | `SpinSwordAttackExecutor` | 否 | 手动 | 1008 断阵回旋 |
+| `piercing-bolt` | `PiercingBoltAttackExecutor` | 是 | 自动 | 1009 贯穿弩 |
+| `hunter-volley` | `HunterVolleyAttackExecutor` | 施放前查询 | 手动 | 1010 猎杀连射 |
+| `star-overload` | `StarOverloadAttackExecutor` | 否 | 手动 | 1011 星环超载 |
 
 ## 碰撞攻击
 

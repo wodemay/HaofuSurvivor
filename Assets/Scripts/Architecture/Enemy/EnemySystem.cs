@@ -16,6 +16,22 @@ namespace HaoFuSurvivor
 		private const int SeparationIterations = 2;
 		private float mSpawnElapsed;
 		private bool mBossSpawned;
+		public void Knockback(CombatEntity target, Vector2 delta)
+		{
+			if (target == null || !target.isActiveAndEnabled || delta.sqrMagnitude < 0.0001f) return;
+			var root = target.transform;
+			if (!mEnemies.Contains(root) || EnemyFactory.Instance.GetConfig(root)?.IsBoss == true) return;
+			var body = root.GetComponent<Rigidbody2D>();
+			if (body == null) return;
+			var filter = new ContactFilter2D(); filter.NoFilter(); filter.useTriggers = false;
+			var distance = delta.magnitude;
+			var direction = delta / distance;
+			var count = body.Cast(direction, filter, mMapHits, distance);
+			for (var i = 0; i < count; i++)
+				if (MapColliderUtility.IsMoveBlocker(mMapHits[i].collider) && Vector2.Dot(direction, mMapHits[i].normal) < 0)
+					distance = Mathf.Min(distance, Mathf.Max(0, mMapHits[i].distance - 0.001f));
+			body.position += direction * distance;
+		}
 		public void Reset()
 		{
 			var navigation = this.GetSystem<MapNavMeshSystem>();

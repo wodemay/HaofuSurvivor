@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4d9d5f7b8564c92a3e71bc6d8129f20, type: 3}
+  m_Name: Skill_Vanguard
+  m_EditorClassIdentifier:
+  Id: 2
+  DisplayName: "\u65AD\u9635\u56DE\u65CB"
+  Description: "\u56DE\u65CB\u6325\u5251\u51FB\u9000\u5468\u56F4\u654C\u4EBA\uFF0C\u5E76\u77ED\u6682\u51CF\u4F24\u3002"
+  Icon: {fileID: 8685408783168630167, guid: f0ac04e59a1635c4fbc64cb69e8b729d, type: 3}
+  InitialAttackIds: f0030000
+  MaxLevel: 3
+  CanUpgrade: 1

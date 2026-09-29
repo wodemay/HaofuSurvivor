@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96b0dbb60bab58c448aca1be333eece7, type: 3}
+  m_Name: Parameters_Star
+  m_EditorClassIdentifier:
+  ProjectilePrefab: {fileID: 4344853039505937588, guid: 526aa97b260a3894ca89ee7aa229390b, type: 3}
+  MoveSpeed: 14
+  Lifetime: 0.5714286
+  AttackRange: 8
+  PoolCapacity: 16
+  Radius: 4
+  Angle: 120
+  Windup: 0.35
+  Duration: 3
+  Interval: 0.5
+  Shots: 6
+  Pierce: 0
+  Knockback: 0
+  ReductionDuration: 0
+  Reduction: 0.5
+  FinalDamage: 24
+  OrbitRadius: 1.2
+  WeaponVisual: {fileID: 5297042613305410878, guid: 325b460b422daa14f85bacbaf95c1e75, type: 3}
+  EffectVisual: {fileID: 1617493169984550723, guid: a5a56d2c515773742a754e83e385b149, type: 3}
+  StartSound: {fileID: 8300000, guid: bee42c25aca787249a661a15f9b5c1ce, type: 3}
+  ShotSound: {fileID: 8300000, guid: 8ec25bb059fdaec4bbae4515149d3f62, type: 3}
+  EndSound: {fileID: 8300000, guid: 5adc0987a2370ca4c8fc95aee0b679a5, type: 3}
+  Levels:
+  - Level: 2
+    Damage: 8
+    Radius: 4
+    Cooldown: 18
+    ReductionDuration: 0
+    FinalDamage: 24
+    Shots: 0
+    Duration: 0
+  - Level: 3
+    Damage: 8
+    Radius: 4
+    Cooldown: 16
+    ReductionDuration: 0
+    FinalDamage: 36
+    Shots: 0
+    Duration: 0

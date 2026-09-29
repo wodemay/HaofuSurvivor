@@ -138,10 +138,12 @@ MonoBehaviour:
   - {fileID: -5051741928756154350, guid: 04816b9c2206483cb57eb30c1b99e5cd, type: 3}
   - {fileID: -1496309013863927477, guid: 04816b9c2206483cb57eb30c1b99e5cd, type: 3}
   MoveFrames:
-  - {fileID: 6866122497732256226, guid: 04816b9c2206483cb57eb30c1b99e5cd, type: 3}
-  - {fileID: 6431489373418738550, guid: 04816b9c2206483cb57eb30c1b99e5cd, type: 3}
-  - {fileID: 5681932939331615096, guid: 04816b9c2206483cb57eb30c1b99e5cd, type: 3}
-  - {fileID: -4881784837080790795, guid: 04816b9c2206483cb57eb30c1b99e5cd, type: 3}
+  - {fileID: 21310000, guid: 72b7566728f644ceb832faaabd0eee2c, type: 3}
+  - {fileID: 21310001, guid: 72b7566728f644ceb832faaabd0eee2c, type: 3}
+  - {fileID: 21310002, guid: 72b7566728f644ceb832faaabd0eee2c, type: 3}
+  - {fileID: 21310003, guid: 72b7566728f644ceb832faaabd0eee2c, type: 3}
+  - {fileID: 21310004, guid: 72b7566728f644ceb832faaabd0eee2c, type: 3}
+  - {fileID: 21310005, guid: 72b7566728f644ceb832faaabd0eee2c, type: 3}
   FaceMovement: 1
   IdleFrameRate: 4
-  MoveFrameRate: 8
+  MoveFrameRate: 12

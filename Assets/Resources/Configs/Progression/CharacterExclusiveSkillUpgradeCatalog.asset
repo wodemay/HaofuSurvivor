@@ -16,10 +16,27 @@ MonoBehaviour:
   - CharacterId: 1
     SkillId: 1
     ExclusiveWeaponId: 1
-    CompletedWeaponIds:
-    - 2
+    CompletedWeaponIds: 02000000
     ExclusiveDodgeId: 1
-    CompletedDodgeIds: []
-    DisplayName: "\u7ec8\u672b\u73af\u6d41"
-    Description: "\u73af\u5f62\u5f39\u5e55\u8f6c\u4e3a\u4e94\u79d2\u7684\u6781\u901f\u5f39\u5e55\u7206\u53d1\u3002"
-    Icon: {fileID: 21300015, guid: 02996dd12d5440ddb70e6e99c7f2e487, type: 3}
+    CompletedDodgeIds:
+    DisplayName: "\u661F\u73AF\u8D85\u8F7D\u5F3A\u5316"
+    Description: "\u63D0\u5347\u6D6E\u6E38\u70AE\u4F24\u5BB3\uFF0C\u6EE1\u7EA7\u5F3A\u5316\u7EC8\u7ED3\u5E76\u7F29\u77ED\u51B7\u5374\u3002"
+    Icon: {fileID: -8560031999483234902, guid: f0ac04e59a1635c4fbc64cb69e8b729d, type: 3}
+  - CharacterId: 2
+    SkillId: 2
+    ExclusiveWeaponId: 5
+    CompletedWeaponIds:
+    ExclusiveDodgeId: 2
+    CompletedDodgeIds:
+    DisplayName: "\u65AD\u9635\u56DE\u65CB\u5F3A\u5316"
+    Description: "\u63D0\u5347\u4E13\u5C5E\u6280\u80FD\u5F3A\u5EA6\uFF0C\u6EE1\u7EA7\u7F29\u77ED\u51B7\u5374\u3002"
+    Icon: {fileID: 8685408783168630167, guid: f0ac04e59a1635c4fbc64cb69e8b729d, type: 3}
+  - CharacterId: 3
+    SkillId: 3
+    ExclusiveWeaponId: 6
+    CompletedWeaponIds:
+    ExclusiveDodgeId: 3
+    CompletedDodgeIds:
+    DisplayName: "\u730E\u6740\u8FDE\u5C04\u5F3A\u5316"
+    Description: "\u63D0\u5347\u4E13\u5C5E\u6280\u80FD\u5F3A\u5EA6\uFF0C\u6EE1\u7EA7\u7F29\u77ED\u51B7\u5374\u3002"
+    Icon: {fileID: -4819520670167334924, guid: f0ac04e59a1635c4fbc64cb69e8b729d, type: 3}

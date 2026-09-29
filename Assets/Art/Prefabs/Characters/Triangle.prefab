@@ -95,7 +95,7 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7151673315206538592}
-  m_BodyType: 0
+  m_BodyType: 1
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
@@ -144,10 +144,12 @@ MonoBehaviour:
   - {fileID: -6555364839340150335, guid: a02ba6e7d1a74a41ad2ae780bc86b7a3, type: 3}
   - {fileID: -6167621470438372002, guid: a02ba6e7d1a74a41ad2ae780bc86b7a3, type: 3}
   MoveFrames:
-  - {fileID: -8337870772604236968, guid: a02ba6e7d1a74a41ad2ae780bc86b7a3, type: 3}
-  - {fileID: 6555622247868243909, guid: a02ba6e7d1a74a41ad2ae780bc86b7a3, type: 3}
-  - {fileID: 1445209541892733688, guid: a02ba6e7d1a74a41ad2ae780bc86b7a3, type: 3}
-  - {fileID: -964967872729394880, guid: a02ba6e7d1a74a41ad2ae780bc86b7a3, type: 3}
+  - {fileID: 21310000, guid: c142c85e44de4e2ba7a8e8c6580207ae, type: 3}
+  - {fileID: 21310001, guid: c142c85e44de4e2ba7a8e8c6580207ae, type: 3}
+  - {fileID: 21310002, guid: c142c85e44de4e2ba7a8e8c6580207ae, type: 3}
+  - {fileID: 21310003, guid: c142c85e44de4e2ba7a8e8c6580207ae, type: 3}
+  - {fileID: 21310004, guid: c142c85e44de4e2ba7a8e8c6580207ae, type: 3}
+  - {fileID: 21310005, guid: c142c85e44de4e2ba7a8e8c6580207ae, type: 3}
   FaceMovement: 1
   IdleFrameRate: 4
-  MoveFrameRate: 8
+  MoveFrameRate: 12

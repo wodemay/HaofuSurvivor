@@ -73,6 +73,8 @@ namespace HaoFuSurvivor
 			var playerModel = this.GetModel<PlayerModel>();
 			if (!playerModel.IsRegistered || playerModel.IsDead || damage <= 0f || playerModel.DamageInvulnerabilityRemaining > 0f || playerModel.DodgeInvulnerabilityRemaining > 0f) return;
 
+			var combat = this.GetModel<CharacterCombatModel>();
+			if (combat.ReductionRemaining > 0) damage *= 1f - Mathf.Clamp01(combat.Reduction);
 			playerModel.CurrentHealth = Mathf.Max(0f, playerModel.CurrentHealth - damage);
 			playerModel.DamageInvulnerabilityRemaining = this.GetModel<PlayerStatModel>().DamageInvulnerabilityDuration;
 			this.SendEvent(new PlayerDamagedEvent(damage, playerModel.CurrentHealth));

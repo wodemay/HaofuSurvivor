@@ -13,10 +13,9 @@ MonoBehaviour:
   m_Name: Skill_SurvivorBarrage
   m_EditorClassIdentifier:
   Id: 1
-  DisplayName: "\u73af\u5f62\u5f39\u5e55"
-  Description: "\u8fde\u7eed\u91ca\u653e\u4e09\u8f6e\u73af\u5f62\u5f39\u5e55\u3002"
-  Icon: {fileID: 21300004, guid: 02996dd12d5440ddb70e6e99c7f2e487, type: 3}
-  InitialAttackIds:
-  - 1004
-  MaxLevel: 2
+  DisplayName: "\u661F\u73AF\u8D85\u8F7D"
+  Description: "\u56DB\u70AE\u5C55\u5F00\u5E76\u73AF\u7ED5\u9F50\u5C04\uFF0C\u6536\u62E2\u540E\u91CA\u653E\u7EC8\u7ED3\u51B2\u51FB\u73AF\u3002"
+  Icon: {fileID: -8560031999483234902, guid: f0ac04e59a1635c4fbc64cb69e8b729d, type: 3}
+  InitialAttackIds: f3030000
+  MaxLevel: 3
   CanUpgrade: 1

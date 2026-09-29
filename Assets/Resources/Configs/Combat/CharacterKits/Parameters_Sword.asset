@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96b0dbb60bab58c448aca1be333eece7, type: 3}
+  m_Name: Parameters_Sword
+  m_EditorClassIdentifier:
+  ProjectilePrefab: {fileID: 0}
+  MoveSpeed: 8
+  Lifetime: 3
+  AttackRange: 8
+  PoolCapacity: 16
+  Radius: 2.2
+  Angle: 120
+  Windup: 0.1
+  Duration: 0.35
+  Interval: 0.2
+  Shots: 6
+  Pierce: 0
+  Knockback: 0.35
+  ReductionDuration: 0
+  Reduction: 0.5
+  FinalDamage: 0
+  OrbitRadius: 1.2
+  WeaponVisual: {fileID: 5212235768241215431, guid: 64ef83d5873e0c34f9ca4b252eb16b08, type: 3}
+  EffectVisual: {fileID: 3510581977552482092, guid: b65ad83c3372ac945ac55f4b08f8e1e9, type: 3}
+  StartSound: {fileID: 8300000, guid: 686c903d7d1418f429a802891f541a1f, type: 3}
+  ShotSound: {fileID: 0}
+  EndSound: {fileID: 0}
+  Levels: []

@@ -33,12 +33,14 @@ namespace HaoFuSurvivor
 			runtime.DurationRemaining = GetDuration(config, runtime.Level);
 			runtime.CooldownRemaining = GetCooldown(config, runtime.Level);
 			player.DodgeInvulnerabilityRemaining = GetInvulnerabilityDuration(config, runtime.Level);
+			GameArchitecture.Interface.GetSystem<CharacterCombatSystem>().BeginDodge(config, runtime);
 			this.SendEvent(new DodgeStartedEvent(runtime.DodgeId, runtime.Level));
 			return true;
 		}
 
 		public void OnRunFixedUpdate(float deltaTime)
 		{
+			if (deltaTime <= 0f) return;
 			var runtime = this.GetModel<DodgeModel>().Runtime;
 			if (runtime == null) return;
 			runtime.CooldownRemaining = Mathf.Max(0f, runtime.CooldownRemaining - deltaTime);
@@ -52,11 +54,27 @@ namespace HaoFuSurvivor
 				this.GetModel<PlayerModel>().DodgeInvulnerabilityRemaining = 0f;
 				return;
 			}
-			this.GetSystem<PlayerSystem>().MoveBy(runtime.Direction * GetDistance(config, runtime.Level) / GetDuration(config, runtime.Level) * deltaTime);
-			runtime.DurationRemaining -= deltaTime;
-			if (runtime.DurationRemaining > 0f) return;
+			var player = this.GetModel<PlayerModel>();
+			if (!player.IsRegistered || player.IsDead)
+			{
+				runtime.IsActive = false;
+				runtime.DurationRemaining = 0f;
+				player.DodgeInvulnerabilityRemaining = 0f;
+				return;
+			}
+			var stepTime = Mathf.Min(deltaTime, Mathf.Max(0f, runtime.DurationRemaining));
+			var movement = runtime.Direction * GetDistance(config, runtime.Level) / GetDuration(config, runtime.Level) * stepTime;
+			var before = player.Position;
+			this.GetSystem<PlayerSystem>().MoveBy(movement);
+			var after = player.Position;
+			GameArchitecture.Interface.GetSystem<CharacterCombatSystem>().TickDodge(config, runtime, before, after);
+			runtime.DurationRemaining = Mathf.Max(0f, runtime.DurationRemaining - stepTime);
+			var blocked = ((after - before) - movement).sqrMagnitude > 0.000001f;
+			if (!blocked && runtime.DurationRemaining > 0f) return;
+			if (blocked) player.DodgeInvulnerabilityRemaining = 0f;
 			runtime.DurationRemaining = 0f;
 			runtime.IsActive = false;
+			GameArchitecture.Interface.GetSystem<CharacterCombatSystem>().EndDodge(config, runtime);
 			this.SendEvent(new DodgeEndedEvent(runtime.DodgeId, runtime.Level));
 		}
 
@@ -98,6 +116,25 @@ namespace HaoFuSurvivor
 			runtime.DurationRemaining = Mathf.Max(0f, durationRemaining);
 			runtime.Direction = direction.sqrMagnitude > 0.001f ? direction.normalized : Vector2.right;
 			runtime.IsActive = isActive && runtime.DurationRemaining > 0f;
+			if (!runtime.IsActive) return;
+			var config = this.GetUtility<DodgeCatalog>().Get(runtime.DodgeId);
+			if (config == null)
+			{
+				runtime.IsActive = false;
+				runtime.DurationRemaining = 0f;
+				this.GetModel<PlayerModel>().DodgeInvulnerabilityRemaining = 0f;
+				return;
+			}
+			runtime.DurationRemaining = Mathf.Min(runtime.DurationRemaining, GetDuration(config, runtime.Level));
+			runtime.IsRestoring = true;
+			try
+			{
+				GameArchitecture.Interface.GetSystem<CharacterCombatSystem>().BeginDodge(config, runtime);
+			}
+			finally
+			{
+				runtime.IsRestoring = false;
+			}
 		}
 
 		private DodgeLevelUpgrade GetUpgrade(DodgeConfig config, int level)

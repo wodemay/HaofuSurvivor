@@ -101,18 +101,35 @@ namespace HaoFuSurvivor
 				if (File.Exists(path))
 				{
 					Directory.CreateDirectory(Path.GetDirectoryName(backupPath));
-					File.Copy(path, backupPath, true);
-					File.Replace(temporaryPath, path, null);
+					ReplaceWithRetry(temporaryPath, path, backupPath);
 				}
 				else File.Move(temporaryPath, path);
 				return true;
 			}
 			catch (Exception exception)
 			{
-				error = exception.Message;
-				Record("write", relativePath, "write", exception.Message, "failed");
+				error = $"{exception.Message} (0x{exception.HResult:X8})";
+				Record("write", relativePath, "write", error, "failed");
 				try { if (File.Exists(temporaryPath)) File.Delete(temporaryPath); } catch { }
 				return false;
+			}
+		}
+
+		private static void ReplaceWithRetry(string temporaryPath, string path, string backupPath)
+		{
+			for (var attempt = 0; ; attempt++)
+			{
+				try
+				{
+					File.Replace(temporaryPath, path, backupPath);
+					return;
+				}
+				catch (IOException exception) when (attempt < 3 && File.Exists(temporaryPath) && File.Exists(path) &&
+					((exception.HResult & 0xffff) == 32 || (exception.HResult & 0xffff) == 33 ||
+					 (exception.HResult & 0xffff) == 1175))
+				{
+					System.Threading.Thread.Sleep(25 * (attempt + 1));
+				}
 			}
 		}
 

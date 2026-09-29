@@ -1,5 +1,27 @@
 # Repository Guidelines
 
+- 2026-09-29 | 替换地图事件边缘指引白底红线占位图：imagegen生成透明青金箭头/符文徽章，覆盖Indicators/WorldGuide.png且保留GUID；直接修改UIWorldGuideItem预制体，Image_Arrow白色原色显示、排序20，Image_Icon移除重复占位图并保留事件覆盖节点、排序21/等比0.3。PPU1280、徽章中心轴心、无压缩与透明导入；Unity预制体引用及隔离预览验证通过，截图Logs/world-guide-preview.png。临时预览场景/材质/纹理/脚本已清理，未修改玩法或存档。
+
+- 2026-09-29 | 修复返回菜单后换角色新开局残留不可拾取道具：RunSystem.StartRun和ReleaseRunRuntime补齐PickupSystem.Clear；此前GameLoop停止后道具列表/池对象残留且未重新注册，Continue的Restore才恢复更新。退出仍先保存再清理，继续保留快照恢复语义。Unity六项流程检查通过（生成回血道具、退出清理、换角色无残留、新局吸收、继续恢复与吸收），dotnet 0错误/2个既有警告；测试后退出Play、恢复原存档并校验，临时脚本清理。未提交推送。
+
+- 2026-09-29 | 修正存档替换失败处理：SaveFileStorage改用File.Replace同次生成旧档备份，取消预先File.Copy；针对共享冲突/锁冲突/1175替换错误最多重试3次，总等待150ms，不删除目标档或退化为原地覆盖。错误日志增加HRESULT。Unity实际文件验证替换与备份、持续锁保留文件、40ms短锁重试均通过；当前用户主档与备份经RunSaveStorage.Validate均Valid，未修改用户存档。dotnet编译0错误、2个既有警告；历史故障具体占用来源未证实。临时探针已清理，构建日志保留。
+
+- 2026-09-29 | 实现三角色战斗方案：Attack1007–1011分别为剑击、回旋、贯穿弩、猎杀连射、星环超载；先锋Weapon5/Skill2/Dodge2/Group2，斥候Weapon6/Skill3/Dodge3/Group3，幸存者Skill1改用1011。接入独立Executor、共享计时、闪避残影/无敌提示、实体剑/浮游炮预制体、池化音效及可关闭终结震动。存档v3保存技能阶段与强化，兼容旧空装备和旧技能冷却；恢复取消活动闪避，退出清理表现。49项定向检查通过，dotnet 0错误/2个既有引用警告，Unity Console无错误警告；退出Play，五个原存档SHA256一致恢复，临时脚本清理。隔离工作树因固定保护保留。长局平衡、人工听感待验收；未重绘全套身体攻击帧。详见 Docs/Guides/CharacterCombat.zh-CN.md 与 Docs/CharacterCombatHandoff-20260929.md；未提交推送。
+
+- 2026-09-28 | 按反馈修订角色战斗设计：先锋改为实体长剑近战，裂阵剑术/断阵回旋/锋刃突进；幸存者大招设计为星环超载（四炮展开、移动齐射、收拢冲击环）；补齐三角色闪避起手/残影/结束与真实无敌提示规则。详见 Docs/CharacterVanguardScoutDesign.md；仅更新设计，技能逻辑、配置及特效预制体尚未实现。
+
+- 2026-09-28 | 为现有先锋 ID2 与斥候 ID3 完成独立战斗设计稿 Docs/CharacterVanguardScoutDesign.md：先锋破阵斩/震地破围/铁肩突进，斥候贯穿弩/猎杀连射/掠影装填，含起始数值、等级、输入、碰撞与暂停清理合同。保留现有基础属性与素材；当前两者 SkillGroupId 仍为 0，本轮仅设计未实现，新增行为/配置及实战平衡待后续开发。
+
+- 2026-09-28 | 修复日志刷屏来源与写盘增长：MainScene 冗余 EventSystem 停用，保留 UIRoot 输入系统；GameLogSystem 连续重复消息每 5 秒汇总、消息变化/关闭时落盘，10 MiB 轮转保留一份 previous，启动超限旧日志归档保留。dotnet 0 错误、2 个既有警告；Unity 主菜单一个启用 EventSystem/正常输入模块/Console 无错误警告，独立 1 万条重复日志、计数、轮转和关闭测试通过。退出 Play Mode，临时测试已清理；SceneView 原生崩溃尚未长时间复现或证实根因，详见 CrashDiagnosis 文档。未提交推送。
+
+- 2026-09-28 | 完成历史崩溃日志排查：9 月 26 日 23:39 为 Unity Editor SceneView/Handles 轮廓绘制原生 SIGSEGV；崩溃会话含 162,019 条双 EventSystem 警告，累计 game.log 约 382 MB。MainScene 与 UIRoot 均含 EventSystem，当前非运行态 MCP 只读检查仅一个启用实例；运行时重复来源待复现。GameLogSystem 逐条 AutoFlush 且无轮转，日志压力与崩溃因果未证实。证据与后续见 Docs/CrashDiagnosis-20260928.md；未修改玩法或删除日志，未提交推送。
+
+- 2026-09-28 | 接用户摆臂反馈再次编辑三张 Run 图，补齐近侧手臂后摆/髋侧/前摆/回摆，保留原 GUID 和六帧 12 FPS 引用；按头部轮廓和脚底重新校准轴心，幸存者增加帧间留白。三套切片边界及 Unity 两圈六帧覆盖、零增量、朝向、停步检查通过。已退出播放模式，临时对象销毁，未提交推送；提示词与验证边界更新于 Docs/RunCycleFix-20260928.md。
+
+- 2026-09-28 | 修复三个角色跑步缺少收腿过渡姿势：内置 image_gen 重绘 Characters/{Survivor,Vanguard,Scout}-Run.png，六帧跑步、12 FPS，单圈仍 0.5 秒；Square/Triangle/Circle 只替换 MoveFrames 与速率，原待机、选角图、镜像和碰撞不变。Unity 导入与 Play Mode 两圈六帧覆盖、零时间增量、朝向、停步、复用检查全部通过，测试对象已销毁并退出播放模式。提示词与边界见 Docs/RunCycleFix-20260928.md；未提交推送。
+
+- 2026-09-28 | 重绘经验球为透明青蓝晶核球，新增 Pickups/ExperienceOrb.png，PPU 461 配合原 0.2 缩放保留可见直径；替换 ExperienceOrb 预制体引用并设白色叠色。选角图 261×261、升级图 198×198、局外升级图 84×84 均启用 Preserve Aspect，局外升级文字宽度 288 留白。检查八面板及世界指引，保持 1920×1080 基准、九宫格背景与填充条。Unity 经验球导入及三种画幅下 99 次图片网格比例检查通过；没有修改 C# 或运行时 UI 生成逻辑。详情与提示词见 Docs/ExperienceOrbUiAspect-20260928.md；未提交推送。
+
 - 2026-09-27 | 已提交推送 2777828，创建 PR #32：https://github.com/wodemay/HaofuSurvivor/pull/32 ，分支 codex/combat-art-facing。包含两轮弹药/技能/地面/角色朝向美术升级，静态差异检查通过；沿用已完成 Unity 与编译验证。未合并，.workbuddy 保留且未提交。
 
 - 2026-09-27 | 收尾审查弹药特效、技能图标、地砖及角色侧向动画；PR #31 已合并，当前 HEAD 与最新 origin/main 文件树一致，从 origin/main 创建 codex/combat-art-facing 承接本轮改动。沿用已通过的 Unity 导入/朝向测试与编译结果，准备独立 PR；保留无关 .workbuddy，不包含构建包或玩法数值修改。

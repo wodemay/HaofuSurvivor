@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96b0dbb60bab58c448aca1be333eece7, type: 3}
+  m_Name: Parameters_Volley
+  m_EditorClassIdentifier:
+  ProjectilePrefab: {fileID: 4344853039505937588, guid: 526aa97b260a3894ca89ee7aa229390b, type: 3}
+  MoveSpeed: 20
+  Lifetime: 0.5
+  AttackRange: 10
+  PoolCapacity: 16
+  Radius: 2.2
+  Angle: 120
+  Windup: 0.1
+  Duration: 1.2
+  Interval: 0.2
+  Shots: 6
+  Pierce: 2
+  Knockback: 0
+  ReductionDuration: 0
+  Reduction: 0.5
+  FinalDamage: 0
+  OrbitRadius: 1.2
+  WeaponVisual: {fileID: 0}
+  EffectVisual: {fileID: 2238086979369162612, guid: b7c0e712c33f6c84b98ba12d58e3fb2c, type: 3}
+  StartSound: {fileID: 0}
+  ShotSound: {fileID: 8300000, guid: 8ec25bb059fdaec4bbae4515149d3f62, type: 3}
+  EndSound: {fileID: 0}
+  Levels:
+  - Level: 2
+    Damage: 20
+    Radius: 2.2
+    Cooldown: 12
+    ReductionDuration: 0
+    FinalDamage: 0
+    Shots: 6
+    Duration: 1.2
+  - Level: 3
+    Damage: 20
+    Radius: 2.2
+    Cooldown: 10
+    ReductionDuration: 0
+    FinalDamage: 0
+    Shots: 8
+    Duration: 1.6

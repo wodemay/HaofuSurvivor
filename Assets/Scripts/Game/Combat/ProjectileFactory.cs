@@ -21,16 +21,17 @@ namespace HaoFuSurvivor
 			}
 		}
 
-		public void Spawn(ProjectileAttackParameterConfig parameters, Vector2 position, Vector2 direction,
+		public ProjectileController Spawn(ProjectileAttackParameterConfig parameters, Vector2 position, Vector2 direction,
 			CombatFaction ownerFaction, float damage, float moveSpeed, int pierce)
 		{
 			var projectile = Get(parameters);
-			if (projectile == null) return;
+			if (projectile == null) return null;
 			projectile.gameObject.SetActive(true);
 			ApplySortingOrder(projectile.gameObject);
 			projectile.ConfigureParameters(parameters);
 			projectile.Launch(position, direction, ownerFaction, damage, moveSpeed, parameters.Lifetime, pierce);
 			GameArchitecture.Interface.GetSystem<ProjectileSystem>().Register(projectile);
+			return projectile;
 		}
 
 		public void SpawnRestored(ProjectileAttackParameterConfig parameters, ProjectileSaveData data)

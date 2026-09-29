@@ -10,6 +10,7 @@ namespace HaoFuSurvivor
 		public float DurationRemaining { get; internal set; }
 		public Vector2 Direction { get; internal set; }
 		public bool IsActive { get; internal set; }
+		public bool IsRestoring { get; internal set; }
 
 		public DodgeRuntimeData(int dodgeId, int level = 1)
 		{

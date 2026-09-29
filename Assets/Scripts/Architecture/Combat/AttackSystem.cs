@@ -96,6 +96,10 @@ namespace HaoFuSurvivor
 			if ((target == null && executor.RequiresTarget) || (target != null && runtime.OwnerFaction == target.Faction) || runtime.CooldownRemaining > 0f) return;
 
 			var weaponRuntime = GetWeaponRuntime(runtime);
+			var skillRuntime = GetSkillRuntime(runtime);
+			var context = new AttackExecutionContext(runtime.Owner, runtime.OwnerFaction, target, runtime.Config, weaponRuntime, skillRuntime);
+			var prepared = executor as IPreparedAttackExecutor;
+			if (prepared != null && !prepared.CanExecute(context)) return;
 			var cooldownMultiplier = weaponRuntime == null
 				? 1f
 				: weaponRuntime.GetModifierValue(runtime.Config.Id, WeaponUpgradeModifierKeys.AttackCooldownMultiplier, 1f);
@@ -104,10 +108,9 @@ namespace HaoFuSurvivor
 				cooldownMultiplier *= this.GetSystem<StatSystem>().GetCooldownMultiplier();
 				if (weaponRuntime != null) cooldownMultiplier *= this.GetSystem<CharacterExclusivePerkSystem>().GetWeaponCooldownMultiplier();
 			}
-			runtime.CooldownDuration = Mathf.Max(0.01f, runtime.Config.Cooldown * Mathf.Max(0.01f, cooldownMultiplier));
+			runtime.CooldownDuration = Mathf.Max(0.01f, (prepared?.Cooldown(context) ?? runtime.Config.Cooldown) * Mathf.Max(0.01f, cooldownMultiplier));
 			runtime.CooldownRemaining = runtime.CooldownDuration;
-			var skillRuntime = GetSkillRuntime(runtime);
-			executor.Execute(new AttackExecutionContext(runtime.Owner, runtime.OwnerFaction, target, runtime.Config, weaponRuntime, skillRuntime));
+			executor.Execute(context);
 			if (skillRuntime != null) this.SendEvent(new SkillUsedEvent(skillRuntime.SkillId));
 		}
 
@@ -147,7 +150,9 @@ namespace HaoFuSurvivor
 					if (runtime.CooldownRemaining < remaining) continue;
 					remaining = runtime.CooldownRemaining;
 					duration = Mathf.Max(remaining, runtime.CooldownDuration > 0f ? runtime.CooldownDuration
-						: runtime.Config.Cooldown * this.GetSystem<StatSystem>().GetCooldownMultiplier());
+						: (this.GetUtility<AttackExecutorRegistry>().Get(runtime.Config.ExecutorId) is IPreparedAttackExecutor prepared
+							? prepared.Cooldown(new AttackExecutionContext(runtime.Owner, runtime.OwnerFaction, null, runtime.Config, GetWeaponRuntime(runtime), skill))
+							: runtime.Config.Cooldown) * this.GetSystem<StatSystem>().GetCooldownMultiplier());
 				}
 				if (found) return new SkillCooldownState(config.DisplayName, remaining, duration);
 			}
@@ -181,8 +186,8 @@ namespace HaoFuSurvivor
 				if (entry == null) continue;
 				foreach (var runtime in mRuntimes.Values)
 					if (runtime.Owner == owner && runtime.OwnerFaction == CombatFaction.Player &&
-						runtime.WeaponRuntimeId == entry.RuntimeId && runtime.Config.Id == entry.AttackId)
-						runtime.CooldownRemaining = Mathf.Max(0f, entry.CooldownRemaining);
+						runtime.WeaponRuntimeId == entry.RuntimeId && (runtime.Config.Id == entry.AttackId || GetSkillRuntime(runtime) != null))
+							runtime.CooldownRemaining = Mathf.Max(runtime.CooldownRemaining, entry.CooldownRemaining);
 			}
 		}
 

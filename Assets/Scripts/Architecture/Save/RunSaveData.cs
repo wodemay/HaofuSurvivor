@@ -50,6 +50,11 @@ namespace HaoFuSurvivor
 		public List<ProjectileSaveData> Projectiles = new();
 		public List<GroundFlameSaveData> GroundFlames = new();
 		public List<TimedEffectSaveData> TimedEffects = new();
+		public List<CharacterActionState> CharacterActions = new();
+		public float CombatReductionRemaining;
+		public float CombatReduction;
+		public float CombatEmpowerRemaining;
+		public float CombatEmpowerMultiplier = 2f;
 		public List<BarrageSaveData> Barrages = new();
 		public List<AttackCooldownSaveData> AttackCooldowns = new();
 		public List<BreakableSaveData> Breakables = new();

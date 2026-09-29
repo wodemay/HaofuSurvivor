@@ -11,7 +11,7 @@ namespace HaoFuSurvivor
 	{
 		private const string SaveFile = "SaveData/active-run.json";
 		private const string BackupFile = "SaveData/active-run.json.bak";
-		private const int CurrentSaveVersion = 2;
+		private const int CurrentSaveVersion = 3;
 
 		public bool HasSave()
 		{
@@ -45,6 +45,12 @@ namespace HaoFuSurvivor
 				if (data == null) return null;
 				if (data.SaveVersion < CurrentSaveVersion)
 				{
+					MigrateEmptyLoadout(data);
+					data.CharacterActions = new List<CharacterActionState>();
+					data.CombatReductionRemaining = 0f;
+					data.CombatReduction = 0f;
+					data.CombatEmpowerRemaining = 0f;
+					data.CombatEmpowerMultiplier = 2f;
 					data.SaveVersion = CurrentSaveVersion;
 					if (string.IsNullOrEmpty(data.RunId))
 					{
@@ -68,6 +74,28 @@ namespace HaoFuSurvivor
 		public RunSaveData Load()
 		{
 			return Load(out _);
+		}
+		private static void MigrateEmptyLoadout(RunSaveData data)
+		{
+			if ((data.Weapons?.Count ?? 0) != 0 || (data.Skills?.Count ?? 0) != 0 || data.DodgeId != 0) return;
+			var architecture = GameArchitecture.Interface;
+			var character = architecture.GetUtility<CharacterCatalog>().Get(data.CharacterId);
+			var group = character == null ? null : architecture.GetUtility<SkillGroupCatalog>().Get(character.SkillGroupId);
+			if (group == null) return;
+			data.Weapons ??= new List<WeaponSaveData>();
+			data.Skills ??= new List<SkillSaveData>();
+			foreach (var id in group.StartingWeaponIds)
+			{
+				var weapon = architecture.GetUtility<WeaponCatalog>().Get(id);
+				if (weapon == null) continue;
+				data.Weapons.Add(new WeaponSaveData { RuntimeId = data.Weapons.Count + 1, WeaponId = id, Level = 1,
+					CanUpgrade = weapon.CanUpgrade, AttackIds = new List<int>(weapon.InitialAttackIds) });
+			}
+			foreach (var id in group.StartingSkillIds)
+				data.Skills.Add(new SkillSaveData { RuntimeId = -(data.Skills.Count + 1), SkillId = id, Level = 1 });
+			data.DodgeId = group.StartingDodgeId;
+			data.DodgeLevel = group.StartingDodgeId == 0 ? 0 : 1;
+			data.HasSkillSnapshot = true;
 		}
 
 		public void Clear()
@@ -122,8 +150,33 @@ namespace HaoFuSurvivor
 			var timeline = GameArchitecture.Interface.GetUtility<RunTimelineCatalog>().Config;
 			if (timeline != null && data.CurrentStageIndex >= timeline.Stages.Count) return SaveValidationResult.Corrupt;
 			if (!ValidateDodge(data) || !ValidateStats(data) || !ValidatePerks(data) || !ValidateLevelUp(data) ||
-				!ValidateLoadout(data) || !ValidateRuntimeLists(data)) return SaveValidationResult.Corrupt;
+				!ValidateLoadout(data) || !ValidateRuntimeLists(data) || !ValidateCharacterCombat(data)) return SaveValidationResult.Corrupt;
 			return SaveValidationResult.Valid;
+		}
+
+		private static bool ValidateCharacterCombat(RunSaveData data)
+		{
+			if (data.SaveVersion < 3) return true;
+			if (!IsFiniteNonNegative(data.CombatReductionRemaining) || data.CombatReductionRemaining > 60f ||
+				!IsFiniteNonNegative(data.CombatReduction) || data.CombatReduction > 1f ||
+				!IsFiniteNonNegative(data.CombatEmpowerRemaining) || data.CombatEmpowerRemaining > 60f ||
+				!IsFinitePositive(data.CombatEmpowerMultiplier) || data.CombatEmpowerMultiplier > 10f) return false;
+			if (data.CharacterActions == null) return true;
+			if (data.CharacterActions.Count > 64) return false;
+			var catalog = GameArchitecture.Interface.GetUtility<AttackCatalog>();
+			foreach (var action in data.CharacterActions)
+			{
+				if (action == null || action.Level < 1 || action.Level > 3 || action.Step < 0 || action.Step > 32 ||
+					(action.Swing != -1 && action.Swing != 1) || !IsFiniteNonNegative(action.Age) || action.Age > 60f ||
+					!IsFiniteNonNegative(action.Damage) ||
+					!IsFiniteNonNegative(action.Radius) || action.Radius > 100f ||
+					!IsFiniteNonNegative(action.Angle) || action.Angle > 360f ||
+					!IsFinite(action.DirectionX) || Mathf.Abs(action.DirectionX) > 1f ||
+					!IsFinite(action.DirectionY) || Mathf.Abs(action.DirectionY) > 1f) return false;
+				var config = catalog.Get(action.AttackId);
+				if (config == null || !(config.ExecutorParameterConfig is CharacterAttackParameterConfig)) return false;
+			}
+			return true;
 		}
 
 		private static bool ValidateDodge(RunSaveData data)

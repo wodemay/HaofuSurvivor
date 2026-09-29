@@ -7,12 +7,15 @@ namespace HaoFuSurvivor
 	{
 		public CombatFaction Faction { get; private set; }
 		private bool mIsInitialized;
+		private static long sNextSpawnId;
+		public long SpawnId { get; private set; }
 
 		public IArchitecture GetArchitecture() => GameArchitecture.Interface;
 
 		public void Initialize(CombatFaction faction)
 		{
 			Faction = faction;
+			SpawnId = ++sNextSpawnId;
 			mIsInitialized = true;
 			this.SendCommand(new RegisterCombatTargetCommand(this));
 		}
