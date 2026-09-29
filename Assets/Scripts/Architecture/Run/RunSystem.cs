@@ -17,6 +17,7 @@ namespace HaoFuSurvivor
 			this.GetSystem<RunEconomySystem>().Reset();
 			this.GetSystem<EnemySystem>().Reset();
 			this.GetSystem<ExperienceSystem>().Reset();
+			this.GetSystem<PickupSystem>().Clear();
 			this.GetSystem<LevelUpSystem>().Reset();
 			this.GetSystem<PlayerStatUpgradeSystem>().Reset();
 			this.GetSystem<CharacterExclusivePerkSystem>().Reset();
@@ -163,6 +164,7 @@ namespace HaoFuSurvivor
 			this.GetSystem<GameLoopSystem>().EndRun();
 			this.GetSystem<EnemySystem>().Reset();
 			this.GetSystem<ExperienceSystem>().Reset();
+			this.GetSystem<PickupSystem>().Clear();
 			this.GetSystem<LevelUpSystem>().Reset();
 			this.GetSystem<DodgeSystem>().Reset();
 			this.GetSystem<ProjectileSystem>().Reset();

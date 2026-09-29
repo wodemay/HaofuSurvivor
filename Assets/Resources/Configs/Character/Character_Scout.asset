@@ -14,8 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier:
   Id: 3
   DisplayName: "\u65A5\u5019"
-  SkillDescription: "\u8FC5\u6377\uFF1A\u66F4\u9AD8\u79FB\u52A8\u901F\u5EA6\u3002"
-  SkillGroupId: 0
+  SkillDescription: "\u9AD8\u901F\u5F29\u77E2\u6700\u591A\u547D\u4E2D\u4E09\u4E2A\u76EE\u6807\u3002
+    \u4E13\u5C5E\u6280\u80FD\uFF1A\u730E\u6740\u8FDE\u5C04\uFF1B\u95EA\u907F\uFF1A\u63A0\u5F71\u88C5\u586B\u3002"
+  SkillGroupId: 3
   Icon: {fileID: 21300000, guid: ca1085338d5d4b64aefc5406f7697711, type: 3}
   PlayerPrefab: {fileID: 6247748158833517194, guid: 22d26f2c37a2718478232424f21f300f, type: 3}
   SortOrder: 2

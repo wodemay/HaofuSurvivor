@@ -1,6 +1,6 @@
 # 闪避系统
 
-当前普通闪避独立于 Weapon 和 Attack。本文说明其配置、输入和运行时边界；角色专属闪避留待后续扩展。
+闪避独立于 Weapon 和 Attack。现已接入普通闪避1、锋刃突进2、掠影装填3；专属行为和特效由 CharacterCombatSystem 的独立 DodgeEffectExecutor 调度，详见 `CharacterCombat.zh-CN.md`。
 
 ## 配置与装备
 

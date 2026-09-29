@@ -1,0 +1,21 @@
+# 经验球与 UI 图片比例
+
+2026-09-28。
+
+## 变更
+
+- 内置 image_gen 生成 `Assets/Art/Sprites/Pickups/ExperienceOrb.png`，1254×1254 透明 PNG。有效 alpha 图案约 461×457，PPU 461，保留预制体 0.2 缩放，实际球体直径约 0.2 世界单位；SpriteRenderer 改为白色，经验数值、吸附与对象池不变。
+- UICharacterSelectPanel 的 Image_Icon 从 330×261 调整为 261×261 并启用 Preserve Aspect。
+- UILevelUpPanel 的 Image_Icon 保留 198×198，启用 Preserve Aspect，兼容图集切片尺寸的差异。
+- UIMetaUpgradePanel 的 Icon 从 18×18 放大为 84×84 并启用 Preserve Aspect；TextGroup 及三个文字节点宽度改为 288，布局组控制文字宽度，给右上角图标留白。
+- 检查八个面板与世界指引：所有局部缩放均为 1；背景/按钮继续使用九宫格或纯色，进度条继续按填充比例显示。1920×1080 CanvasScaler 基准与 Match 0.5 不变。只编辑已有预制体，无运行时 UI 创建代码或 Designer 改动。
+
+## 验证
+
+Unity 刷新后经验球 Sprite 引用、白色叠色、源 alpha 通过。加载八个面板的临时 Prefab Contents，按 1920×1080、1600×1200、2560×1080 对应的逻辑画布尺寸检查；三类图标区域分别代入角色图和全部 16 枚图标，99 次 Image 实际网格宽高比检查通过（计入 Sprite 透明裁边）。局外升级文字宽度检查通过。临时预制体内容已卸载，没有保存测试状态。
+
+这些检查覆盖图片比例与配置，不代表整局游玩或所有文本长度的截图验收。本轮没有修改 C#，未重复编译。
+
+## 最终生成提示词
+
+One production-ready experience pickup orb sprite for a hand-painted chibi fantasy survivor game. A compact luminous cyan-blue spherical magical orb with a small faceted diamond crystal core, crisp deep teal edge and restrained icy-blue highlights. Round readable silhouette at 10 to 20 pixels, simple clear center, very subtle tight glow only, no floating sparkles beyond silhouette, no tail, no pedestal, no text, no border. Centered with 12 percent transparent padding in a square canvas. True transparent alpha background. Match polished gold/teal fantasy game pickup art, avoid huge bloom or star spikes. Single experience orb only.

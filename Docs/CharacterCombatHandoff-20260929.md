@@ -1,0 +1,31 @@
+# 三角色战斗改造交接
+
+本任务由用户授权按 CharacterVanguardScoutDesign.md 实现；尚未提交或推送。工作目录 D:/Lihaofu/Game/ProjectSurvivor，分支 codex/combat-art-facing，基础 HEAD 24d534b。工作区包含此前 UI、经验球、跑步素材与日志修复改动，不要覆盖或混淆；.workbuddy 为无关内容。
+
+## 已接入
+
+- Attack 1007 sword、1008 spin-sword、1009 piercing-bolt、1010 hunter-volley、1011 star-overload；旧1004保留兼容历史弹幕。
+- 先锋 Weapon5/Skill2/Dodge2/Group2；斥候 Weapon6/Skill3/Dodge3/Group3；幸存者 Skill1 改为星环超载，MaxLevel3。
+- CharacterCombatModel/System 保存攻击阶段、减伤和装填状态；独立 Executor 负责行为。新图集 CharacterCombat.png 与七个特效/武器预制体；四声道音效预制体和四个合成短音效。
+- 空旧局装备迁移；存档 v3 保存技能阶段和临时强化。恢复时取消瞬时普攻与活动闪避，保留冷却，避免重复伤害或额外发放强化。旧技能冷却按技能运行时身份继承。
+- 短残影、真实无敌环、减伤光环、装填待发光；剑持握与摆动，浮游炮展开/公转/收拢。投射物出生身份去重、新弩矢扫掠碰撞及朝向。
+
+## 已验证与剩余
+
+Unity Play Mode 定向测试 Run/Boundaries/ProjectilesAndEffects 共43项断言通过，涵盖伤害、减伤、暂停、JSON恢复、命中去重、装填、齐射次数、升级、碰墙、高速投射物、残影回收及音效暂停。dotnet 编译0错误、2个既有引用警告。测试位于 Assets/Editor/CharacterCombatVerification.cs；不能把这些断言当作长时间实战或完整动画验收。
+
+收尾结果：另有4项旧档迁移/冷却检查、2项终结震动开关检查通过，累计49项。最终Console无错误或警告，已退出Play Mode、解除暂停，场景未脏。五个原SaveData文件已恢复且逐文件SHA256一致。主线程完成最终自审；独立第二轮复审因额度限制未完成。临时测试脚本已清理，正式文档已同步。
+
+## 环境与恢复
+
+- MCP http://127.0.0.1:8800/mcp；必须选择 ProjectSurvivor@662e2df93b4f2899，可能还有其他项目连接，不得操作它们。
+- 临时调用器 Logs/character-mcp.py：`python Logs/character-mcp.py code <cs文件>`；底层复用 Logs/effects-mcp-temp.py。set_active_instance 成功后才发请求。
+- 原用户存档已逐文件备份在 Logs/CharacterCombatSaveBackup，五个文件：active-run.json、active-run.json.bak、profile.json、profile.json.bak、selected-character.json。原存档v2先锋空装备。所有Play验证结束后原样恢复，并逐文件比对SHA256；不要删除备份或崩溃证据。
+- 当前测试通常把 EditorApplication.isPaused 设为true，应明确退出Play而不是留下冻结游戏。
+- 本轮临时脚本为 Logs/character-*.cs 与 Logs/character-mcp.py，可在测试完成后精确清理；保留 Logs/character-build.log、截图和存档备份。
+- 隔离工作树 C:/Users/Administrator/.codex/worktrees/character-dodge/ProjectSurvivor 的Dodge/Save增量已集成主目录。归档工具报告该工作树受固定任务或工作区保护，故保留；不要shell递归删除。
+- Assets/Editor/CharacterCombatSetup.cs 是可重复的配置工具，会重置本轮配置的基础值，只在明确需要重新应用本方案时执行。不要日常启动自动调用。
+
+## 表现边界
+
+剑使用独立实体Sprite随手部附近锚点摆动，保留原角色身体跑步帧；没有新绘整套持剑身体帧。CameraFollow.EnableCombatShake可关闭终结震动，默认开启，持续0.15秒、最大0.05单位。音效是原创短合成音，未做人工听感验收。平衡数值尚未经过完整长局验证。

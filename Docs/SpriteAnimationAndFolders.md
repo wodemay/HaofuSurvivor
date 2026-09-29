@@ -7,7 +7,7 @@
 | Characters | Survivor、Vanguard、Scout 静态图和各自 Animation 图集 |
 | Enemies | Enemy、Boss 静态图和各自 Animation 图集 |
 | Environment | Ground、Tree、Chest |
-| Pickups | Coin、Health、Absorb |
+| Pickups | Coin、Health、Absorb、ExperienceOrb |
 | Indicators | WorldGuide 指引图，原哈希文件已改为明确名称 |
 | Effects | Bullet、FireBall、FireExplosion、GroundFlame 透明特效图 |
 | Icons | SkillAtlas：16 枚技能、武器与升级图标 |
@@ -20,7 +20,7 @@
 - 每套图集为四列两行，第一行四帧待机，第二行四帧移动。三个角色、普通怪、Boss 共 40 帧。
 - 图集通过内置 image_gen 基于既有造型生成，Unity importer 切帧；未使用运行时图片切割。
 - `ActorFrameAnimationView` 只控制 SpriteRenderer。通过 Command 注册到 GameLoopSystem，跟随对局计时，不添加 MonoBehaviour.Update。
-- 待机 4 FPS、移动 8 FPS；根据世界位移判断移动，使用 0.1 秒停步缓冲避免固定物理帧与渲染帧频率差引起闪烁。
+- 待机 4 FPS；2026-09-28 三角色跑步更新为独立 `*-Run.png` 六帧、12 FPS，补足收腿过渡，敌人移动仍为四帧、8 FPS。根据世界位移判断移动，使用 0.1 秒停步缓冲避免固定物理帧与渲染帧频率差引起闪烁。详见 RunCycleFix-20260928.md。
 - 暂停、升级选择和对局结束时，现有 GameLoop 不再更新动画。对象禁用时注销，重新启用及新局开始时重置到待机首帧并注册。
 - 切帧按 alpha 内容校准水平中心和脚底。史莱姆保留跳跃高度变化；碰撞器和根节点不参与动画。
 - 2026-09-26：三个角色改用 `*-Side.png` 的右侧待机/移动循环，左向镜像，停步和纵向移动保持朝向；原正面静态图作为选角图标。敌人沿用原图集。不包含前后朝向、攻击、受击、死亡动作，AI 生成帧仍可能有局部细节变化。详见 SkillGroundFacingArt-20260926.md。

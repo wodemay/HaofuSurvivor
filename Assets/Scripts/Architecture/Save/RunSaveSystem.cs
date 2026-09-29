@@ -97,6 +97,7 @@ namespace HaoFuSurvivor
 			data.Projectiles.AddRange(this.GetSystem<ProjectileSystem>().GetSaveData());
 			data.GroundFlames.AddRange(this.GetSystem<ExplosiveAreaSystem>().GetGroundFlameSaveData());
 			data.TimedEffects.AddRange(this.GetSystem<ExplosiveAreaSystem>().GetTimedEffectSaveData());
+			this.GetSystem<CharacterCombatSystem>().Capture(data);
 			data.Barrages.AddRange(this.GetSystem<BarrageProjectileSystem>().GetSaveData());
 			data.Breakables.AddRange(this.GetSystem<MapSystem>().GetBreakableSaveData());
 			data.MapEvents.AddRange(this.GetSystem<MapEventSystem>().GetSaveData());
@@ -148,7 +149,7 @@ namespace HaoFuSurvivor
 			this.GetSystem<RunEconomySystem>().Restore(runCoin, data.NormalKillCount, data.BossKillCount, data.EndlessRound);
 			player.CurrentHealth = Mathf.Max(0f, data.CurrentHealth);
 			player.DamageInvulnerabilityRemaining = Mathf.Max(0f, data.DamageInvulnerabilityRemaining);
-			player.DodgeInvulnerabilityRemaining = Mathf.Max(0f, data.DodgeInvulnerabilityRemaining);
+			player.DodgeInvulnerabilityRemaining = 0f;
 			this.GetSystem<RunTimerSystem>().Restore(data.ElapsedSeconds, data.CurrentStageIndex);
 			experience.Level = Mathf.Max(1, data.Level);
 			experience.CurrentExperience = Mathf.Max(0f, data.CurrentExperience);
@@ -162,8 +163,8 @@ namespace HaoFuSurvivor
 			loadout.SetDodge(data.DodgeId);
 			var dodge = this.GetModel<DodgeModel>().Runtime;
 			if (dodge != null) dodge.Level = Mathf.Max(1, data.DodgeLevel);
-			this.GetSystem<DodgeSystem>().RestoreRuntime(data.DodgeCooldownRemaining, data.DodgeDurationRemaining,
-				new Vector2(data.DodgeDirectionX, data.DodgeDirectionY), data.DodgeIsActive);
+			this.GetSystem<DodgeSystem>().RestoreRuntime(data.DodgeCooldownRemaining, 0f,
+				new Vector2(data.DodgeDirectionX, data.DodgeDirectionY), false);
 			var restoredWeaponCount = 0;
 			foreach (var weapon in data.Weapons ?? new List<WeaponSaveData>())
 			{
@@ -183,6 +184,7 @@ namespace HaoFuSurvivor
 			this.GetSystem<ProjectileSystem>().Restore(data.Projectiles);
 			this.GetSystem<ExplosiveAreaSystem>().RestoreGroundFlames(data.GroundFlames);
 			this.GetSystem<ExplosiveAreaSystem>().RestoreTimedEffects(data.TimedEffects);
+			this.GetSystem<CharacterCombatSystem>().Restore(data);
 			this.GetSystem<BarrageProjectileSystem>().Restore(data.Barrages, player.RuntimeRoot);
 			this.GetSystem<PickupSystem>().Restore(data.Pickups);
 			this.GetSystem<AttackSystem>().RestorePlayerCooldowns(player.RuntimeRoot, data.AttackCooldowns);

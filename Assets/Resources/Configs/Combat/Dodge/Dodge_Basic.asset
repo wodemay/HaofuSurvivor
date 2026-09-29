@@ -17,10 +17,23 @@ MonoBehaviour:
   Description: "\u5411\u79FB\u52A8\u65B9\u5411\u5FEB\u901F\u51B2\u523A\u5E76\u77ED\u6682\u65E0\u654C"
   Icon: {fileID: 21300005, guid: 02996dd12d5440ddb70e6e99c7f2e487, type: 3}
   ExecutorId: dash
+  TrailPrefab: {fileID: 2836845987616723981, guid: dd095a935e11f654a8c1c9e6953dbf59, type: 3}
+  BurstPrefab: {fileID: 1617493169984550723, guid: a5a56d2c515773742a754e83e385b149, type: 3}
+  ThrustPrefab: {fileID: 2238086979369162612, guid: b7c0e712c33f6c84b98ba12d58e3fb2c, type: 3}
   Cooldown: 1
   Duration: 0.2
   Distance: 2.5
   InvulnerabilityDuration: 0.15
+  Damage: 12
+  UpgradedDamage: 18
+  DamageUpgradeLevel: 2
+  PathWidth: 0.9
+  KnockbackDistance: 0.8
+  ReloadBuffDuration: 3
+  ReloadDamageMultiplier: 2
+  UpgradedReloadDamageMultiplier: 2.5
+  ReloadUpgradeLevel: 3
+  ReloadPierceBonus: 2
   MaxLevel: 5
   CanUpgrade: 1
   LevelUpgrades: []

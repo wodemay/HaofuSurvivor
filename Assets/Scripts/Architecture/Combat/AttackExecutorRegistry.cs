@@ -60,6 +60,11 @@ namespace HaoFuSurvivor
 			Register(new ProjectileAttackExecutor());
 			Register(new ExplosiveProjectileAttackExecutor());
 			Register(new BarrageProjectileAttackExecutor());
+			Register(new SwordAttackExecutor());
+			Register(new SpinSwordAttackExecutor());
+			Register(new PiercingBoltAttackExecutor());
+			Register(new HunterVolleyAttackExecutor());
+			Register(new StarOverloadAttackExecutor());
 		}
 
 		public void Register(IAttackExecutor executor)
@@ -93,7 +98,7 @@ namespace HaoFuSurvivor
 
 	public class ProjectileAttackExecutor : IAttackExecutor, IAutomaticAttackExecutor
 	{
-		public string Id => "projectile";
+		public virtual string Id => "projectile";
 		public bool RequiresTarget => true;
 
 		public void ConfigureOwner(GameObject owner, AttackConfig config, CombatFaction ownerFaction, int weaponRuntimeId = 0)
@@ -109,7 +114,7 @@ namespace HaoFuSurvivor
 				new FindClosestCombatTargetQuery(context.Owner.transform.position, context.OwnerFaction, parameters.AttackRange));
 		}
 
-		public void Execute(AttackExecutionContext context)
+		public virtual void Execute(AttackExecutionContext context)
 		{
 			if (context.Config.ExecutorParameterConfig is not ProjectileAttackParameterConfig parameters ||
 				parameters.ProjectilePrefab == null || context.Owner == null || context.Target == null) return;

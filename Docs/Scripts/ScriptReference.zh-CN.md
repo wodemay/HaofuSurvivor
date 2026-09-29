@@ -28,6 +28,11 @@
 
 ## 战斗、技能、成长与闪避
 
+- `Architecture/Combat/CharacterCombatModel.cs`、`CharacterCombatSystem.cs`：角色攻击阶段、临时减伤/装填、表现池及存档。
+- `Architecture/Combat/CharacterAttackParameterConfig.cs`、`CharacterAttackExecutors.cs`：近战剑、回旋斩、穿透弩、定向连射和星环超载。
+- `Architecture/Combat/DodgeEffectExecutors.cs`：普通残影、剑突进路径伤害、闪避装填；`Game/Presentation/CombatAudioView.cs`：限声道音效与暂停。
+- `Assets/Editor/CharacterCombatSetup.cs`、`CharacterCombatVerification.cs`：配置接入与Unity定向验收入口。
+
 - `Architecture/Combat/AttackConfig.cs`、`AttackCatalog.cs`、`AttackCatalogConfig.cs`：Attack 配置目录。
 - `Architecture/Combat/AttackExecutorRegistry.cs`、`AttackSystem.cs`：Executor 注册、AttackRuntime、冷却、自动目标和执行。
 - `Architecture/Combat/CombatTargetSystem.cs`、`CombatFaction.cs`：阵营、最近目标和范围目标查询。

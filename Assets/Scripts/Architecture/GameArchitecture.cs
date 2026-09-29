@@ -19,6 +19,7 @@ namespace HaoFuSurvivor
 			RegisterModel(new ExperienceModel());
 			RegisterModel(new LevelUpModel());
 			RegisterModel(new DodgeModel());
+			RegisterModel(new CharacterCombatModel());
 			RegisterModel(new PlayerStatUpgradeModel());
 			RegisterModel(new CharacterExclusivePerkModel());
 			RegisterModel(new MapModel());
@@ -76,6 +77,7 @@ namespace HaoFuSurvivor
 			RegisterSystem(new LevelUpSystem());
 			RegisterSystem(new RunSaveSystem());
 			RegisterSystem(new DodgeSystem());
+			RegisterSystem(new CharacterCombatSystem());
 			RegisterSystem(new MetaUpgradeSystem());
 			RegisterSystem(new PlayerStatUpgradeSystem());
 			RegisterSystem(new CharacterExclusivePerkSystem());

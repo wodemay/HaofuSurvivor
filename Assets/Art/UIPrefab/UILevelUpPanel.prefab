@@ -50,7 +50,6 @@ MonoBehaviour:
   m_Name:
   m_EditorClassIdentifier:
   Text_Level: {fileID: 6928597108728487168}
-  Button_Refesh: {fileID: 0}
   UILevelUpOptionItemTemplate: {fileID: 9149505613838433857}
 --- !u!1 &2508607670371159004
 GameObject:
@@ -110,7 +109,7 @@ MonoBehaviour:
   m_Name:
   m_EditorClassIdentifier:
   m_Material: {fileID: 0}
-  m_Color: {r: 0.42, g: 0.68, b: 0.63, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -119,7 +118,7 @@ MonoBehaviour:
       m_Calls: []
   m_Sprite: {fileID: 0}
   m_Type: 0
-  m_PreserveAspect: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1
@@ -659,7 +658,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: 0, y: -174}
-  m_SizeDelta: {x: 900, y: 48}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &9208555541228235477
 CanvasRenderer:
@@ -1031,9 +1030,9 @@ RectTransform:
   - {fileID: 5549181488193501252}
   m_Father: {fileID: 4941398596191373506}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 750, y: -322.5}
   m_SizeDelta: {x: 438, y: 624}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2356225493761947387

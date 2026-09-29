@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f7a4ef7c0e44f1a9d3f1d1a0a000002, type: 3}
+  m_Name: Dodge_Vanguard
+  m_EditorClassIdentifier:
+  Id: 2
+  DisplayName: "\u950B\u5203\u7A81\u8FDB"
+  Description: "\u6301\u5251\u7A81\u8FDB\uFF0C\u5BF9\u6CBF\u9014\u654C\u4EBA\u9020\u6210\u4F24\u5BB3\u5E76\u51FB\u9000\u3002"
+  Icon: {fileID: 1290604313456987552, guid: f0ac04e59a1635c4fbc64cb69e8b729d, type: 3}
+  ExecutorId: sword-dash
+  TrailPrefab: {fileID: 2836845987616723981, guid: dd095a935e11f654a8c1c9e6953dbf59, type: 3}
+  BurstPrefab: {fileID: 1617493169984550723, guid: a5a56d2c515773742a754e83e385b149, type: 3}
+  ThrustPrefab: {fileID: 2238086979369162612, guid: b7c0e712c33f6c84b98ba12d58e3fb2c, type: 3}
+  Cooldown: 2.5
+  Duration: 0.22
+  Distance: 2.8
+  InvulnerabilityDuration: 0.22
+  Damage: 12
+  UpgradedDamage: 18
+  DamageUpgradeLevel: 2
+  PathWidth: 0.9
+  KnockbackDistance: 0.8
+  ReloadBuffDuration: 3
+  ReloadDamageMultiplier: 2
+  UpgradedReloadDamageMultiplier: 2.5
+  ReloadUpgradeLevel: 3
+  ReloadPierceBonus: 2
+  MaxLevel: 3
+  CanUpgrade: 1
+  LevelUpgrades:
+  - Level: 2
+    Description: "\u7A81\u8FDB\u4F24\u5BB3\u63D0\u5347\u81F318"
+    CooldownAdd: 0
+    DurationAdd: 0
+    DistanceAdd: 0
+    InvulnerabilityDurationAdd: 0
+  - Level: 3
+    Description: "\u51B7\u5374\u7F29\u77ED\u81F32.2\u79D2"
+    CooldownAdd: -0.3
+    DurationAdd: 0
+    DistanceAdd: 0
+    InvulnerabilityDurationAdd: 0

@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cf9105407af64c6b92ed47fd559fd786, type: 3}
   m_Name: AttackCatalog
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier:
   Attacks:
   - {fileID: 11400000, guid: 5f70154a4f0d4989b7afb3ae8d0a4088, type: 2}
   - {fileID: 11400000, guid: cc2ec306624b46b43840e4cf264189c3, type: 2}
@@ -19,3 +19,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: c3d4e5f6a7b8490c8d1e2f3a4b5c6d7e, type: 2}
   - {fileID: 11400000, guid: 7e2fc2ba5de84ef7b4c9f847c8eb2141, type: 2}
   - {fileID: 11400000, guid: cf4072e84bb2459190b7488016010402, type: 2}
+  - {fileID: 11400000, guid: a1c851ad1b522b7499dc91957d21e07f, type: 2}
+  - {fileID: 11400000, guid: 4357b31c2b3d9c1448b379a0271cf21a, type: 2}
+  - {fileID: 11400000, guid: 2aaa795477ad715479f26a724cfe41d1, type: 2}
+  - {fileID: 11400000, guid: e9ae65160ef0fcd4b88ff107d2a9f7ff, type: 2}
+  - {fileID: 11400000, guid: d076af787acd62249a8c68d71b007ff1, type: 2}
