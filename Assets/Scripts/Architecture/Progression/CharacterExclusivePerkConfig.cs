@@ -8,7 +8,10 @@ namespace HaoFuSurvivor
 	{
 		LowHealthDamage,
 		DodgeWeaponProjectileCount,
-		SkillWeaponCooldownReduction
+		SkillWeaponCooldownReduction,
+		DodgeDamageBoost,
+		SkillDamageReduction,
+		HealthyDamage
 	}
 
 	[Serializable]

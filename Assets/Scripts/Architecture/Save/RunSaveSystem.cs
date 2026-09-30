@@ -151,9 +151,9 @@ namespace HaoFuSurvivor
 			player.DamageInvulnerabilityRemaining = Mathf.Max(0f, data.DamageInvulnerabilityRemaining);
 			player.DodgeInvulnerabilityRemaining = 0f;
 			this.GetSystem<RunTimerSystem>().Restore(data.ElapsedSeconds, data.CurrentStageIndex);
-			experience.Level = Mathf.Max(1, data.Level);
-			experience.CurrentExperience = Mathf.Max(0f, data.CurrentExperience);
-			experience.RequiredExperience = Mathf.Max(1f, data.RequiredExperience);
+			var progression = this.GetUtility<ExperienceProgressionCatalog>().Config;
+			experience.RestoreProgress(data.Level, data.CurrentExperience, data.RequiredExperience,
+				progression == null ? data.RequiredExperience : progression.GetRequiredExperience(Mathf.Max(1, data.Level)));
 			this.GetSystem<PlayerStatUpgradeSystem>().Restore(data.StatUpgrades);
 			this.GetSystem<CharacterExclusivePerkSystem>().Restore(data.CharacterPerks, data.CharacterPerkRuntime);
 

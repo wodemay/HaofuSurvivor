@@ -210,7 +210,8 @@ namespace HaoFuSurvivor
 					if (definition == null || entry.Level < 0 || entry.Level > definition.MaxLevel || !seen.Add(entry.PerkId)) return false;
 				}
 			var runtime = data.CharacterPerkRuntime;
-			return runtime != null && IsFiniteNonNegative(runtime.DodgeProjectileBonusRemaining) && IsFiniteNonNegative(runtime.SkillCooldownBonusRemaining);
+			return runtime != null && IsFiniteNonNegative(runtime.DodgeProjectileBonusRemaining) && IsFiniteNonNegative(runtime.SkillCooldownBonusRemaining)
+				&& IsFiniteNonNegative(runtime.DodgeDamageRemaining) && IsFiniteNonNegative(runtime.SkillGuardRemaining);
 		}
 
 		private static bool ValidateLevelUp(RunSaveData data)

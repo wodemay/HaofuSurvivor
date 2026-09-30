@@ -15,7 +15,7 @@ MonoBehaviour:
   Id: 2
   DisplayName: "\u65AD\u9635\u56DE\u65CB"
   Description: "\u56DE\u65CB\u6325\u5251\u51FB\u9000\u5468\u56F4\u654C\u4EBA\uFF0C\u5E76\u77ED\u6682\u51CF\u4F24\u3002"
-  Icon: {fileID: 8685408783168630167, guid: f0ac04e59a1635c4fbc64cb69e8b729d, type: 3}
+  Icon: {fileID: -5624067246213660119, guid: f691f9091975de5468a6fb71b773fac7, type: 3}
   InitialAttackIds: f0030000
   MaxLevel: 3
   CanUpgrade: 1

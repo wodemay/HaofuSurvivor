@@ -8,6 +8,8 @@ namespace HaoFuSurvivor
 	{
 		private float mDodgeProjectileBonusRemaining;
 		private float mSkillCooldownBonusRemaining;
+		private float mDodgeDamageRemaining;
+		private float mSkillGuardRemaining;
 
 		public IReadOnlyList<CharacterExclusivePerkDefinition> GetEligible()
 		{
@@ -46,12 +48,20 @@ namespace HaoFuSurvivor
 		{
 			var player = this.GetModel<PlayerModel>();
 			var stats = this.GetModel<PlayerStatModel>();
-			var definition = GetDefinition(CharacterExclusivePerkType.LowHealthDamage);
-			if (!player.IsRegistered || definition == null || stats.MaxHealth <= 0f ||
-				player.CurrentHealth > stats.MaxHealth * Mathf.Clamp01(definition.HealthThreshold)) return 1f;
-			var level = GetLevel(definition.Id);
-			return level <= 0 ? 1f : 1f + (definition.GetLevel(level)?.Value ?? 0f);
+			if (!player.IsRegistered || stats.MaxHealth <= 0f) return 1f;
+			var bonus = mDodgeDamageRemaining > 0f ? GetActiveValue(CharacterExclusivePerkType.DodgeDamageBoost) : 0f;
+			foreach (var definition in this.GetUtility<CharacterExclusivePerkCatalog>().GetByCharacter(player.CharacterId))
+			{
+				var ratio = player.CurrentHealth / stats.MaxHealth;
+				if ((definition.Type == CharacterExclusivePerkType.LowHealthDamage && ratio <= definition.HealthThreshold) ||
+					(definition.Type == CharacterExclusivePerkType.HealthyDamage && ratio >= definition.HealthThreshold))
+					bonus += definition.GetLevel(GetLevel(definition.Id))?.Value ?? 0f;
+			}
+			return 1f + bonus;
 		}
+
+		public float GetIncomingDamageMultiplier() => mSkillGuardRemaining > 0f
+			? 1f - Mathf.Clamp01(GetActiveValue(CharacterExclusivePerkType.SkillDamageReduction)) : 1f;
 
 		public int GetWeaponProjectileCountAdd()
 		{
@@ -71,7 +81,9 @@ namespace HaoFuSurvivor
 		{
 			mDodgeProjectileBonusRemaining = Mathf.Max(0f, mDodgeProjectileBonusRemaining - deltaTime);
 			mSkillCooldownBonusRemaining = Mathf.Max(0f, mSkillCooldownBonusRemaining - deltaTime);
-			if (mDodgeProjectileBonusRemaining <= 0f && mSkillCooldownBonusRemaining <= 0f)
+			mDodgeDamageRemaining = Mathf.Max(0f, mDodgeDamageRemaining - deltaTime);
+			mSkillGuardRemaining = Mathf.Max(0f, mSkillGuardRemaining - deltaTime);
+			if (mDodgeProjectileBonusRemaining <= 0f && mSkillCooldownBonusRemaining <= 0f && mDodgeDamageRemaining <= 0f && mSkillGuardRemaining <= 0f)
 				this.GetSystem<GameLoopSystem>().UnregisterUpdateable(this);
 		}
 
@@ -80,6 +92,8 @@ namespace HaoFuSurvivor
 			this.GetModel<CharacterExclusivePerkModel>().Reset();
 			mDodgeProjectileBonusRemaining = 0f;
 			mSkillCooldownBonusRemaining = 0f;
+			mDodgeDamageRemaining = 0f;
+			mSkillGuardRemaining = 0f;
 			this.GetSystem<GameLoopSystem>().UnregisterUpdateable(this);
 		}
 
@@ -88,7 +102,9 @@ namespace HaoFuSurvivor
 			return new CharacterExclusivePerkRuntimeSaveData
 			{
 				DodgeProjectileBonusRemaining = mDodgeProjectileBonusRemaining,
-				SkillCooldownBonusRemaining = mSkillCooldownBonusRemaining
+				SkillCooldownBonusRemaining = mSkillCooldownBonusRemaining,
+				DodgeDamageRemaining = mDodgeDamageRemaining,
+				SkillGuardRemaining = mSkillGuardRemaining
 			};
 		}
 
@@ -97,11 +113,17 @@ namespace HaoFuSurvivor
 			this.GetModel<CharacterExclusivePerkModel>().Restore(levels);
 			mDodgeProjectileBonusRemaining = Mathf.Max(0f, runtime?.DodgeProjectileBonusRemaining ?? 0f);
 			mSkillCooldownBonusRemaining = Mathf.Max(0f, runtime?.SkillCooldownBonusRemaining ?? 0f);
+			mDodgeDamageRemaining = Mathf.Max(0f, runtime?.DodgeDamageRemaining ?? 0f);
+			mSkillGuardRemaining = Mathf.Max(0f, runtime?.SkillGuardRemaining ?? 0f);
 			RegisterTimedEffect();
 		}
 
 		private void OnDodgeEnded(DodgeEndedEvent dodgeEvent)
 		{
+			var boost = GetDefinition(CharacterExclusivePerkType.DodgeDamageBoost);
+			if (boost != null && boost.TriggerDodgeId == dodgeEvent.DodgeId)
+				mDodgeDamageRemaining = boost.GetLevel(GetLevel(boost.Id))?.Duration ?? 0f;
+			RegisterTimedEffect();
 			var definition = GetDefinition(CharacterExclusivePerkType.DodgeWeaponProjectileCount);
 			var level = definition == null ? 0 : GetLevel(definition.Id);
 			if (definition == null || (definition.TriggerDodgeId != 0 && definition.TriggerDodgeId != dodgeEvent.DodgeId)) return;
@@ -112,6 +134,10 @@ namespace HaoFuSurvivor
 
 		private void OnSkillUsed(SkillUsedEvent skillEvent)
 		{
+			var guard = GetDefinition(CharacterExclusivePerkType.SkillDamageReduction);
+			if (guard != null && guard.TriggerSkillId == skillEvent.SkillId)
+				mSkillGuardRemaining = guard.GetLevel(GetLevel(guard.Id))?.Duration ?? 0f;
+			RegisterTimedEffect();
 			var definition = GetDefinition(CharacterExclusivePerkType.SkillWeaponCooldownReduction);
 			var level = definition == null ? 0 : GetLevel(definition.Id);
 			if (definition == null || level <= 0 || definition.TriggerSkillId != skillEvent.SkillId) return;
@@ -121,7 +147,7 @@ namespace HaoFuSurvivor
 
 		private void RegisterTimedEffect()
 		{
-			if (mDodgeProjectileBonusRemaining > 0f || mSkillCooldownBonusRemaining > 0f)
+			if (mDodgeProjectileBonusRemaining > 0f || mSkillCooldownBonusRemaining > 0f || mDodgeDamageRemaining > 0f || mSkillGuardRemaining > 0f)
 				this.GetSystem<GameLoopSystem>().RegisterUpdateable(this);
 		}
 

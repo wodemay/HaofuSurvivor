@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: WeaponCombination_ProjectileAttackDamage
   m_EditorClassIdentifier:
   Id: 1
-  DisplayName: 聚能投射
-  Description: 投射物武器满级且拥有攻击强化后，进化为高速聚能投射。
-  Icon: {fileID: 21300001, guid: 02996dd12d5440ddb70e6e99c7f2e487, type: 3}
+  DisplayName: "\u805A\u80FD\u6295\u5C04"
+  Description: "\u6295\u5C04\u7269\u6B66\u5668\u6EE1\u7EA7\u4E14\u62E5\u6709\u653B\u51FB\u5F3A\u5316\u540E\uFF0C\u8FDB\u5316\u4E3A\u9AD8\u901F\u805A\u80FD\u6295\u5C04\u3002"
+  Icon: {fileID: -8893543114333640690, guid: f691f9091975de5468a6fb71b773fac7, type: 3}
   CandidateChance: 0.7
   RequiredWeapons:
   - WeaponId: 1

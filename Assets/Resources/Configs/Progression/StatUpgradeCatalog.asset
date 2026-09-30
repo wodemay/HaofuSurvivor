@@ -3,55 +3,62 @@
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9160f38e31fc48d6bfc5c3c1b6bcedec, type: 3}
   m_Name: StatUpgradeCatalog
+  m_EditorClassIdentifier:
   Upgrades:
   - Id: 1
     Type: 0
-    DisplayName: 攻击强化
-    Description: 所有伤害提高10%
-    Icon: {fileID: 21300006, guid: 02996dd12d5440ddb70e6e99c7f2e487, type: 3}
+    DisplayName: "\u653B\u51FB\u5F3A\u5316"
+    Description: "\u6240\u6709\u4F24\u5BB3\u63D0\u9AD810%"
+    Icon: {fileID: -5087343687574289020, guid: f691f9091975de5468a6fb71b773fac7, type: 3}
     PercentPerLevel: 0.1
     MaxLevel: 5
   - Id: 2
     Type: 1
-    DisplayName: 冷却优化
-    Description: 所有冷却缩短8%
-    Icon: {fileID: 21300007, guid: 02996dd12d5440ddb70e6e99c7f2e487, type: 3}
+    DisplayName: "\u51B7\u5374\u4F18\u5316"
+    Description: "\u6240\u6709\u51B7\u5374\u7F29\u77ED8%"
+    Icon: {fileID: 5886820993961067050, guid: f691f9091975de5468a6fb71b773fac7, type: 3}
     PercentPerLevel: 0.08
     MaxLevel: 5
   - Id: 3
     Type: 2
-    DisplayName: 吸收范围
-    Description: 经验吸收范围提高20%
-    Icon: {fileID: 21300008, guid: 02996dd12d5440ddb70e6e99c7f2e487, type: 3}
+    DisplayName: "\u5438\u6536\u8303\u56F4"
+    Description: "\u7ECF\u9A8C\u5438\u6536\u8303\u56F4\u63D0\u9AD820%"
+    Icon: {fileID: 9017743475654932309, guid: f691f9091975de5468a6fb71b773fac7, type: 3}
     PercentPerLevel: 0.2
     MaxLevel: 5
   - Id: 4
     Type: 3
-    DisplayName: 经验增幅
-    Description: 获得经验提高15%
-    Icon: {fileID: 21300009, guid: 02996dd12d5440ddb70e6e99c7f2e487, type: 3}
+    DisplayName: "\u7ECF\u9A8C\u589E\u5E45"
+    Description: "\u83B7\u5F97\u7ECF\u9A8C\u63D0\u9AD815%"
+    Icon: {fileID: -987311008134348357, guid: f691f9091975de5468a6fb71b773fac7, type: 3}
     PercentPerLevel: 0.15
     MaxLevel: 5
   - Id: 5
     Type: 4
-    DisplayName: 疾行
-    Description: 移动速度提高8%
-    Icon: {fileID: 21300010, guid: 02996dd12d5440ddb70e6e99c7f2e487, type: 3}
+    DisplayName: "\u75BE\u884C"
+    Description: "\u79FB\u52A8\u901F\u5EA6\u63D0\u9AD88%"
+    Icon: {fileID: -4540553022140704257, guid: f691f9091975de5468a6fb71b773fac7, type: 3}
     PercentPerLevel: 0.08
     MaxLevel: 5
   - Id: 6
     Type: 5
-    DisplayName: 自愈
-    Description: 每秒恢复最大生命值的0.5%
-    Icon: {fileID: 21300011, guid: 02996dd12d5440ddb70e6e99c7f2e487, type: 3}
+    DisplayName: "\u81EA\u6108"
+    Description: "\u6BCF\u79D2\u6062\u590D\u6700\u5927\u751F\u547D\u503C\u76840.5%"
+    Icon: {fileID: 3446277748366551907, guid: f691f9091975de5468a6fb71b773fac7, type: 3}
     PercentPerLevel: 0.005
     MaxLevel: 5
   - Id: 7
     Type: 6
-    DisplayName: 恢复效率
-    Description: 外部治疗效果提高20%
-    Icon: {fileID: 21300012, guid: 02996dd12d5440ddb70e6e99c7f2e487, type: 3}
+    DisplayName: "\u6062\u590D\u6548\u7387"
+    Description: "\u5916\u90E8\u6CBB\u7597\u6548\u679C\u63D0\u9AD820%"
+    Icon: {fileID: 3446277748366551907, guid: f691f9091975de5468a6fb71b773fac7, type: 3}
     PercentPerLevel: 0.2
     MaxLevel: 5
