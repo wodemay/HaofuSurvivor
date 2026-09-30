@@ -66,7 +66,7 @@ namespace HaoFuSurvivor
 
 	[Serializable] public class StatUpgradeSaveData { public int UpgradeId; public int Level; }
 	[Serializable] public class CharacterExclusivePerkSaveData { public int PerkId; public int Level; }
-	[Serializable] public class CharacterExclusivePerkRuntimeSaveData { public float DodgeProjectileBonusRemaining; public float SkillCooldownBonusRemaining; }
+	[Serializable] public class CharacterExclusivePerkRuntimeSaveData { public float DodgeProjectileBonusRemaining; public float SkillCooldownBonusRemaining; public float DodgeDamageRemaining; public float SkillGuardRemaining; }
 	[Serializable] public class LevelUpOptionSaveData { public string CandidateKey; public int Type; public int RuntimeId; public int ContentId; public int CurrentLevel; public string DisplayName; public string Description; public bool IsNewWeapon; public string LevelText; public float Weight; }
 	[Serializable] public class EnemySaveData { public int ConfigId; public float PositionX; public float PositionY; public float CurrentHealth; public float MoveSpeed; public List<AttackCooldownSaveData> AttackCooldowns = new(); }
 	[Serializable] public class ExperienceDropSaveData { public int ConfigId; public float Experience; public float PositionX; public float PositionY; public bool IsCaptured; public float AbsorbSpeed; }

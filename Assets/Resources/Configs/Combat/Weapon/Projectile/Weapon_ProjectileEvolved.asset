@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: Weapon_ProjectileEvolved
   m_EditorClassIdentifier:
   Id: 2
-  DisplayName: 投射物武器·进化
-  Description: 进化后的投射物武器。
-  Icon: {fileID: 21300001, guid: 02996dd12d5440ddb70e6e99c7f2e487, type: 3}
-  InitialAttackIds:
-  - 1003
+  DisplayName: "\u6295\u5C04\u7269\u6B66\u5668\xB7\u8FDB\u5316"
+  Description: "\u8FDB\u5316\u540E\u7684\u6295\u5C04\u7269\u6B66\u5668\u3002"
+  Icon: {fileID: -8893543114333640690, guid: f691f9091975de5468a6fb71b773fac7, type: 3}
+  InitialAttackIds: eb030000
   MaxLevel: 1
   CanUpgrade: 0
+  CanAcquireDuringRun: 0
   LevelUpgrades: []

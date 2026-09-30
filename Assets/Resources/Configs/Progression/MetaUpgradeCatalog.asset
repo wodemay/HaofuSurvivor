@@ -3,14 +3,21 @@
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7f2c7e65f3a14f4386c31a6b0f5b7ce1, type: 3}
   m_Name: MetaUpgradeCatalog
+  m_EditorClassIdentifier:
   Upgrades:
   - Id: 1
     Type: 0
-    DisplayName: 最大生命值
-    Description: 后续对局最大生命值提升10%
-    Icon: {fileID: 21300013, guid: 02996dd12d5440ddb70e6e99c7f2e487, type: 3}
+    DisplayName: "\u6700\u5927\u751F\u547D\u503C"
+    Description: "\u540E\u7EED\u5BF9\u5C40\u6700\u5927\u751F\u547D\u503C\u63D0\u534710%"
+    Icon: {fileID: -7351052778887087000, guid: f691f9091975de5468a6fb71b773fac7, type: 3}
     PercentPerLevel: 0.1
     MaxLevel: 5
     Costs:
@@ -21,9 +28,9 @@ MonoBehaviour:
     - 2000
   - Id: 2
     Type: 1
-    DisplayName: 攻击力
-    Description: 后续对局所有伤害提升8%
-    Icon: {fileID: 21300006, guid: 02996dd12d5440ddb70e6e99c7f2e487, type: 3}
+    DisplayName: "\u653B\u51FB\u529B"
+    Description: "\u540E\u7EED\u5BF9\u5C40\u6240\u6709\u4F24\u5BB3\u63D0\u53478%"
+    Icon: {fileID: -5087343687574289020, guid: f691f9091975de5468a6fb71b773fac7, type: 3}
     PercentPerLevel: 0.08
     MaxLevel: 5
     Costs:
@@ -34,9 +41,9 @@ MonoBehaviour:
     - 2000
   - Id: 3
     Type: 2
-    DisplayName: 移动速度
-    Description: 后续对局移动速度提升6%
-    Icon: {fileID: 21300010, guid: 02996dd12d5440ddb70e6e99c7f2e487, type: 3}
+    DisplayName: "\u79FB\u52A8\u901F\u5EA6"
+    Description: "\u540E\u7EED\u5BF9\u5C40\u79FB\u52A8\u901F\u5EA6\u63D0\u53476%"
+    Icon: {fileID: -4540553022140704257, guid: f691f9091975de5468a6fb71b773fac7, type: 3}
     PercentPerLevel: 0.06
     MaxLevel: 5
     Costs:

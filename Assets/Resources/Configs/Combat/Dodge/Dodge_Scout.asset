@@ -15,7 +15,7 @@ MonoBehaviour:
   Id: 3
   DisplayName: "\u63A0\u5F71\u88C5\u586B"
   Description: "\u95EA\u907F\u540E\u4E0B\u4E00\u679A\u8D2F\u7A7F\u5F29\u4F24\u5BB3\u7FFB\u500D\uFF0C\u989D\u5916\u8D2F\u7A7F\u4E24\u4EBA\u3002"
-  Icon: {fileID: 1290604313456987552, guid: f0ac04e59a1635c4fbc64cb69e8b729d, type: 3}
+  Icon: {fileID: -3272184696137876264, guid: f691f9091975de5468a6fb71b773fac7, type: 3}
   ExecutorId: reload-dash
   TrailPrefab: {fileID: 2836845987616723981, guid: dd095a935e11f654a8c1c9e6953dbf59, type: 3}
   BurstPrefab: {fileID: 1617493169984550723, guid: a5a56d2c515773742a754e83e385b149, type: 3}

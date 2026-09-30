@@ -16,9 +16,9 @@ MonoBehaviour:
   - Id: 1
     CharacterId: 1
     Type: 0
-    DisplayName: 绝境意志
-    Description: 生命值不高于50%时，所有伤害提高。
-    Icon: {fileID: 21300013, guid: 02996dd12d5440ddb70e6e99c7f2e487, type: 3}
+    DisplayName: "\u7EDD\u5883\u610F\u5FD7"
+    Description: "\u751F\u547D\u503C\u4E0D\u9AD8\u4E8E50%\u65F6\uFF0C\u6240\u6709\u4F24\u5BB3\u63D0\u9AD8\u3002"
+    Icon: {fileID: -7351052778887087000, guid: f691f9091975de5468a6fb71b773fac7, type: 3}
     CandidateWeight: 2
     HealthThreshold: 0.5
     TriggerDodgeId: 0
@@ -36,9 +36,9 @@ MonoBehaviour:
   - Id: 2
     CharacterId: 1
     Type: 1
-    DisplayName: 战术翻滚
-    Description: 闪避结束后2秒内，武器子弹数量增加。
-    Icon: {fileID: 21300014, guid: 02996dd12d5440ddb70e6e99c7f2e487, type: 3}
+    DisplayName: "\u6218\u672F\u7FFB\u6EDA"
+    Description: "\u95EA\u907F\u7ED3\u675F\u540E2\u79D2\u5185\uFF0C\u6B66\u5668\u5B50\u5F39\u6570\u91CF\u589E\u52A0\u3002"
+    Icon: {fileID: -2357014432273373965, guid: f691f9091975de5468a6fb71b773fac7, type: 3}
     CandidateWeight: 2
     HealthThreshold: 0.5
     TriggerDodgeId: 1
@@ -56,9 +56,9 @@ MonoBehaviour:
   - Id: 3
     CharacterId: 1
     Type: 2
-    DisplayName: 环流蓄能
-    Description: 施放环形弹幕后，武器攻击冷却缩减。
-    Icon: {fileID: 21300015, guid: 02996dd12d5440ddb70e6e99c7f2e487, type: 3}
+    DisplayName: "\u661F\u73AF\u84C4\u80FD"
+    Description: "\u65BD\u653E\u661F\u73AF\u8D85\u8F7D\u540E\uFF0C\u6B66\u5668\u653B\u51FB\u51B7\u5374\u7F29\u51CF12%/18%/24%\uFF0C\u6301\u7EED3/4/5\u79D2\u3002"
+    Icon: {fileID: 4821094577353298223, guid: f691f9091975de5468a6fb71b773fac7, type: 3}
     CandidateWeight: 2
     HealthThreshold: 0.5
     TriggerDodgeId: 0
@@ -73,3 +73,123 @@ MonoBehaviour:
     - Level: 3
       Value: 0.24
       Duration: 5
+  - Id: 4
+    CharacterId: 2
+    Type: 0
+    DisplayName: "\u80CC\u6C34\u5251\u8A93"
+    Description: "\u751F\u547D\u4E0D\u9AD8\u4E8E50%\u65F6\uFF0C\u4F24\u5BB3\u63D0\u9AD815%/30%/45%\u3002"
+    Icon: {fileID: -875838452324426762, guid: f691f9091975de5468a6fb71b773fac7, type: 3}
+    CandidateWeight: 2
+    HealthThreshold: 0.5
+    TriggerDodgeId: 0
+    TriggerSkillId: 0
+    LevelUpgrades:
+    - Level: 1
+      Value: 0.15
+      Duration: 0
+    - Level: 2
+      Value: 0.3
+      Duration: 0
+    - Level: 3
+      Value: 0.45
+      Duration: 0
+  - Id: 5
+    CharacterId: 2
+    Type: 3
+    DisplayName: "\u8FFD\u950B"
+    Description: "\u950B\u5203\u7A81\u8FDB\u7ED3\u675F\u540E3\u79D2\u5185\uFF0C\u4F24\u5BB3\u63D0\u9AD815%/25%/35%\u3002"
+    Icon: {fileID: -4046260676687583776, guid: f691f9091975de5468a6fb71b773fac7, type: 3}
+    CandidateWeight: 2
+    HealthThreshold: 0.5
+    TriggerDodgeId: 2
+    TriggerSkillId: 0
+    LevelUpgrades:
+    - Level: 1
+      Value: 0.15
+      Duration: 3
+    - Level: 2
+      Value: 0.25
+      Duration: 3
+    - Level: 3
+      Value: 0.35
+      Duration: 3
+  - Id: 6
+    CharacterId: 2
+    Type: 4
+    DisplayName: "\u5251\u56F4\u5B88\u52BF"
+    Description: "\u65BD\u653E\u65AD\u9635\u56DE\u65CB\u540E4\u79D2\uFF0C\u6240\u53D7\u4F24\u5BB3\u964D\u4F4E10%/20%/30%\uFF0C\u4E0E\u56DE\u65CB\u51CF\u4F24\u76F8\u4E58\u3002"
+    Icon: {fileID: 4813087541258129010, guid: f691f9091975de5468a6fb71b773fac7, type: 3}
+    CandidateWeight: 2
+    HealthThreshold: 0.5
+    TriggerDodgeId: 0
+    TriggerSkillId: 2
+    LevelUpgrades:
+    - Level: 1
+      Value: 0.1
+      Duration: 4
+    - Level: 2
+      Value: 0.2
+      Duration: 4
+    - Level: 3
+      Value: 0.3
+      Duration: 4
+  - Id: 7
+    CharacterId: 3
+    Type: 5
+    DisplayName: "\u7A33\u606F\u7784\u51C6"
+    Description: "\u751F\u547D\u4E0D\u4F4E\u4E8E80%\u65F6\uFF0C\u4F24\u5BB3\u63D0\u9AD810%/20%/30%\u3002"
+    Icon: {fileID: 4154590135188174747, guid: f691f9091975de5468a6fb71b773fac7, type: 3}
+    CandidateWeight: 2
+    HealthThreshold: 0.8
+    TriggerDodgeId: 0
+    TriggerSkillId: 0
+    LevelUpgrades:
+    - Level: 1
+      Value: 0.1
+      Duration: 0
+    - Level: 2
+      Value: 0.2
+      Duration: 0
+    - Level: 3
+      Value: 0.3
+      Duration: 0
+  - Id: 8
+    CharacterId: 3
+    Type: 1
+    DisplayName: "\u8FC5\u6377\u7BAD\u888B"
+    Description: "\u63A0\u5F71\u88C5\u586B\u7ED3\u675F\u540E2\u79D2\uFF0C\u6B66\u5668\u5B50\u5F39\u6570\u91CF\u589E\u52A01/2/3\u3002"
+    Icon: {fileID: -3272184696137876264, guid: f691f9091975de5468a6fb71b773fac7, type: 3}
+    CandidateWeight: 2
+    HealthThreshold: 0.5
+    TriggerDodgeId: 3
+    TriggerSkillId: 0
+    LevelUpgrades:
+    - Level: 1
+      Value: 1
+      Duration: 2
+    - Level: 2
+      Value: 2
+      Duration: 2
+    - Level: 3
+      Value: 3
+      Duration: 2
+  - Id: 9
+    CharacterId: 3
+    Type: 2
+    DisplayName: "\u730E\u6740\u8282\u62CD"
+    Description: "\u65BD\u653E\u730E\u6740\u8FDE\u5C04\u540E4\u79D2\uFF0C\u6B66\u5668\u653B\u51FB\u51B7\u5374\u7F29\u51CF10%/20%/30%\u3002"
+    Icon: {fileID: -5906147484530305419, guid: f691f9091975de5468a6fb71b773fac7, type: 3}
+    CandidateWeight: 2
+    HealthThreshold: 0.5
+    TriggerDodgeId: 0
+    TriggerSkillId: 3
+    LevelUpgrades:
+    - Level: 1
+      Value: 0.1
+      Duration: 4
+    - Level: 2
+      Value: 0.2
+      Duration: 4
+    - Level: 3
+      Value: 0.3
+      Duration: 4

@@ -16,3 +16,5 @@ MonoBehaviour:
   - 36
   - 42
   - 50
+  ExperienceGrowthPerLevel: 8
+  ExperienceGrowthAcceleration: 0.25

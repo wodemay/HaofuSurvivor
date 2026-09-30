@@ -15,7 +15,7 @@ MonoBehaviour:
   Id: 2
   DisplayName: "\u950B\u5203\u7A81\u8FDB"
   Description: "\u6301\u5251\u7A81\u8FDB\uFF0C\u5BF9\u6CBF\u9014\u654C\u4EBA\u9020\u6210\u4F24\u5BB3\u5E76\u51FB\u9000\u3002"
-  Icon: {fileID: 1290604313456987552, guid: f0ac04e59a1635c4fbc64cb69e8b729d, type: 3}
+  Icon: {fileID: 4768195912259151316, guid: f691f9091975de5468a6fb71b773fac7, type: 3}
   ExecutorId: sword-dash
   TrailPrefab: {fileID: 2836845987616723981, guid: dd095a935e11f654a8c1c9e6953dbf59, type: 3}
   BurstPrefab: {fileID: 1617493169984550723, guid: a5a56d2c515773742a754e83e385b149, type: 3}

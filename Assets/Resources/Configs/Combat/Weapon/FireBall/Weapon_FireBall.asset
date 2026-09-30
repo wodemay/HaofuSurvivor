@@ -13,43 +13,42 @@ MonoBehaviour:
   m_Name: Weapon_FireBall
   m_EditorClassIdentifier:
   Id: 3
-  DisplayName: 火球术
-  Description: 自动向最近敌人发射火球。
-  Icon: {fileID: 21300002, guid: 02996dd12d5440ddb70e6e99c7f2e487, type: 3}
-  InitialAttackIds:
-  - 1005
+  DisplayName: "\u706B\u7403\u672F"
+  Description: "\u81EA\u52A8\u5411\u6700\u8FD1\u654C\u4EBA\u53D1\u5C04\u706B\u7403\u3002"
+  Icon: {fileID: 9156287425024038243, guid: f691f9091975de5468a6fb71b773fac7, type: 3}
+  InitialAttackIds: ed030000
   MaxLevel: 5
   CanUpgrade: 1
   CanAcquireDuringRun: 1
   LevelUpgrades:
   - Level: 2
-    Description: 火球伤害 +6
-    AddAttackIds: []
-    RemoveAttackIds: []
+    Description: "\u706B\u7403\u4F24\u5BB3 +6"
+    AddAttackIds:
+    RemoveAttackIds:
     AttackModifiers:
     - AttackId: 1005
       Key: Projectile.DamageAdd
       Value: 6
   - Level: 3
-    Description: 火球冷却 -15%
-    AddAttackIds: []
-    RemoveAttackIds: []
+    Description: "\u706B\u7403\u51B7\u5374 -15%"
+    AddAttackIds:
+    RemoveAttackIds:
     AttackModifiers:
     - AttackId: 1005
       Key: Attack.CooldownMultiplier
       Value: -0.15
   - Level: 4
-    Description: 额外发射 1 枚火球
-    AddAttackIds: []
-    RemoveAttackIds: []
+    Description: "\u989D\u5916\u53D1\u5C04 1 \u679A\u706B\u7403"
+    AddAttackIds:
+    RemoveAttackIds:
     AttackModifiers:
     - AttackId: 1005
       Key: Projectile.CountAdd
       Value: 1
   - Level: 5
-    Description: 火球伤害 +8，穿透 +1
-    AddAttackIds: []
-    RemoveAttackIds: []
+    Description: "\u706B\u7403\u4F24\u5BB3 +8\uFF0C\u7A7F\u900F +1"
+    AddAttackIds:
+    RemoveAttackIds:
     AttackModifiers:
     - AttackId: 1005
       Key: Projectile.DamageAdd

@@ -13,34 +13,34 @@ MonoBehaviour:
   m_Name: Weapon_Projectile
   m_EditorClassIdentifier:
   Id: 1
-  DisplayName: 投射物武器
-  Description: 发射直线投射物攻击敌人。
-  Icon: {fileID: 21300000, guid: 02996dd12d5440ddb70e6e99c7f2e487, type: 3}
-  InitialAttackIds:
-  - 1002
+  DisplayName: "\u6295\u5C04\u7269\u6B66\u5668"
+  Description: "\u53D1\u5C04\u76F4\u7EBF\u6295\u5C04\u7269\u653B\u51FB\u654C\u4EBA\u3002"
+  Icon: {fileID: 3097038364141802143, guid: f691f9091975de5468a6fb71b773fac7, type: 3}
+  InitialAttackIds: ea030000
   MaxLevel: 5
   CanUpgrade: 1
+  CanAcquireDuringRun: 0
   LevelUpgrades:
   - Level: 2
-    Description: 投射物数量 +1
-    AddAttackIds: []
-    RemoveAttackIds: []
+    Description: "\u6295\u5C04\u7269\u6570\u91CF +1"
+    AddAttackIds:
+    RemoveAttackIds:
     AttackModifiers:
     - AttackId: 1002
       Key: Projectile.CountAdd
       Value: 1
   - Level: 3
-    Description: 攻击冷却 -20%
-    AddAttackIds: []
-    RemoveAttackIds: []
+    Description: "\u653B\u51FB\u51B7\u5374 -20%"
+    AddAttackIds:
+    RemoveAttackIds:
     AttackModifiers:
     - AttackId: 1002
       Key: Attack.CooldownMultiplier
       Value: -0.2
   - Level: 4
-    Description: 伤害 +5，飞行速度 +25%
-    AddAttackIds: []
-    RemoveAttackIds: []
+    Description: "\u4F24\u5BB3 +5\uFF0C\u98DE\u884C\u901F\u5EA6 +25%"
+    AddAttackIds:
+    RemoveAttackIds:
     AttackModifiers:
     - AttackId: 1002
       Key: Projectile.DamageAdd
@@ -49,9 +49,9 @@ MonoBehaviour:
       Key: Projectile.SpeedMultiplier
       Value: 0.25
   - Level: 5
-    Description: 投射物数量 +1，穿透 +1
-    AddAttackIds: []
-    RemoveAttackIds: []
+    Description: "\u6295\u5C04\u7269\u6570\u91CF +1\uFF0C\u7A7F\u900F +1"
+    AddAttackIds:
+    RemoveAttackIds:
     AttackModifiers:
     - AttackId: 1002
       Key: Projectile.CountAdd

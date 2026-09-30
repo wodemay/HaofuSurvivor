@@ -1,0 +1,13 @@
+# 地图事件底盘与进度环
+
+2026-09-30：使用内置 image_gen 生成两张透明 PNG，替换 MapEventRoot 中误用的金币底图和宝箱进度图。
+
+- `Assets/Art/Sprites/Indicators/EventBase.png`：深蓝金边符文底盘。
+- `Assets/Art/Sprites/Indicators/EventProgress.png`：透明中心的青蓝能量环。
+- `Assets/Art/Prefabs/Map/Events/MapEventRoot.prefab`：白色叠色、统一 3 世界单位正方形范围；背景 Simple 模式，进度 PreserveAspect、Radial360、顶部顺时针填充，关闭 RaycastTarget。
+
+生成提示词规格：底盘为正交俯视、正圆居中、深蓝雕刻金属、细金色同心边框、八个青色符文镶嵌、中心低对比；进度为完整连续的青蓝发光圆环、细金色内外边、中心及外侧透明、均匀亮度。两图均无文字、数字、场景、透视或外部投影。
+
+生成源文件分别为 `exec-ca57ab66-23d4-4458-8d5b-4601e8f06d93.png` 与 `exec-a71e4ad0-182b-4415-b9d0-227ee266fec7.png`，正式资源已复制进项目，旧资源保留。
+
+Unity 导入成功；隔离预览场景通过 MapEventEntityView.SetProgress 检查 0%、50%、100% 叠加效果，预览保存于 `Logs/EventArtPreview.png`。未修改运行时逻辑或触发范围，未进行整局试玩。临时预览对象和材质已销毁。

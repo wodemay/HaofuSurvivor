@@ -13,11 +13,10 @@ MonoBehaviour:
   m_Name: Weapon_FireBallInferno
   m_EditorClassIdentifier:
   Id: 4
-  DisplayName: 炼狱火球
-  Description: 命中后引爆并在地面留下灼烧火焰。
-  Icon: {fileID: 21300003, guid: 02996dd12d5440ddb70e6e99c7f2e487, type: 3}
-  InitialAttackIds:
-  - 1006
+  DisplayName: "\u70BC\u72F1\u706B\u7403"
+  Description: "\u547D\u4E2D\u540E\u5F15\u7206\u5E76\u5728\u5730\u9762\u7559\u4E0B\u707C\u70E7\u706B\u7130\u3002"
+  Icon: {fileID: -4335502286875588057, guid: f691f9091975de5468a6fb71b773fac7, type: 3}
+  InitialAttackIds: ee030000
   MaxLevel: 1
   CanUpgrade: 0
   CanAcquireDuringRun: 0

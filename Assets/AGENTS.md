@@ -1,4 +1,10 @@
+- 2026-09-30 | 重绘并接入地图事件 EventBase/EventProgress 两张透明青金素材；MapEventRoot 修正白色叠色、等比例尺寸与顶部顺时针径向填充，替换临时金币/宝箱图片。Unity 导入及隔离场景 0/50/100% 预览通过，未改玩法；详见 Docs/Guides/MapEventArt.zh-CN.md。未提交推送。
+
 # Repository Guidelines
+
+- 2026-09-30 | 修复经验表10级后固定50：表外按末项+8n+0.25n²向上取整，保留前10级；读档按当前等级重算需求并保留经验条比例。Unity 2008项曲线检查及余额/迁移/重复恢复通过，dotnet 0错误/2既有警告。与统一UI、HUD装备栏、角色被动、地图事件美术一并准备PR和GitHub Windows包；细节见Docs/Guides/ExperienceCurve.zh-CN.md。长局平衡待试玩。
+
+- 2026-09-30 | 按用户授权接入统一青金UI皮肤与25图标、八面板/血条预制体，HUD新增6武器+6技能固定槽，由GetRunLoadoutQuery/RunLoadoutView刷新，无运行时节点生成。先锋专属被动4/5/6（背水剑誓/追锋/剑围守势），斥候7/8/9（稳息瞄准/迅捷箭袋/猎杀节拍），每项3级；幸存者旧描述同步星环超载。追加计时存档字段兼容旧v3缺省0。Unity32项定向检查及36处图标引用审计通过，旧档Valid；八张1920×1080示例预览在Logs/UIRefreshReview。实现/验证边界见Docs/Guides/UnifiedUIAndPerks.zh-CN.md；未做长局平衡，未提交推送。
 
 - 2026-09-29 | 按授权整理PR：分支codex/character-combat-polish，提交18d9179及主分支合并b37adf9；保留六帧跑步和新角色技能配置，重生成文档索引解决旧PR合并冲突。覆盖角色战斗、美术/UI比例、存档替换/道具生命周期及日志限流；合并后dotnet 0错误/2个既有警告，差异检查通过。存档、Logs、.workbuddy未纳入。长局平衡、人工听感与原生SceneView崩溃长期复现仍未验收；准备推送并创建PR，不自动合并。
 
