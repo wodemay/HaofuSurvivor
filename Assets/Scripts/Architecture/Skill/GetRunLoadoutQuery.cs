@@ -24,6 +24,13 @@ namespace HaoFuSurvivor
 		{
 			var result = new RunLoadoutState();
 			var loadout = this.GetModel<PlayerLoadoutModel>();
+			var characters = GameArchitecture.Interface.GetUtility<CharacterCatalog>();
+			var exclusiveSkillIds = new HashSet<int>();
+			foreach (var character in characters.All)
+			{
+				var group = GameArchitecture.Interface.GetUtility<SkillGroupCatalog>().Get(character.SkillGroupId);
+				if (group?.StartingSkillIds != null) exclusiveSkillIds.UnionWith(group.StartingSkillIds);
+			}
 			foreach (var weapon in loadout.Weapons)
 			{
 				var config = GameArchitecture.Interface.GetUtility<WeaponCatalog>().Get(weapon.WeaponId);
@@ -31,15 +38,14 @@ namespace HaoFuSurvivor
 			}
 			foreach (var skill in loadout.Skills)
 			{
+				if (exclusiveSkillIds.Contains(skill.SkillId)) continue;
 				var config = GameArchitecture.Interface.GetUtility<SkillCatalog>().Get(skill.SkillId);
 				if (config != null) result.Skills.Add(new RunLoadoutItem(config.DisplayName, config.Icon, skill.Level));
 			}
-			var dodge = loadout.DodgeId > 0 ? GameArchitecture.Interface.GetUtility<DodgeCatalog>().Get(loadout.DodgeId) : null;
-			if (dodge != null) result.Skills.Add(new RunLoadoutItem(dodge.DisplayName, dodge.Icon, this.GetModel<DodgeModel>().Runtime?.Level ?? 1));
-			foreach (var perk in GameArchitecture.Interface.GetUtility<CharacterExclusivePerkCatalog>().GetByCharacter(this.GetModel<PlayerModel>().CharacterId))
+			foreach (var upgrade in this.GetModel<PlayerStatUpgradeModel>().GetSaveData())
 			{
-				var level = this.GetModel<CharacterExclusivePerkModel>().GetLevel(perk.Id);
-				if (level > 0) result.Skills.Add(new RunLoadoutItem(perk.DisplayName, perk.Icon, level));
+				var config = GameArchitecture.Interface.GetUtility<StatUpgradeCatalog>().Get(upgrade.UpgradeId);
+				if (config != null) result.Skills.Add(new RunLoadoutItem(config.DisplayName, config.Icon, upgrade.Level));
 			}
 			return result;
 		}

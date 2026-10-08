@@ -73,7 +73,7 @@
 
 - `UI/UIGameHUDPanel.cs`：通过经验查询与技能冷却查询刷新等级、经验进度及技能倒计时；控件存于 HUD 预制体，Designer 由 QFramework 生成。
 - `Architecture/Combat/AttackSystem.cs` 中的 `GetSkillCooldownStateQuery`：提供首个已装备技能的真实剩余冷却和进度分母。
-- `Architecture/Skill/GetRunLoadoutQuery.cs`：读取已装备武器、主动技能、闪避与已选角色被动的图标、名称和等级。
+- `Architecture/Skill/GetRunLoadoutQuery.cs`：读取已装备武器、非专属技能与通用属性升级，排除角色专属技能、闪避和独特天赋。
 - `UI/RunLoadoutView.cs`：通过事件刷新 HUD 预制体中的六个武器槽和六个技能槽，不在运行时生成控件。
 - `Assets/Editor/UnifiedUISetup.cs`：手动导入青金 UI 与统一图标、配置角色被动并保存面板预制体；再次执行会覆盖相关外观配置。
 - `Assets/Editor/UnifiedUIPreview.cs`：在隔离预览场景导出八个面板的 1920×1080 示例图。

@@ -24,6 +24,7 @@ namespace HaoFuSurvivor
 			this.RegisterEvent<WeaponReplacedEvent>(_ => Refresh()).UnRegisterWhenGameObjectDestroyed(gameObject);
 			this.RegisterEvent<WeaponUpgradedEvent>(_ => Refresh()).UnRegisterWhenGameObjectDestroyed(gameObject);
 			this.RegisterEvent<SkillUpgradedEvent>(_ => Refresh()).UnRegisterWhenGameObjectDestroyed(gameObject);
+			this.RegisterEvent<PlayerStatUpgradedEvent>(_ => Refresh()).UnRegisterWhenGameObjectDestroyed(gameObject);
 			this.RegisterEvent<DodgeUpgradedEvent>(_ => Refresh()).UnRegisterWhenGameObjectDestroyed(gameObject);
 			this.RegisterEvent<RunStartedEvent>(_ => Refresh()).UnRegisterWhenGameObjectDestroyed(gameObject);
 			this.RegisterEvent<CharacterExclusivePerkUpgradedEvent>(_ => Refresh()).UnRegisterWhenGameObjectDestroyed(gameObject);

@@ -2,6 +2,12 @@
 
 # Repository Guidelines
 
+- 2026-10-08 | 按用户要求准备独立PR：基于已合并#34的origin/main整理天赋/HUD/地面优化，分支codex/talent-hud-ground-polish；沿用37项System/Query检查与Unity导入，运行时/Editor编译0错误、差异检查通过。不纳入.workbuddy、存档、日志或构建产物，不自动合并。
+
+- 2026-10-08 | 根据移动蠕动反馈重绘Ground-Wilderness为平滑低对比夯土，去除高频砂砾；启用Mipmap/Trilinear，Unity确认导入、GUID与1单位尺寸。未改玩法，实际移动观感待试玩；提示词与源图见TalentHudGround文档。
+
+- 2026-10-08 | 重做先锋/斥候天赋4—9，追加失血连续增伤与移动输入增伤，沿用等级与计时存档；HUD去装饰框、放大文字并显示通用属性升级，排除全部角色专属技能/闪避/天赋；生图生成荒原地面并接入Tile。Unity编辑状态37项System/Query检查及HUD/3×3地面预览通过，运行时/Editor编译0错误（2/4既有警告）。未做整局试玩，未提交；当前Unity会话在8080。最新规则与数值见Docs/Guides/TalentHudGround-20261008.zh-CN.md。
+
 - 2026-09-30 | 修复经验表10级后固定50：表外按末项+8n+0.25n²向上取整，保留前10级；读档按当前等级重算需求并保留经验条比例。Unity 2008项曲线检查及余额/迁移/重复恢复通过，dotnet 0错误/2既有警告。与统一UI、HUD装备栏、角色被动、地图事件美术一并准备PR和GitHub Windows包；细节见Docs/Guides/ExperienceCurve.zh-CN.md。长局平衡待试玩。
 
 - 2026-09-30 | 按用户授权接入统一青金UI皮肤与25图标、八面板/血条预制体，HUD新增6武器+6技能固定槽，由GetRunLoadoutQuery/RunLoadoutView刷新，无运行时节点生成。先锋专属被动4/5/6（背水剑誓/追锋/剑围守势），斥候7/8/9（稳息瞄准/迅捷箭袋/猎杀节拍），每项3级；幸存者旧描述同步星环超载。追加计时存档字段兼容旧v3缺省0。Unity32项定向检查及36处图标引用审计通过，旧档Valid；八张1920×1080示例预览在Logs/UIRefreshReview。实现/验证边界见Docs/Guides/UnifiedUIAndPerks.zh-CN.md；未做长局平衡，未提交推送。
