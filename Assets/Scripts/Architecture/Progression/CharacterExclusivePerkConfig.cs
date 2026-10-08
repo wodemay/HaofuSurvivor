@@ -11,7 +11,9 @@ namespace HaoFuSurvivor
 		SkillWeaponCooldownReduction,
 		DodgeDamageBoost,
 		SkillDamageReduction,
-		HealthyDamage
+		HealthyDamage,
+		MissingHealthDamage,
+		MovingDamage
 	}
 
 	[Serializable]

@@ -13,6 +13,19 @@ namespace HaoFuSurvivor.Editor
 		private static Sprite[] mIcons;
 		private static Sprite[] mSkin;
 
+		[MenuItem("ProjectSurvivor/Apply Readable Loadout And Talents")]
+		public static void ApplyReadableLoadout()
+		{
+			if (EditorApplication.isPlaying) throw new InvalidOperationException("Exit Play Mode first.");
+			mIcons = AssetDatabase.LoadAllAssetsAtPath(IconsPath).OfType<Sprite>().OrderBy(s => s.name).ToArray();
+			ConfigurePerks();
+			var path = "Assets/Art/UIPrefab/UIGameHUDPanel.prefab";
+			var root = PrefabUtility.LoadPrefabContents(path);
+			try { ConfigureHud(root); PrefabUtility.SaveAsPrefabAsset(root, path); }
+			finally { PrefabUtility.UnloadPrefabContents(root); }
+			AssetDatabase.SaveAssets();
+		}
+
 		[MenuItem("ProjectSurvivor/Apply Unified UI And Perks")]
 		public static void Apply()
 		{
@@ -84,23 +97,40 @@ namespace HaoFuSurvivor.Editor
 			var survivor = config.Perks.Find(p => p.Id == 3);
 			survivor.DisplayName = "星环蓄能";
 			survivor.Description = "施放星环超载后，武器攻击冷却缩减12%/18%/24%，持续3/4/5秒。";
-			AddPerk(config, 2, CharacterExclusivePerkType.LowHealthDamage, "背水剑誓", "生命不高于50%时，伤害提高15%/30%/45%。", new[] { .15f, .3f, .45f }, 0, .5f, 0, 0);
-			AddPerk(config, 2, CharacterExclusivePerkType.DodgeDamageBoost, "追锋", "锋刃突进结束后3秒内，伤害提高15%/25%/35%。", new[] { .15f, .25f, .35f }, 3, .5f, 2, 0);
-			AddPerk(config, 2, CharacterExclusivePerkType.SkillDamageReduction, "剑围守势", "施放断阵回旋后4秒，所受伤害降低10%/20%/30%，与回旋减伤相乘。", new[] { .1f, .2f, .3f }, 4, .5f, 0, 2);
-			AddPerk(config, 3, CharacterExclusivePerkType.HealthyDamage, "稳息瞄准", "生命不低于80%时，伤害提高10%/20%/30%。", new[] { .1f, .2f, .3f }, 0, .8f, 0, 0);
-			AddPerk(config, 3, CharacterExclusivePerkType.DodgeWeaponProjectileCount, "迅捷箭袋", "掠影装填结束后2秒，武器子弹数量增加1/2/3。", new[] { 1f, 2f, 3f }, 2, .5f, 3, 0);
-			AddPerk(config, 3, CharacterExclusivePerkType.SkillWeaponCooldownReduction, "猎杀节拍", "施放猎杀连射后4秒，武器攻击冷却缩减10%/20%/30%。", new[] { .1f, .2f, .3f }, 4, .5f, 0, 3);
+			SetPerk(config, 4, CharacterExclusivePerkType.MissingHealthDamage, "不屈剑心", "每损失10%生命，伤害提高4%/6%/8%；满血无加成。", new[] { .4f, .6f, .8f }, 0);
+			SetPerk(config, 5, CharacterExclusivePerkType.DodgeDamageBoost, "破阵追击", "锋刃突进结束后2.5秒，伤害提高20%/30%/40%；再次触发刷新时间。", new[] { .2f, .3f, .4f }, 2.5f);
+			SetPerk(config, 6, CharacterExclusivePerkType.SkillDamageReduction, "剑刃壁垒", "断阵回旋后3/4/5秒，所受伤害降低15%/20%/25%；与回旋减伤相乘。", new[] { .15f, .2f, .25f }, 3);
+			for (var i = 0; i < 3; i++) config.Perks.Find(p => p.Id == 6).LevelUpgrades[i].Duration = 3 + i;
+			SetPerk(config, 7, CharacterExclusivePerkType.MovingDamage, "游猎本能", "移动输入期间，伤害提高12%/20%/28%；停止移动后立即结束。", new[] { .12f, .2f, .28f }, 0);
+			SetPerk(config, 8, CharacterExclusivePerkType.DodgeWeaponProjectileCount, "机动弹匣", "掠影装填结束后2/3/4秒，武器弹数增加1/1/2；再次触发刷新时间。", new[] { 1f, 1f, 2f }, 2);
+			for (var i = 0; i < 3; i++) config.Perks.Find(p => p.Id == 8).LevelUpgrades[i].Duration = 2 + i;
+			SetPerk(config, 9, CharacterExclusivePerkType.SkillWeaponCooldownReduction, "猎杀窗口", "猎杀连射后3/4/5秒，武器攻击冷却缩减15%/22%/30%。", new[] { .15f, .22f, .3f }, 3);
+			for (var i = 0; i < 3; i++) config.Perks.Find(p => p.Id == 9).LevelUpgrades[i].Duration = 3 + i;
 			foreach (var perk in config.Perks)
 			{
 				var index = perk.CharacterId == 1 ? 17 + perk.Id : perk.CharacterId == 2
-					? perk.Type == CharacterExclusivePerkType.LowHealthDamage ? 21 : perk.Type == CharacterExclusivePerkType.DodgeDamageBoost ? 22 : 23
-					: perk.Type == CharacterExclusivePerkType.HealthyDamage ? 24 : perk.Type == CharacterExclusivePerkType.DodgeWeaponProjectileCount ? 11 : 8;
+					? perk.Type == CharacterExclusivePerkType.MissingHealthDamage ? 21 : perk.Type == CharacterExclusivePerkType.DodgeDamageBoost ? 22 : 23
+					: perk.Type == CharacterExclusivePerkType.MovingDamage ? 24 : perk.Type == CharacterExclusivePerkType.DodgeWeaponProjectileCount ? 11 : 8;
 				perk.Icon = mIcons[index];
 			}
 			EditorUtility.SetDirty(config);
 			var survivorCharacter = AssetDatabase.LoadAssetAtPath<CharacterConfig>("Assets/Resources/Configs/Character/Character_Survivor.asset");
 			survivorCharacter.SkillDescription = "专属技能：星环超载，浮游炮齐射后释放冲击环。\n专属被动：绝境意志、战术翻滚、星环蓄能。";
 			EditorUtility.SetDirty(survivorCharacter);
+			foreach (var slug in new[] { "Vanguard", "Scout" })
+			{
+				var character = AssetDatabase.LoadAssetAtPath<CharacterConfig>($"Assets/Resources/Configs/Character/Character_{slug}.asset");
+				character.SkillDescription = slug == "Vanguard" ? "长剑近战，越战越勇。\n专属技能：断阵回旋；闪避：锋刃突进。\n独特天赋：不屈剑心、破阵追击、剑刃壁垒。" : "移动射击，闪避装填。\n专属技能：猎杀连射；闪避：掠影装填。\n独特天赋：游猎本能、机动弹匣、猎杀窗口。";
+				EditorUtility.SetDirty(character);
+			}
+		}
+
+		private static void SetPerk(CharacterExclusivePerkConfig config, int id, CharacterExclusivePerkType type, string name, string description, float[] values, float duration)
+		{
+			var perk = config.Perks.Find(p => p.Id == id);
+			if (perk == null) throw new InvalidOperationException($"Missing perk {id}");
+			perk.Type = type; perk.DisplayName = name; perk.Description = description;
+			for (var i = 0; i < values.Length; i++) { perk.LevelUpgrades[i].Value = values[i]; perk.LevelUpgrades[i].Duration = duration; }
 		}
 
 		private static void AddPerk(CharacterExclusivePerkConfig config, int character, CharacterExclusivePerkType type, string name, string description, float[] values, float duration, float threshold, int dodge, int skill)
@@ -171,10 +201,22 @@ namespace HaoFuSurvivor.Editor
 			var existing = root.transform.Find("LoadoutPanel");
 			if (existing != null)
 			{
-				((RectTransform)existing.Find("WeaponHeading")).anchoredPosition = new Vector2(-231, 92);
-				((RectTransform)existing.Find("SkillHeading")).anchoredPosition = new Vector2(-231, -8);
+				var panel = (RectTransform)existing; panel.sizeDelta = new Vector2(684, 232); panel.anchoredPosition = new Vector2(365, -300);
+				var panelBackground = existing.GetComponent<Image>(); panelBackground.sprite = null; panelBackground.type = Image.Type.Simple; panelBackground.color = new Color(.035f, .055f, .075f, .9f);
+				foreach (var pair in new[] { ("WeaponHeading", "武器", 94f), ("SkillHeading", "通用技能", -16f) })
+				{
+					var heading = existing.Find(pair.Item1).GetComponent<Text>(); heading.text = pair.Item2; heading.fontSize = 18; heading.alignment = TextAnchor.MiddleLeft;
+					((RectTransform)heading.transform).anchoredPosition = new Vector2(-280, pair.Item3); ((RectTransform)heading.transform).sizeDelta = new Vector2(100, 24);
+				}
 				for (var row = 0; row < 2; row++) for (var i = 0; i < 6; i++)
-					((RectTransform)existing.Find($"{(row == 0 ? "Weapon" : "Skill")}_{i}")).anchoredPosition = new Vector2(-207 + i * 82, 38 - row * 100);
+				{
+					var item = (RectTransform)existing.Find($"{(row == 0 ? "Weapon" : "Skill")}_{i}"); item.anchoredPosition = new Vector2(-270 + i * 108, 40 - row * 110); item.sizeDelta = new Vector2(104, 80);
+					var socket = item.GetComponent<Image>(); socket.sprite = null; socket.type = Image.Type.Simple; socket.color = new Color(.08f, .11f, .14f, .95f);
+					var icon = (RectTransform)item.Find("Icon"); icon.sizeDelta = new Vector2(48, 48); icon.anchoredPosition = new Vector2(0, 12);
+					var name = item.Find("Name").GetComponent<Text>(); name.fontSize = 15; name.color = Color.white; name.resizeTextForBestFit = true; name.resizeTextMinSize = 12; name.resizeTextMaxSize = 15;
+					((RectTransform)name.transform).sizeDelta = new Vector2(100, 22); ((RectTransform)name.transform).anchoredPosition = new Vector2(0, -27);
+					var level = item.Find("Level").GetComponent<Text>(); level.fontSize = 12; level.color = new Color(.64f, .83f, .84f); ((RectTransform)level.transform).anchoredPosition = new Vector2(30, 27); ((RectTransform)level.transform).sizeDelta = new Vector2(42, 18);
+				}
 				return;
 			}
 			var parent = Rect(root.transform, "LoadoutPanel", new Vector2(550, 218), new Vector2(306, -230));

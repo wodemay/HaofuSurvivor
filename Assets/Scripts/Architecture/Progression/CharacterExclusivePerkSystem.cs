@@ -53,6 +53,11 @@ namespace HaoFuSurvivor
 			foreach (var definition in this.GetUtility<CharacterExclusivePerkCatalog>().GetByCharacter(player.CharacterId))
 			{
 				var ratio = player.CurrentHealth / stats.MaxHealth;
+				var value = definition.GetLevel(GetLevel(definition.Id))?.Value ?? 0f;
+				if (definition.Type == CharacterExclusivePerkType.MissingHealthDamage)
+					bonus += value * (1f - Mathf.Clamp01(ratio));
+				if (definition.Type == CharacterExclusivePerkType.MovingDamage && this.GetModel<InputModel>().Movement.sqrMagnitude > 0.01f)
+					bonus += value;
 				if ((definition.Type == CharacterExclusivePerkType.LowHealthDamage && ratio <= definition.HealthThreshold) ||
 					(definition.Type == CharacterExclusivePerkType.HealthyDamage && ratio >= definition.HealthThreshold))
 					bonus += definition.GetLevel(GetLevel(definition.Id))?.Value ?? 0f;

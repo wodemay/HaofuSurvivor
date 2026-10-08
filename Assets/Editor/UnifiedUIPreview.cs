@@ -54,8 +54,8 @@ namespace HaoFuSurvivor.Editor
 			var hud = root.GetComponentInChildren<RunLoadoutView>(true);
 			if (hud != null)
 			{
-				var names = new[] { "裂阵剑术", "火球术", "投射物武器", "空位", "空位", "空位", "断阵回旋", "锋刃突进", "背水剑誓", "追锋", "剑围守势", "空位" };
-				var indexes = new[] { 5, 2, 0, -1, -1, -1, 6, 10, 21, 22, 23, -1 };
+				var names = new[] { "裂阵剑术", "火球术", "投射物武器", "空位", "空位", "空位", "攻击强化", "冷却缩减", "经验加成", "移动加速", "自然恢复", "空位" };
+				var indexes = new[] { 5, 2, 0, -1, -1, -1, 5, 14, 15, 13, 12, -1 };
 				var slots = hud.Weapons.Concat(hud.Skills).ToArray();
 				for (var i = 0; i < slots.Length; i++) { slots[i].Name.text = names[i]; slots[i].Level.text = indexes[i] >= 0 ? "Lv.2" : ""; slots[i].Icon.enabled = indexes[i] >= 0; if (indexes[i] >= 0) slots[i].Icon.sprite = icons[indexes[i]]; }
 			}
